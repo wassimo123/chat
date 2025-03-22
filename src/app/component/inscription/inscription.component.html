@@ -1,0 +1,127 @@
+<!-- inscription.component.html -->
+<!-- Barre de navigation -->
+<nav class="bg-white shadow-md fixed top-0 left-0 w-full px-6 py-4 flex justify-between items-center z-50">
+  <a href="#" class="text-3xl font-['Pacifico'] text-primary">Sfax</a>
+</nav>
+
+<!-- Contenu de la page -->
+<div class="flex items-center justify-center min-h-screen bg-gray-100 pt-20">
+  <div class="w-full max-w-md bg-white rounded-lg shadow-lg p-8">
+    <h1 class="text-2xl font-bold text-center mb-6 text-gray-900">Inscription</h1>
+    
+    <form (ngSubmit)="onSubmit()" #registerForm="ngForm" class="space-y-4">
+      
+      <!-- Nom & Prénom -->
+      <div class="grid grid-cols-2 gap-4">
+        <div>
+          <label class="text-sm font-medium text-gray-700">Nom</label>
+          <div class="relative">
+            <input type="text" name="lastname" [(ngModel)]="user.lastname" 
+              class="w-full rounded-lg border border-gray-300 py-3 px-4 pl-10 focus:ring-2 focus:ring-blue-500 text-sm"
+              placeholder="Votre nom" required />
+            <i class="ri-user-line absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"></i>
+          </div>
+        </div>
+        <div>
+          <label class="text-sm font-medium text-gray-700">Prénom</label>
+          <div class="relative">
+            <input type="text" name="firstname" [(ngModel)]="user.firstname"
+              class="w-full rounded-lg border border-gray-300 py-3 px-4 pl-10 focus:ring-2 focus:ring-blue-500 text-sm"
+              placeholder="Votre prénom" required />
+            <i class="ri-user-line absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"></i>
+          </div>
+        </div>
+      </div>
+
+      <!-- Email -->
+      <div>
+        <label class="text-sm font-medium text-gray-700">Email</label>
+        <div class="relative">
+          <input type="email" name="email" [(ngModel)]="user.email"
+            class="w-full rounded-lg border border-gray-300 py-3 px-4 pl-10 focus:ring-2 focus:ring-blue-500 text-sm"
+            placeholder="Votre adresse email" required />
+          <i class="ri-mail-line absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"></i>
+        </div>
+      </div>
+
+      <!-- Mot de passe -->
+      <div>
+        <label class="text-sm font-medium text-gray-700">Mot de passe</label>
+        <div class="relative">
+          <input type="password" name="password" [(ngModel)]="user.password"
+            class="w-full rounded-lg border border-gray-300 py-3 px-4 pl-10 focus:ring-2 focus:ring-blue-500 text-sm"
+            placeholder="Votre mot de passe" required />
+          <i class="ri-lock-line absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"></i>
+        </div>
+      </div>
+
+      <!-- Confirmation mot de passe -->
+      <div>
+        <label class="text-sm font-medium text-gray-700">Confirmer le mot de passe</label>
+        <div class="relative">
+          <input type="password" name="confirmPassword" [(ngModel)]="user.confirmPassword"
+            class="w-full rounded-lg border border-gray-300 py-3 px-4 pl-10 focus:ring-2 focus:ring-blue-500 text-sm"
+            placeholder="Confirmez votre mot de passe" required />
+          <i class="ri-lock-line absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"></i>
+        </div>
+      </div>
+
+      <!-- Téléphone -->
+      <div>
+        <label class="text-sm font-medium text-gray-700">Téléphone</label>
+        <div class="relative">
+          <input type="tel" name="phone" [(ngModel)]="user.phone"
+            class="w-full rounded-lg border border-gray-300 py-3 px-4 pl-10 focus:ring-2 focus:ring-blue-500 text-sm"
+            placeholder="Votre numéro de téléphone" required />
+          <i class="ri-phone-line absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"></i>
+        </div>
+      </div>
+
+      <!-- Adresse -->
+      <div>
+        <label class="text-sm font-medium text-gray-700">Adresse</label>
+        <div class="relative">
+          <input type="text" name="address" [(ngModel)]="user.address"
+            class="w-full rounded-lg border border-gray-300 py-3 px-4 pl-10 focus:ring-2 focus:ring-blue-500 text-sm"
+            placeholder="Votre adresse" required />
+          <i class="ri-map-pin-line absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"></i>
+        </div>
+      </div>
+
+      <!-- Matricule fiscale -->
+      <div>
+        <label class="text-sm font-medium text-gray-700">Matricule fiscale</label>
+        <div class="relative">
+          <input type="text" name="matricule" [(ngModel)]="user.matricule"
+            class="w-full rounded-lg border border-gray-300 py-3 px-4 pl-10 focus:ring-2 focus:ring-blue-500 text-sm"
+            placeholder="Votre matricule fiscale" required />
+          <i class="ri-file-list-line absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"></i>
+        </div>
+      </div>
+
+      <!-- Conditions d'utilisation -->
+      <div class="flex items-center gap-2">
+        <input type="checkbox" name="terms" [(ngModel)]="user.terms"
+          class="w-4 h-4 border-gray-300 text-blue-600 focus:ring-blue-500" required />
+        <label class="text-sm text-gray-600">J'accepte les 
+          <button type="button" class="text-blue-600 hover:text-blue-800">conditions d'utilisation</button> 
+          et la 
+          <button type="button" class="text-blue-600 hover:text-blue-800">politique de confidentialité</button>.
+        </label>
+      </div>
+
+      <!-- Bouton d'inscription -->
+      <button type="submit" class="w-full bg-blue-600 text-white py-3 rounded-lg hover:bg-blue-700 transition">
+        S'inscrire
+      </button>
+
+      <!-- Lien vers la connexion -->
+<p class="text-center text-sm text-gray-600 mt-4">
+  Déjà inscrit ?
+  <a (click)="goToLogin()" class="text-primary hover:text-primary/80 font-medium cursor-pointer">
+    Se connecter
+  </a>
+</p>
+    </form>
+  </div>
+</div>
