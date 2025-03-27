@@ -1,23 +1,13 @@
-import { Component, OnInit, HostListener } from '@angular/core';
+import { Component, OnInit, HostListener, ViewChild, ElementRef } from '@angular/core';
 
 @Component({
-  selector: 'app-gestion-des-utilisateurs',
-  templateUrl: './gestion-des-utilisateurs.component.html',
-  styleUrls: ['./gestion-des-utilisateurs.component.css']
+  selector: 'app-profile',
+  templateUrl: './profile.component.html',
+  styleUrls: ['./profile.component.css']
 })
-export class GestionDesUtilisateursComponent implements OnInit {
-  // Propriétés pour la barre de recherche
-  searchQuery: string = '';
-  tableSearchQuery: string = '';
-  statusFilter: string = '';
-
+export class ProfileComponent implements OnInit {
   // Contrôle l'affichage du menu de profil
   isProfileMenuOpen: boolean = false;
-
-  // Contrôle l'affichage du modal pour ajouter/modifier un utilisateur
-  isModalOpen: boolean = false;
-  modalTitle: string = 'Ajouter un utilisateur';
-  currentUser: any = { nom: '', prenom: '', email: '', statut: 'Actif', dateCreation: '' };
 
   // Contrôle l'affichage du modal pour changer le mot de passe
   isPasswordModalOpen: boolean = false;
@@ -34,88 +24,35 @@ export class GestionDesUtilisateursComponent implements OnInit {
   messageModalTitle: string = '';
   messageModalMessage: string = '';
 
-  // Liste des utilisateurs
-  users = [
-    { id: 1, nom: 'Mezghani', prenom: 'Ahmed', email: 'ahmed.mezghani@gmail.com', statut: 'Actif', dateCreation: '15/03/2025' },
-    { id: 2, nom: 'Sahnoun', prenom: 'Mariem', email: 'mariem.sahnoun@gmail.com', statut: 'Actif', dateCreation: '14/03/2025' },
-    { id: 3, nom: 'Ben Ali', prenom: 'Sami', email: 'sami.benali@gmail.com', statut: 'Inactif', dateCreation: '13/03/2025' },
-    { id: 4, nom: 'Affes', prenom: 'Wassim', email: 'wassim.affes@gmail.com', statut: 'Actif', dateCreation: '12/03/2025' },
-    { id: 5, nom: 'Mzid', prenom: 'Racem', email: 'racem.mzid@gmail.com', statut: 'Actif', dateCreation: '11/03/2025' },
-    { id: 6, nom: 'Tahri', prenom: 'Amir', email: 'amir.tahri@gmail.com', statut: 'Actif', dateCreation: '10/03/2025' },
-    { id: 7, nom: 'Masmoudi', prenom: 'Bilel', email: 'bilel.masmoudi@gmail.com', statut: 'Inactif', dateCreation: '09/03/2025' },
-    { id: 8, nom: 'Laswad', prenom: 'Oumayma', email: 'oumayma.laswad@gmail.com', statut: 'Actif', dateCreation: '08/03/2025' },
-  ];
+  // Données du profil
+  profileImage: string = 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQxOX4mkcW8pH9FbpI9rTBkokiMxSY2GJ3eyw&s';
+  profile = {
+    firstName: 'Affes',
+    lastName: 'Wassim',
+    email: 'wassimaffes947@gmail.com',
+    language: 'fr',
+    timezone: 'Tunisie'
+  };
+  originalProfile: any = null;
 
-  filteredUsers = [...this.users];
+  // Toast pour les modifications du profil
+  toastMessage: string | null = null;
+  toastType: 'success' | 'info' = 'success';
+
+  // Nombre de notifications non lues (mocké pour l'instant)
   notificationCount: number = 3;
+
+  @ViewChild('photoInput') photoInput!: ElementRef<HTMLInputElement>;
 
   constructor() {}
 
   ngOnInit() {
-    this.filterUsers();
-  }
-
-  // Méthode pour la recherche dans l'en-tête
-  onSearch() {
-    console.log('Recherche:', this.searchQuery);
-  }
-
-  // Filtrer les utilisateurs selon les critères
-  filterUsers() {
-    this.filteredUsers = this.users.filter(user =>
-      (!this.tableSearchQuery || `${user.nom} ${user.prenom}`.toLowerCase().includes(this.tableSearchQuery.toLowerCase())) &&
-      (!this.statusFilter || user.statut === this.statusFilter)
-    );
-  }
-
-  // Ouvre le modal pour ajouter un utilisateur
-  openAddUserModal() {
-    this.modalTitle = 'Ajouter un utilisateur';
-    this.currentUser = { nom: '', prenom: '', email: '', statut: 'Actif', dateCreation: '' };
-    this.isModalOpen = true;
-  }
-
-  // Ouvre le modal pour modifier un utilisateur
-  editUser(user: any) {
-    this.modalTitle = "Modifier l'utilisateur";
-    this.currentUser = { ...user };
-    this.isModalOpen = true;
-  }
-
-  // Sauvegarde l'utilisateur (ajout ou modification)
-  saveUser() {
-    if (this.currentUser.nom && this.currentUser.prenom && this.currentUser.email) {
-      if (!this.currentUser.dateCreation) {
-        this.currentUser.dateCreation = new Date().toLocaleDateString('fr-FR');
-      }
-      if (!this.currentUser.id) {
-        this.currentUser.id = this.users.length + 1;
-        this.users.push({ ...this.currentUser });
-      } else {
-        const index = this.users.findIndex(u => u.id === this.currentUser.id);
-        this.users[index] = { ...this.currentUser };
-      }
-      this.filterUsers();
-      this.closeModal();
-    }
-  }
-
-  // Ferme le modal d'ajout/modification d'utilisateur
-  closeModal() {
-    this.isModalOpen = false;
-    this.currentUser = { nom: '', prenom: '', email: '', statut: 'Actif', dateCreation: '' };
-  }
-
-  // Archive un utilisateur
-  archiveUser(id: number) {
-    if (confirm('Êtes-vous sûr de vouloir archiver cet utilisateur ?')) {
-      console.log('Utilisateur archivé:', id);
-      // Ici, vous pourriez mettre à jour la liste des utilisateurs
-    }
+    // Sauvegarde des données initiales pour la réinitialisation
+    this.originalProfile = { ...this.profile };
   }
 
   // Ouvre/ferme le menu de profil
-  toggleProfile() {
+  toggleProfileMenu() {
     this.isProfileMenuOpen = !this.isProfileMenuOpen;
   }
 
@@ -126,6 +63,46 @@ export class GestionDesUtilisateursComponent implements OnInit {
     if (!target.closest('#profileButton') && !target.closest('#profileMenu')) {
       this.isProfileMenuOpen = false;
     }
+  }
+
+  // Ouvre l'input de fichier pour changer la photo de profil
+  triggerFileInput() {
+    this.photoInput.nativeElement.click();
+  }
+
+  // Met à jour la photo de profil
+  updateProfileImage(event: Event) {
+    const input = event.target as HTMLInputElement;
+    const file = input.files?.[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        this.profileImage = e.target?.result as string;
+        this.showToast('Photo de profil mise à jour avec succès', 'success');
+      };
+      reader.readAsDataURL(file);
+    }
+  }
+
+  // Réinitialise le formulaire
+  resetForm() {
+    this.profile = { ...this.originalProfile };
+    this.showToast('Les modifications ont été annulées', 'info');
+  }
+
+  // Soumet le formulaire de profil
+  handleProfileSubmit() {
+    this.originalProfile = { ...this.profile };
+    this.showToast('Profil mis à jour avec succès', 'success');
+  }
+
+  // Affiche un toast
+  showToast(message: string, type: 'success' | 'info') {
+    this.toastMessage = message;
+    this.toastType = type;
+    setTimeout(() => {
+      this.toastMessage = null;
+    }, 3000);
   }
 
   // Affiche le modal pour changer le mot de passe

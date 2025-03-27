@@ -1,10 +1,10 @@
-/* Styles spécifiques au composant Notification */
+/* Styles spécifiques au composant Profile */
 .text-primary {
   color: #4F46E5;
 }
 
-.hover\:text-primary-dark:hover {
-  color: #4338CA;
+.hover\:bg-primary-dark:hover {
+  background-color: #4338CA;
 }
 
 .rounded-button {

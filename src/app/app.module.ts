@@ -9,6 +9,11 @@ import { GestionDesUtilisateursComponent } from './admin/gestion-des-utilisateur
 import { NotificationComponent } from './admin/notification/notification.component';
 import { ConnexionComponent } from './component/connexion/connexion.component';
 import { InscriptionComponent } from './component/inscription/inscription.component';
+import { ProfileComponent } from './admin/profile/profile.component';
+import { HomeComponent } from './component/home/home.component';
+import { NavbarComponent } from './component/navbar/navbar.component';
+import { FooterComponent } from './component/footer/footer.component';
+
 
 @NgModule({
   declarations: [
@@ -18,6 +23,10 @@ import { InscriptionComponent } from './component/inscription/inscription.compon
     NotificationComponent,
     ConnexionComponent,
     InscriptionComponent,
+    ProfileComponent,
+    HomeComponent,
+    NavbarComponent,
+    FooterComponent,
     
    
   ],

@@ -2,3 +2,44 @@
 @tailwind components;
 @tailwind utilities;
 @import '@fontsource/pacifico';
+@import url('https://cdn.jsdelivr.net/npm/remixicon@4.5.0/fonts/remixicon.css');
+@import url('https://fonts.googleapis.com/css2?family=Pacifico&display=swap');
+:where([class^="ri-"])::before {
+    content: "\f3c2";
+  }
+  
+  .modal {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5);
+  }
+  
+  .modal:not(.hidden) {
+    display: block;
+  }
+  
+  .password-strength {
+    height: 4px;
+    transition: all 0.3s ease;
+    margin-top: 4px;
+    border-radius: 2px;
+  }
+  
+  .password-strength.weak {
+    width: 33.33%;
+    background-color: #ef4444;
+  }
+  
+  .password-strength.medium {
+    width: 66.66%;
+    background-color: #f59e0b;
+  }
+  
+  .password-strength.strong {
+    width: 100%;
+    background-color: #10b981;
+  }

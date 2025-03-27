@@ -1,197 +1,217 @@
-import { Component, OnInit, HostListener } from '@angular/core';
-import { EChartsOption } from 'echarts';
+import { Component, OnInit, AfterViewInit, ViewChild, ElementRef, HostListener } from '@angular/core';
+import * as echarts from 'echarts';
 
 @Component({
   selector: 'app-tableau-de-bord',
   templateUrl: './tableau-de-bord.component.html',
   styleUrls: ['./tableau-de-bord.component.css']
 })
-export class TableauDeBordComponent implements OnInit {
+export class TableauDeBordComponent implements OnInit, AfterViewInit {
+  @ViewChild('userActivityChart') userActivityChartElement!: ElementRef;
+  @ViewChild('userRolesChart') userRolesChartElement!: ElementRef;
+
+  // Propriétés pour la barre de recherche
   searchQuery: string = '';
-  tableSearchQuery: string = '';
+  userSearchQuery: string = '';
   statusFilter: string = '';
-  isModalOpen: boolean = false;
-  modalTitle: string = "Modifier l'utilisateur";
-  currentUser: any = { nom: '', prenom: '', email: '', statut: 'Actif', dateCreation: '' };
+  roleFilter: string = '';
+
+  // Contrôle l'affichage du menu de profil
   isProfileMenuOpen: boolean = false;
+
+  // Statistiques pour les cartes
+  stats = {
+    totalUsers: 124,
+    activeUsers: 80,
+    pendingUsers: 25,
+    inactiveUsers: 15
+  };
+
+  // Dernières activités
+  recentActivities = [
+    { type: 'new', icon: 'ri-user-add-line', message: 'Nouveau utilisateur inscrit:  Wassim Affes', time: 'Il y a 2 heures' },
+    { type: 'activated', icon: 'ri-check-line', message: 'Compte activé: Racem Ben Jdidia', time: 'Il y a 3 heures' },
+    { type: 'updated', icon: 'ri-edit-line', message: 'Profil mis à jour: Mohamed Kallel', time: 'Il y a 5 heures' }
+  ];
+
+
+  // Modal pour changer le mot de passe
   isPasswordModalOpen: boolean = false;
   currentPassword: string = '';
   newPassword: string = '';
   confirmPassword: string = '';
-  strengthLevel: string = '';
-  passwordsMatch: boolean = false;
+  passwordStrengthClass: string = '';
   passwordMatchMessage: string = '';
+  passwordMatchClass: string = '';
 
-  stats = {
-    users: 1234,
-    usersTrend: 12,
-    active: 956,
-    activeTrend: 8,
-    pending: 145,
-    pendingTrend: -3,
-    inactive: 133,
-    inactiveTrend: 2
-  };
+  // Modal pour ajouter/modifier un utilisateur
+  isUserModalOpen: boolean = false;
+  modalTitle: string = 'Ajouter un utilisateur';
+  selectedUser: any = { nom: '', prenom: '', email: '', role: '' };
 
-  recentActivities = [
-    { icon: 'ri-user-add-line', description: 'Nouveau utilisateur inscrit: Wassim Affes', time: 'Il y a 2 heures' },
-    { icon: 'ri-check-line', description: 'Compte activé: Racem Ben Jdidia', time: 'Il y a 3 heures' },
-    { icon: 'ri-edit-line', description: 'Profil mis à jour: Mohamed Kallel', time: 'Il y a 5 heures' }
-  ];
-
-  users = [
-    { id: 1, nom: 'Mezghani', prenom: 'Ahmed', email: 'ahmed.mezghani@gmail.com', statut: 'Actif', dateCreation: '15/03/2025' },
-    { id: 2, nom: 'Sahnoun', prenom: 'Mariem', email: 'mariem.sahnoun@gmail.com', statut: 'Actif', dateCreation: '14/03/2025' },
-    { id: 3, nom: 'Ben Ali', prenom: 'Sami', email: 'sami.benali@gmail.com', statut: 'Inactif', dateCreation: '13/03/2025' },
-    { id: 4, nom: 'Affes', prenom: 'Wassim', email: 'wassim.affes@gmail.com', statut: 'Actif', dateCreation: '12/03/2025' },
-    { id: 5, nom: 'Mzid', prenom: 'Racem', email: 'racem.mzid@gmail.com', statut: 'Actif', dateCreation: '11/03/2025' },
-    { id: 6, nom: 'Tahri', prenom: 'Amir', email: 'amir.tahri@gmail.com', statut: 'Actif', dateCreation: '10/03/2025' },
-    { id: 7, nom: 'Masmoudi', prenom: 'Bilel', email: 'bilel.masmoudi@gmail.com', statut: 'Inactif', dateCreation: '09/03/2025' },
-    { id: 8, nom: 'Laswad', prenom: 'Oumayma', email: 'oumayma.laswad@gmail.com', statut: 'Actif', dateCreation: '08/03/2025' },
-  ];
-
-  filteredUsers = [...this.users];
-
-  userActivityChartOptions: EChartsOption = {
-    animation: false,
-    tooltip: { trigger: 'axis', backgroundColor: 'rgba(255, 255, 255, 0.9)', textStyle: { color: '#1f2937' } },
-    xAxis: {
-      type: 'category',
-      data: ['Lun', 'Mar', 'Mer', 'Jeu', 'Ven', 'Sam', 'Dim'],
-      axisLine: { lineStyle: { color: '#e5e7eb' } },
-      axisLabel: { color: '#1f2937' }
-    },
-    yAxis: {
-      type: 'value',
-      axisLine: { lineStyle: { color: '#e5e7eb' } },
-      axisLabel: { color: '#1f2937' },
-      splitLine: { lineStyle: { color: '#e5e7eb' } }
-    },
-    grid: { top: '10%', right: '3%', bottom: '10%', left: '3%', containLabel: true },
-    series: [{
-      data: [150, 230, 224, 218, 135, 147, 260],
-      type: 'line',
-      smooth: true,
-      symbol: 'none',
-      itemStyle: { color: 'rgba(87, 181, 231, 1)' },
-      areaStyle: {
-        color: {
-          type: 'linear',
-          x: 0,
-          y: 0,
-          x2: 0,
-          y2: 1,
-          colorStops: [
-            { offset: 0, color: 'rgba(87, 181, 231, 0.1)' },
-            { offset: 1, color: 'rgba(87, 181, 231, 0)' }
-          ]
-        }
-      }
-    }]
-  };
-
-  userRolesChartOptions: EChartsOption = {
-    animation: false,
-    tooltip: { trigger: 'item', backgroundColor: 'rgba(255, 255, 255, 0.9)', textStyle: { color: '#1f2937' } },
-    legend: { top: '5%', left: 'center', textStyle: { color: '#1f2937' } },
-    series: [{
-      name: 'Rôles',
-      type: 'pie',
-      radius: ['40%', '70%'],
-      avoidLabelOverlap: false,
-      itemStyle: { borderRadius: 10, borderColor: '#fff', borderWidth: 2 },
-      label: { show: false, position: 'center' },
-      emphasis: { label: { show: true, fontSize: '20', fontWeight: 'bold' } },
-      labelLine: { show: false },
-      data: [
-        { value: 735, name: 'Utilisateurs', itemStyle: { color: 'rgba(87, 181, 231, 1)' } },
-        { value: 580, name: 'Modérateurs', itemStyle: { color: 'rgba(141, 211, 199, 1)' } },
-        { value: 484, name: 'Administrateurs', itemStyle: { color: 'rgba(251, 191, 114, 1)' } },
-        { value: 300, name: 'Invités', itemStyle: { color: 'rgba(252, 141, 98, 1)' } }
-      ]
-    }]
-  };
+  // Modal pour les messages
+  showMessageModal: boolean = false;
+  messageModalType: 'error' | 'success' = 'error';
+  messageModalTitle: string = '';
+  messageModalMessage: string = '';
+  notificationCount: number = 3;
+  constructor() {}
 
   ngOnInit() {
-    this.filterUsers();
+    
   }
 
+  ngAfterViewInit() {
+    this.initCharts();
+    window.addEventListener('resize', () => {
+      this.resizeCharts();
+    });
+  }
+
+  // Initialisation des graphiques
+  initCharts() {
+    // Graphique: Activité des utilisateurs
+    const userActivityChart = echarts.init(this.userActivityChartElement.nativeElement);
+    const userActivityOption = {
+      animation: false,
+      tooltip: {
+        trigger: 'axis',
+        backgroundColor: 'rgba(255, 255, 255, 0.9)',
+        textStyle: { color: '#1f2937' }
+      },
+      xAxis: {
+        type: 'category',
+        data: ['Lun', 'Mar', 'Mer', 'Jeu', 'Ven', 'Sam', 'Dim'],
+        axisLine: { lineStyle: { color: '#e5e7eb' } },
+        axisLabel: { color: '#1f2937' }
+      },
+      yAxis: {
+        type: 'value',
+        axisLine: { lineStyle: { color: '#e5e7eb' } },
+        axisLabel: { color: '#1f2937' },
+        splitLine: { lineStyle: { color: '#e5e7eb' } }
+      },
+      grid: {
+        top: '10%',
+        right: '3%',
+        bottom: '10%',
+        left: '3%',
+        containLabel: true
+      },
+      series: [
+        {
+          data: [150, 230, 224, 218, 135, 147, 260],
+          type: 'line',
+          smooth: true,
+          symbol: 'none',
+          itemStyle: { color: 'rgba(87, 181, 231, 1)' },
+          areaStyle: {
+            color: {
+              type: 'linear',
+              x: 0,
+              y: 0,
+              x2: 0,
+              y2: 1,
+              colorStops: [
+                { offset: 0, color: 'rgba(87, 181, 231, 0.1)' },
+                { offset: 1, color: 'rgba(87, 181, 231, 0)' }
+              ]
+            }
+          }
+        }
+      ]
+    };
+    userActivityChart.setOption(userActivityOption);
+
+    // Graphique: Distribution des rôles
+    const userRolesChart = echarts.init(this.userRolesChartElement.nativeElement);
+    const userRolesOption = {
+      animation: false,
+      tooltip: {
+        trigger: 'item',
+        backgroundColor: 'rgba(255, 255, 255, 0.9)',
+        textStyle: { color: '#1f2937' }
+      },
+      legend: {
+        top: '5%',
+        left: 'center',
+        textStyle: { color: '#1f2937' }
+      },
+      series: [
+        {
+          name: 'Rôles',
+          type: 'pie',
+          radius: ['40%', '70%'],
+          avoidLabelOverlap: false,
+          itemStyle: {
+            borderRadius: 10,
+            borderColor: '#fff',
+            borderWidth: 2
+          },
+          label: { show: false, position: 'center' },
+          emphasis: {
+            label: { show: true, fontSize: '20', fontWeight: 'bold' }
+          },
+          labelLine: { show: false },
+          data: [
+            { value: 735, name: 'Utilisateurs', itemStyle: { color: 'rgba(87, 181, 231, 1)' } },
+            { value: 580, name: 'Modérateurs', itemStyle: { color: 'rgba(141, 211, 199, 1)' } },
+            { value: 484, name: 'Administrateurs', itemStyle: { color: 'rgba(251, 191, 114, 1)' } },
+            { value: 300, name: 'Invités', itemStyle: { color: 'rgba(252, 141, 98, 1)' } }
+          ]
+        }
+      ]
+    };
+    userRolesChart.setOption(userRolesOption);
+  }
+
+  // Redimensionner les graphiques lors du changement de taille de la fenêtre
+  resizeCharts() {
+    const userActivityChart = echarts.getInstanceByDom(this.userActivityChartElement.nativeElement);
+    const userRolesChart = echarts.getInstanceByDom(this.userRolesChartElement.nativeElement);
+    if (userActivityChart) userActivityChart.resize();
+    if (userRolesChart) userRolesChart.resize();
+  }
+
+  // Méthode pour la recherche dans l'en-tête
   onSearch() {
     console.log('Recherche:', this.searchQuery);
   }
 
-  filterUsers() {
-    this.filteredUsers = this.users.filter(user =>
-      (!this.tableSearchQuery || `${user.nom} ${user.prenom}`.toLowerCase().includes(this.tableSearchQuery.toLowerCase())) &&
-      (!this.statusFilter || user.statut === this.statusFilter)
-    );
-  }
-
-  editUser(user: any) {
-    this.modalTitle = "Modifier l'utilisateur";
-    this.currentUser = { ...user };
-    this.isModalOpen = true;
-  }
-
-  archiveUser(id: number) {
-    if (confirm('Êtes-vous sûr de vouloir archiver cet utilisateur ?')) {
-      console.log('Utilisateur archivé:', id);
-    }
-  }
-
-  saveUser() {
-    if (this.currentUser.nom && this.currentUser.prenom && this.currentUser.email) {
-      this.currentUser.dateCreation = new Date().toLocaleDateString('fr-FR');
-      if (!this.currentUser.id) {
-        this.currentUser.id = this.users.length + 1;
-        this.users.push({ ...this.currentUser });
-      } else {
-        const index = this.users.findIndex(u => u.id === this.currentUser.id);
-        this.users[index] = { ...this.currentUser };
-      }
-      this.filterUsers();
-      this.closeModal();
-    }
-  }
-
-  closeModal() {
-    this.isModalOpen = false;
-    this.currentUser = { nom: '', prenom: '', email: '', statut: 'Actif', dateCreation: '' };
-  }
-
+  // Ouvre/ferme le menu de profil
   toggleProfile() {
     this.isProfileMenuOpen = !this.isProfileMenuOpen;
   }
 
+  // Ferme le menu de profil si clic en dehors
   @HostListener('document:click', ['$event'])
   onDocumentClick(event: Event) {
     const target = event.target as HTMLElement;
-    if (!target.closest('.relative')) {
+    if (!target.closest('#profileButton') && !target.closest('#profileMenu')) {
       this.isProfileMenuOpen = false;
     }
   }
 
+
+
+  // Afficher le modal pour changer le mot de passe
   showPasswordModal() {
     this.isPasswordModalOpen = true;
-    this.currentPassword = '';
-    this.newPassword = '';
-    this.confirmPassword = '';
-    this.strengthLevel = '';
-    this.passwordsMatch = false;
-    this.passwordMatchMessage = '';
-    this.isProfileMenuOpen = false; // Ferme le menu de profil
+    this.isProfileMenuOpen = false;
   }
 
+  // Fermer le modal pour changer le mot de passe
   closePasswordModal() {
     this.isPasswordModalOpen = false;
     this.currentPassword = '';
     this.newPassword = '';
     this.confirmPassword = '';
-    this.strengthLevel = '';
-    this.passwordsMatch = false;
+    this.passwordStrengthClass = '';
     this.passwordMatchMessage = '';
+    this.passwordMatchClass = '';
   }
 
+  // Vérifier la force du mot de passe
   checkPasswordStrength() {
     const password = this.newPassword;
     const hasLower = /[a-z]/.test(password);
@@ -203,76 +223,91 @@ export class TableauDeBordComponent implements OnInit {
     const strength = [hasLower, hasUpper, hasNumber, hasSpecial, length].filter(Boolean).length;
 
     if (strength <= 2) {
-      this.strengthLevel = 'weak';
+      this.passwordStrengthClass = 'weak';
     } else if (strength <= 4) {
-      this.strengthLevel = 'medium';
+      this.passwordStrengthClass = 'medium';
     } else {
-      this.strengthLevel = 'strong';
+      this.passwordStrengthClass = 'strong';
     }
   }
 
+  // Vérifier si les mots de passe correspondent
   checkPasswordMatch() {
-    this.passwordsMatch = this.newPassword === this.confirmPassword;
-    this.passwordMatchMessage = this.confirmPassword ? (this.newPassword === this.confirmPassword ? 'Les mots de passe correspondent' : 'Les mots de passe ne correspondent pas') : '';
+    if (this.confirmPassword) {
+      if (this.newPassword === this.confirmPassword) {
+        this.passwordMatchMessage = 'Les mots de passe correspondent';
+        this.passwordMatchClass = 'text-green-600';
+      } else {
+        this.passwordMatchMessage = 'Les mots de passe ne correspondent pas';
+        this.passwordMatchClass = 'text-red-600';
+      }
+    } else {
+      this.passwordMatchMessage = '';
+      this.passwordMatchClass = '';
+    }
   }
 
-  isPasswordValid(): boolean {
-    const hasLower = /[a-z]/.test(this.newPassword);
-    const hasUpper = /[A-Z]/.test(this.newPassword);
-    const hasNumber = /\d/.test(this.newPassword);
-    const hasSpecial = /[!@#$%^&*(),.?":{}|<>]/.test(this.newPassword);
-    const length = this.newPassword.length >= 8;
-    return hasLower && hasUpper && hasNumber && hasSpecial && length && this.passwordsMatch && !!this.newPassword && !!this.confirmPassword;
+  // Valider le mot de passe selon les critères
+  validatePassword(password: string): boolean {
+    const hasLower = /[a-z]/.test(password);
+    const hasUpper = /[A-Z]/.test(password);
+    const hasNumber = /\d/.test(password);
+    const hasSpecial = /[!@#$%^&*(),.?":{}|<>]/.test(password);
+    const length = password.length >= 8;
+    return hasLower && hasUpper && hasNumber && hasSpecial && length;
   }
 
+  // Soumettre le formulaire de changement de mot de passe
   handlePasswordSubmit() {
-    if (!this.isPasswordValid()) {
-      this.showErrorModal('Le nouveau mot de passe ne respecte pas les critères de sécurité requis.');
+    if (!this.validatePassword(this.newPassword)) {
+      this.showMessageModal = true;
+      this.messageModalType = 'error';
+      this.messageModalTitle = 'Erreur de validation';
+      this.messageModalMessage = 'Le nouveau mot de passe ne respecte pas les critères de sécurité requis.';
       return;
     }
 
     if (this.newPassword !== this.confirmPassword) {
-      this.showErrorModal('Les nouveaux mots de passe ne correspondent pas.');
+      this.showMessageModal = true;
+      this.messageModalType = 'error';
+      this.messageModalTitle = 'Erreur de validation';
+      this.messageModalMessage = 'Les nouveaux mots de passe ne correspondent pas.';
       return;
     }
 
-    this.showSuccessModal('Votre mot de passe a été modifié avec succès.');
+    // Ici, vous feriez normalement un appel API pour changer le mot de passe
+    this.showMessageModal = true;
+    this.messageModalType = 'success';
+    this.messageModalTitle = 'Succès';
+    this.messageModalMessage = 'Votre mot de passe a été modifié avec succès.';
     this.closePasswordModal();
   }
 
-  showErrorModal(message: string) {
-    const modalDiv = document.createElement('div');
-    modalDiv.className = 'fixed inset-0 flex items-center justify-center z-50';
-    modalDiv.innerHTML = `
-      <div class="bg-white rounded-lg shadow-xl p-6 max-w-sm w-full mx-4">
-        <div class="text-red-600 flex items-center mb-4">
-          <i class="ri-error-warning-line text-2xl mr-2"></i>
-          <h3 class="text-lg font-semibold">Erreur de validation</h3>
-        </div>
-        <p class="text-gray-700 mb-6">${message}</p>
-        <div class="flex justify-end">
-          <button class="px-4 py-2 bg-primary text-white rounded-button" onclick="this.closest('.fixed').remove()">OK</button>
-        </div>
-      </div>
-    `;
-    document.body.appendChild(modalDiv);
+  // Afficher le modal pour ajouter/modifier un utilisateur
+  showUserModal(title: string = 'Ajouter un utilisateur') {
+    this.modalTitle = title;
+    this.isUserModalOpen = true;
+    this.selectedUser = { nom: '', prenom: '', email: '', role: '' };
   }
 
-  showSuccessModal(message: string) {
-    const modalDiv = document.createElement('div');
-    modalDiv.className = 'fixed inset-0 flex items-center justify-center z-50';
-    modalDiv.innerHTML = `
-      <div class="bg-white rounded-lg shadow-xl p-6 max-w-sm w-full mx-4">
-        <div class="text-green-600 flex items-center mb-4">
-          <i class="ri-checkbox-circle-line text-2xl mr-2"></i>
-          <h3 class="text-lg font-semibold">Succès</h3>
-        </div>
-        <p class="text-gray-700 mb-6">${message}</p>
-        <div class="flex justify-end">
-          <button class="px-4 py-2 bg-primary text-white rounded-button" onclick="this.closest('.fixed').remove()">OK</button>
-        </div>
-      </div>
-    `;
-    document.body.appendChild(modalDiv);
+  // Fermer le modal utilisateur
+  closeUserModal() {
+    this.isUserModalOpen = false;
+    this.selectedUser = { nom: '', prenom: '', email: '', role: '' };
+  }
+
+  // Soumettre le formulaire utilisateur
+  handleUserSubmit() {
+    // Ici, vous feriez normalement un appel API pour ajouter/modifier l'utilisateur
+    console.log('Utilisateur soumis:', this.selectedUser);
+    this.closeUserModal();
+  }
+
+
+
+
+  // Fermer le modal de message
+  closeMessageModal() {
+    this.showMessageModal = false;
   }
 }
