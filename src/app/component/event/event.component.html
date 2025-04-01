@@ -1,0 +1,97 @@
+<app-navbar></app-navbar>
+
+<main class="pt-24 pb-12">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div class="flex justify-between items-center mb-8">
+      <h1 class="text-3xl font-bold text-gray-900">Agenda des Événements</h1>
+      <div class="flex space-x-4">
+        <div class="relative">
+          <select
+            class="bg-white px-4 py-2 rounded-button border appearance-none pr-8 hover:border-primary"
+            [(ngModel)]="selectedCategory"
+            (ngModelChange)="filterCategory()">
+            <option value="all">Tous les événements</option>
+            <option value="Culturel">Culturels</option>
+            <option value="Sportif">Sportifs</option>
+            <option value="Professionnel">Professionnels</option>
+            <option value="Gastronomique">Gastronomiques</option>
+          </select>
+          <i class="ri-arrow-down-s-line absolute right-3 top-3 text-gray-400"></i>
+        </div>
+      </div>
+    </div>
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+      <div *ngFor="let event of filteredEvent" class="bg-white rounded-lg shadow-lg overflow-hidden">
+        <img [src]="event.image" [alt]="event.title" class="w-full h-48 object-cover" />
+        <div class="p-6">
+          <div class="flex items-center justify-between mb-4">
+            <span class="text-sm text-primary">{{ event.date }}</span>
+            <span class="bg-blue-100 text-primary px-3 py-1 rounded-full text-sm">{{ event.category }}</span>
+          </div>
+          <h3 class="text-xl font-semibold mb-2">{{ event.title }}</h3>
+          <p class="text-gray-600 mb-4">{{ event.description }}</p>
+          <div class="flex items-center justify-between">
+            <div class="flex items-center">
+              <i class="ri-map-pin-line text-primary mr-2"></i>
+              <span class="text-gray-600">{{ event.location }}</span>
+            </div>
+            <button class="text-primary hover:text-blue-700 flex items-center" (click)="openEventModal(event)">
+              Plus d'infos <i class="ri-arrow-right-line ml-1"></i>
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Modal pour les détails d'événement -->
+    <div *ngIf="showReserveModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+      <div class="bg-white rounded-lg p-8 max-w-2xl w-full mx-4 max-h-[90vh] overflow-y-auto">
+        <div class="flex justify-between items-start mb-6">
+          <h3 class="text-2xl font-bold text-gray-900">{{ selectedEvent.title }}</h3>
+          <button class="text-gray-400 hover:text-gray-500" (click)="closeModal()">
+            <i class="ri-close-line text-2xl"></i>
+          </button>
+        </div>
+        <div class="space-y-4">
+          <p class="text-gray-600">{{ selectedEvent.description }}</p>
+          <div class="space-y-2">
+            <div class="flex items-center">
+              <i class="ri-time-line text-primary mr-2"></i>
+              <span>Horaires: 10:00 - 22:00</span>
+            </div>
+            <div class="flex items-center">
+              <i class="ri-money-euro-circle-line text-primary mr-2"></i>
+              <span>Tarif: À partir de 20 DT</span>
+            </div>
+          </div>
+        </div>
+        <div class="mt-8 flex justify-end space-x-4">
+          <button class="px-6 py-2 border rounded-button text-gray-600 hover:bg-gray-50" (click)="closeModal()">Annuler</button>
+          <button class="px-6 py-2 bg-primary text-white rounded-button hover:bg-blue-700" (click)="submitReservation()">
+            Réserver
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Modal pour notification -->
+    <div *ngIf="showNotifyModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+      <div class="bg-white rounded-lg p-8 max-w-md w-full mx-4">
+        <h3 class="text-xl font-bold mb-4">Notification - {{ selectedEvent?.title }}</h3>
+        <div class="space-y-4">
+          <p class="text-gray-600">Recevez une notification dès que cet événement sera disponible.</p>
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1">Email</label>
+            <input [(ngModel)]="notificationEmail" type="email" class="w-full px-3 py-2 border rounded-button" />
+          </div>
+        </div>
+        <div class="mt-6 flex justify-end space-x-4">
+          <button class="px-4 py-2 border rounded-button text-gray-600 hover:bg-gray-50" (click)="closeModal()">Annuler</button>
+          <button class="px-4 py-2 bg-primary text-white rounded-button hover:bg-blue-700" (click)="submitNotification()">Confirmer</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</main>
+
+<app-footer></app-footer>

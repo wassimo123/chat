@@ -19,6 +19,7 @@
     "@angular/platform-browser-dynamic": "^16.2.0",
     "@angular/router": "^16.2.0",
     "@fontsource/pacifico": "^5.2.5",
+    "@ngneat/tailwind": "^7.0.3",
     "echarts": "^5.6.0",
     "ngx-echarts": "^19.0.0",
     "remixicon": "^4.6.0",

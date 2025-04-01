@@ -11,8 +11,13 @@ import { ConnexionComponent } from './component/connexion/connexion.component';
 import { InscriptionComponent } from './component/inscription/inscription.component';
 import { ProfileComponent } from './admin/profile/profile.component';
 import { HomeComponent } from './component/home/home.component';
-import { NavbarComponent } from './component/navbar/navbar.component';
-import { FooterComponent } from './component/footer/footer.component';
+import { HttpClientModule } from '@angular/common/http';
+import { HotelsComponent } from './component/hotels/hotels.component';
+import { HotelDetailComponent } from './component/hotel-detail/hotel-detail.component';
+import { EventComponent } from './component/event/event.component';
+import { NavbarComponent } from "./component/navbar/navbar.component";
+import { FooterComponent } from "./component/footer/footer.component";
+import { PromotionsComponent } from './component/promotions/promotions.component';
 
 
 @NgModule({
@@ -25,17 +30,24 @@ import { FooterComponent } from './component/footer/footer.component';
     InscriptionComponent,
     ProfileComponent,
     HomeComponent,
-    NavbarComponent,
-    FooterComponent,
     
    
+  
   ],
   imports: [
     BrowserModule,
     AppRoutingModule,
     FormsModule,
-    NgxEchartsModule.forRoot({ echarts: () => import('echarts') })
-  ],
+    HttpClientModule,
+    NgxEchartsModule.forRoot({ echarts: () => import('echarts') }),
+    HotelsComponent, // Ajoutez ici car il est standalone
+    HotelDetailComponent,
+    EventComponent,
+    NavbarComponent,
+    FooterComponent,
+    PromotionsComponent,
+  
+],
   providers: [],
   bootstrap: [AppComponent]
 })

@@ -1,73 +1,73 @@
 <footer class="bg-gray-900 text-white py-12">
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
-        <div>
-          <h3 class="text-xl font-['Pacifico'] mb-4">Sfax</h3>
-          <p class="text-gray-400">
-            Votre guide complet pour découvrir et explorer la ville de Sfax
-          </p>
-        </div>
-        <div>
-          <h4 class="font-semibold mb-4">Liens Rapides</h4>
-          <ul class="space-y-2">
-            <li><a href="#" class="text-gray-400 hover:text-white">Découverte</a></li>
-            <li><a href="#" class="text-gray-400 hover:text-white">Annuaire</a></li>
-            <li><a href="#" class="text-gray-400 hover:text-white">Agenda</a></li>
-            <li><a href="#" class="text-gray-400 hover:text-white">Promotions</a></li>
-          </ul>
-        </div>
-        <div>
-          <h4 class="font-semibold mb-4">Contact</h4>
-          <ul class="space-y-2">
-            <li class="flex items-center">
-              <i class="ri-map-pin-line mr-2"></i>
-              <span class="text-gray-400">Route de Tunis Km 0.5, Sfax</span>
-            </li>
-            <li class="flex items-center">
-              <i class="ri-phone-line mr-2"></i>
-              <span class="text-gray-400">+216 74 000 000</span>
-            </li>
-            <li class="flex items-center">
-              <i class="ri-mail-line mr-2"></i>
-              <span class="text-gray-400">contact&#64;sfax.tn</span>
-            </li>
-          </ul>
-        </div>
-        <div>
-          <h4 class="font-semibold mb-4">Newsletter</h4>
-          <p class="text-gray-400 mb-4">Restez informé des dernières actualités</p>
-          <div class="flex">
-            <input
-              type="email"
-              placeholder="Votre email"
-              class="flex-1 px-4 py-2 rounded-l-button text-gray-900"
-            />
-            <button
-              class="bg-primary px-4 py-2 !rounded-r-button hover:bg-blue-700 whitespace-nowrap"
-            >
-              S'abonner
-            </button>
-          </div>
-        </div>
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+      <div>
+        <h3 class="text-xl font-['Pacifico'] mb-4">Sfax</h3>
+        <p class="text-gray-400">
+          Votre guide complet pour découvrir et explorer la ville de Sfax
+        </p>
       </div>
-      <div
-        class="border-t border-gray-800 mt-8 pt-8 flex flex-col md:flex-row justify-between items-center"
-      >
-        <p class="text-gray-400">© 2025 Ville de Sfax. Tous droits réservés.</p>
-        <div class="flex space-x-4 mt-4 md:mt-0">
-          <a href="#" class="text-gray-400 hover:text-white">
-            <i class="ri-facebook-fill text-xl"></i>
-          </a>
-          <a href="#" class="text-gray-400 hover:text-white">
-            <i class="ri-twitter-fill text-xl"></i>
-          </a>
-          <a href="#" class="text-gray-400 hover:text-white">
-            <i class="ri-instagram-fill text-xl"></i>
-          </a>
-          <a href="#" class="text-gray-400 hover:text-white">
-            <i class="ri-youtube-fill text-xl"></i>
-          </a>
+      <div>
+        <h4 class="font-semibold mb-4">Liens Rapides</h4>
+        <ul class="space-y-2">
+          <li><a routerLink="/decouverte" class="text-gray-400 hover:text-white">Découverte</a></li>
+          <li><a routerLink="/annuaire" class="text-gray-400 hover:text-white">Annuaire</a></li>
+          <li><a routerLink="/events" class="text-gray-400 hover:text-white">Agenda</a></li>
+          <li><a routerLink="/promotions" class="text-gray-400 hover:text-white">Promotions</a></li>
+        </ul>
+      </div>
+      <div>
+        <h4 class="font-semibold mb-4">Contact</h4>
+        <ul class="space-y-2">
+          <li class="flex items-center">
+            <i class="ri-map-pin-line mr-2"></i>
+            <span class="text-gray-400">Route de Tunis Km 0.5, Sfax</span>
+          </li>
+          <li class="flex items-center">
+            <i class="ri-phone-line mr-2"></i>
+            <span class="text-gray-400">+216 74 000 000</span>
+          </li>
+          <li class="flex items-center">
+            <i class="ri-mail-line mr-2"></i>
+           <span class="text-gray-400">contact&#64;sfax.tn</span>
+          </li>
+        </ul>
+      </div>
+      <div>
+        <h4 class="font-semibold mb-4">Newsletter</h4>
+        <p class="text-gray-400 mb-4">Restez informé des dernières actualités</p>
+        <div class="flex">
+          <input
+            type="email"
+            placeholder="Votre email"
+            class="flex-1 px-4 py-2 rounded-l-button text-gray-900"
+          />
+          <button
+            class="bg-primary px-4 py-2 rounded-r-button hover:bg-blue-700 whitespace-nowrap"
+          >
+            S'abonner
+          </button>
         </div>
       </div>
     </div>
-  </footer>
+    <div
+      class="border-t border-gray-800 mt-8 pt-8 flex flex-col md:flex-row justify-between items-center"
+    >
+      <p class="text-gray-400">© 2025 Ville de Sfax. Tous droits réservés.</p>
+      <div class="flex space-x-4 mt-4 md:mt-0">
+        <a routerLink="/facebook" class="text-gray-400 hover:text-white">
+          <i class="ri-facebook-fill text-xl"></i>
+        </a>
+        <a routerLink="/twitter" class="text-gray-400 hover:text-white">
+          <i class="ri-twitter-fill text-xl"></i>
+        </a>
+        <a routerLink="/instagram" class="text-gray-400 hover:text-white">
+          <i class="ri-instagram-fill text-xl"></i>
+        </a>
+        <a routerLink="/youtube" class="text-gray-400 hover:text-white">
+          <i class="ri-youtube-fill text-xl"></i>
+        </a>
+      </div>
+    </div>
+  </div>
+</footer>

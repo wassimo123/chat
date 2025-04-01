@@ -9,10 +9,19 @@ import { ProfileComponent } from './admin/profile/profile.component';
 import { HomeComponent } from './component/home/home.component';
 import { NavbarComponent } from './component/navbar/navbar.component';
 import { FooterComponent } from './component/footer/footer.component';
+import { HotelDetailComponent } from './component/hotel-detail/hotel-detail.component';
+import { HotelsComponent } from './component/hotels/hotels.component';
+import { EventComponent } from './component/event/event.component';
+import { PromotionsComponent } from './component/promotions/promotions.component';
+
 
 
 const routes: Routes = [
-  { path: 'dashboard', component: TableauDeBordComponent },
+  { path: 'dashboard', component: TableauDeBordComponent }, 
+  { path: 'hotels', component: HotelsComponent },
+  { path: 'hotel/:id', component: HotelDetailComponent },
+  { path: 'event', component: EventComponent },
+  { path: 'promotion', component: PromotionsComponent },
   { path: 'users', component: GestionDesUtilisateursComponent }, 
   { path: 'notifications', component: NotificationComponent }, 
   { path: 'profile', component: ProfileComponent }, 
@@ -23,6 +32,7 @@ const routes: Routes = [
   { path: 'footer', component: FooterComponent },
   { path: 'connexion', redirectTo: '/connexion', pathMatch: 'full' },
   { path: '', redirectTo: '/dashboard', pathMatch: 'full' }
+
 
 ];
 

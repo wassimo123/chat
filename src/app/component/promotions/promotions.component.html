@@ -1,0 +1,54 @@
+<app-navbar></app-navbar>
+
+<main class="pt-24 pb-12">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div class="flex justify-between items-center mb-8">
+      <h1 class="text-3xl font-bold text-gray-900">Promotions</h1>
+      <div class="flex space-x-4">
+        <div class="relative">
+          <select
+            class="bg-white px-4 py-2 rounded-button border appearance-none pr-8 hover:border-primary"
+            [(ngModel)]="selectedPromotionCategory"
+            (ngModelChange)="filterPromotions()">
+            <option value="all">Toutes les catégories</option>
+            <option value="Hôtels">Hôtels</option>
+            <option value="Restaurants">Restaurants</option>
+            <option value="Autres">Autres</option>
+          </select>
+          <i class="ri-arrow-down-s-line absolute right-3 top-3 text-gray-400"></i>
+        </div>
+      </div>
+    </div>
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+      <div *ngFor="let promotion of filteredPromotions" class="bg-white rounded-lg shadow-lg overflow-hidden">
+        <div class="relative">
+          <img [src]="promotion.image" [alt]="promotion.title" class="w-full h-48 object-cover" />
+          <div class="absolute top-4 right-4 bg-red-500 text-white px-3 py-1 rounded-full text-sm font-semibold">
+            {{ promotion.discount }}
+          </div>
+        </div>
+        <div class="p-6">
+          <div class="flex items-center justify-between mb-4">
+            <span class="text-sm text-primary">Valable jusqu'au {{ promotion.expiry }}</span>
+            <span class="bg-blue-100 text-primary px-3 py-1 rounded-full text-sm">{{ promotion.category }}</span>
+          </div>
+          <h3 class="text-xl font-semibold mb-2">{{ promotion.title }}</h3>
+          <p class="text-gray-600 mb-4">{{ promotion.description }}</p>
+          <div class="flex items-center justify-between">
+            <div class="flex items-center space-x-2">
+              <span class="text-2xl font-bold text-primary">{{ promotion.price }}</span>
+              <span class="text-gray-400 line-through">{{ promotion.originalPrice }}</span>
+            </div>
+            <button
+              class="bg-primary text-white px-4 py-2 rounded-button hover:bg-blue-700"
+              (click)="redirectToBookingSite(promotion.bookingUrl)">
+              Réserver
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</main>
+
+<app-footer></app-footer>

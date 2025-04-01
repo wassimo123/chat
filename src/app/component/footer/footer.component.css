@@ -1,0 +1,30 @@
+:host {
+  display: block;
+}
+
+/* Si Tailwind est configuré, ces styles peuvent être supprimés */
+.bg-gray-900 {
+  background-color: #111827;
+}
+
+.text-gray-400 {
+  color: #9CA3AF;
+}
+
+.rounded-l-button {
+  border-top-left-radius: 8px;
+  border-bottom-left-radius: 8px;
+}
+
+.rounded-r-button {
+  border-top-right-radius: 8px;
+  border-bottom-right-radius: 8px;
+}
+
+.bg-primary {
+  background-color: #4F46E5;
+}
+
+.hover\:bg-blue-700:hover {
+  background-color: #1D4ED8;
+}

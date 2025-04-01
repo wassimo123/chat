@@ -1,5 +1,5 @@
 import { Component, OnInit, HostListener } from '@angular/core';
-
+import { UserService } from '../../services/user.service';
 @Component({
   selector: 'app-gestion-des-utilisateurs',
   templateUrl: './gestion-des-utilisateurs.component.html',
@@ -35,26 +35,20 @@ export class GestionDesUtilisateursComponent implements OnInit {
   messageModalMessage: string = '';
 
   // Liste des utilisateurs
-  users = [
-    { id: 1, nom: 'Mezghani', prenom: 'Ahmed', email: 'ahmed.mezghani@gmail.com', statut: 'Actif', dateCreation: '15/03/2025' },
-    { id: 2, nom: 'Sahnoun', prenom: 'Mariem', email: 'mariem.sahnoun@gmail.com', statut: 'Actif', dateCreation: '14/03/2025' },
-    { id: 3, nom: 'Ben Ali', prenom: 'Sami', email: 'sami.benali@gmail.com', statut: 'Inactif', dateCreation: '13/03/2025' },
-    { id: 4, nom: 'Affes', prenom: 'Wassim', email: 'wassim.affes@gmail.com', statut: 'Actif', dateCreation: '12/03/2025' },
-    { id: 5, nom: 'Mzid', prenom: 'Racem', email: 'racem.mzid@gmail.com', statut: 'Actif', dateCreation: '11/03/2025' },
-    { id: 6, nom: 'Tahri', prenom: 'Amir', email: 'amir.tahri@gmail.com', statut: 'Actif', dateCreation: '10/03/2025' },
-    { id: 7, nom: 'Masmoudi', prenom: 'Bilel', email: 'bilel.masmoudi@gmail.com', statut: 'Inactif', dateCreation: '09/03/2025' },
-    { id: 8, nom: 'Laswad', prenom: 'Oumayma', email: 'oumayma.laswad@gmail.com', statut: 'Actif', dateCreation: '08/03/2025' },
-  ];
-
-  filteredUsers = [...this.users];
+  
+  users: any[] = [];
   notificationCount: number = 3;
 
-  constructor() {}
+  constructor(private userService: UserService) {}
 
   ngOnInit() {
-    this.filterUsers();
-  }
 
+    this.userService.getUsers().subscribe(data => this.users = data);
+    console.log(this.users)
+    this.filterUsers();
+    
+  }
+  filteredUsers = [...this.users];
   // Méthode pour la recherche dans l'en-tête
   onSearch() {
     console.log('Recherche:', this.searchQuery);

@@ -1,0 +1,181 @@
+<app-navbar></app-navbar>
+
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8" *ngIf="hotel">
+  <!-- Back Arrow and Breadcrumb -->
+  <div class="mb-8 flex items-center">
+    <!-- Back Arrow -->
+    <a routerLink="/hotels" class="mr-4 text-gray-700 hover:text-primary">
+      <i class="ri-arrow-left-line text-2xl"></i>
+    </a>
+
+    <!-- Breadcrumb -->
+    <nav class="flex" aria-label="Breadcrumb">
+      <ol class="inline-flex items-center space-x-1 md:space-x-3">
+        <li class="inline-flex items-center">
+          <a routerLink="/" class="text-gray-700 hover:text-primary">Accueil</a>
+        </li>
+        <li>
+          <div class="flex items-center">
+            <i class="ri-arrow-right-s-line text-gray-400"></i>
+            <a routerLink="/hotels" class="ml-1 text-gray-700 hover:text-primary md:ml-2">Hôtels</a>
+          </div>
+        </li>
+        <li aria-current="page">
+          <div class="flex items-center">
+            <i class="ri-arrow-right-s-line text-gray-400"></i>
+            <span class="ml-1 text-gray-500 md:ml-2">{{ hotel.nom }}</span>
+          </div>
+        </li>
+      </ol>
+    </nav>
+  </div>
+
+  <!-- Hotel Details -->
+  <div class="bg-white rounded-lg shadow-sm overflow-hidden">
+    <div class="relative h-96">
+      <img [src]="hotel.image" [alt]="hotel.nom" class="w-full h-full object-cover" />
+    </div>
+    <div class="p-8">
+      <div class="flex justify-between items-start">
+        <div>
+          <h1 class="text-3xl font-bold text-gray-900">{{ hotel.nom }}</h1>
+          <div class="mt-2 flex items-center">
+            <div class="flex items-center">
+              <i class="ri-star-fill text-yellow-400" *ngFor="let star of getStars(hotel.rating)"></i>
+              <i class="ri-star-half-fill text-yellow-400" *ngIf="getHalfStar(hotel.rating)"></i>
+            </div>
+            <span class="ml-2 text-sm text-gray-500">({{ hotel.reviews }} avis)</span>
+          </div>
+        </div>
+        <div class="text-right">
+          <p class="text-2xl font-bold text-primary">{{ hotel.price }} DT</p>
+          <p class="text-sm text-gray-500">Prix moyen par nuit</p>
+        </div>
+      </div>
+      <div class="mt-8 grid grid-cols-1 md:grid-cols-2 gap-8">
+        <div>
+          <h2 class="text-xl font-semibold text-gray-900 mb-4">À propos</h2>
+          <p class="text-gray-700">{{ hotel.description }}</p>
+          <div class="mt-6 space-y-4">
+            <div class="flex items-center">
+              <i class="ri-map-pin-line w-5 h-5 text-primary"></i>
+              <span class="ml-2 text-gray-700">{{ hotel.address }}</span>
+            </div>
+            <div class="flex items-center">
+              <i class="ri-time-line w-5 h-5 text-primary"></i>
+              <span class="ml-2 text-gray-700">{{ hotel.hours }}</span>
+            </div>
+            <div class="flex items-center">
+              <i class="ri-phone-line w-5 h-5 text-primary"></i>
+              <span class="ml-2 text-gray-700">{{ hotel.phone }}</span>
+            </div>
+          </div>
+          <div class="mt-6">
+            <h3 class="text-lg font-semibold text-gray-900 mb-3">Localisation</h3>
+            <div class="h-64 rounded-lg overflow-hidden relative">
+              <div class="absolute inset-0 bg-center bg-no-repeat bg-cover"
+                   style="background-image: url('https://public.readdy.ai/gen_page/map_placeholder_1280x720.png');">
+              </div>
+              <div class="absolute bottom-4 right-4">
+                <button (click)="openMapModal()"
+                        class="bg-white text-primary px-3 py-2 rounded-button shadow-md hover:bg-gray-50 transition-colors flex items-center whitespace-nowrap">
+                  <i class="ri-map-2-line mr-1"></i>
+                  Voir en grand
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="bg-gray-50 p-6 rounded-lg">
+          <h2 class="text-xl font-semibold text-gray-900 mb-4">Réservation</h2>
+          <form (ngSubmit)="onSubmitReservation()" class="space-y-4">
+            <div>
+              <label class="block text-sm font-medium text-gray-700">Date</label>
+              <input type="date" [(ngModel)]="reservationDate" name="date"
+                     class="mt-1 block w-full rounded-button border-gray-300 shadow-sm focus:border-primary focus:ring focus:ring-primary focus:ring-opacity-50" />
+            </div>
+            <div>
+              <label class="block text-sm font-medium text-gray-700">Heure</label>
+              <select [(ngModel)]="reservationTime" name="time"
+                      class="mt-1 block w-full rounded-button border-gray-300 shadow-sm focus:border-primary focus:ring focus:ring-primary focus:ring-opacity-50">
+                <option value="12:00">12:00</option>
+                <option value="12:30">12:30</option>
+                <option value="13:00">13:00</option>
+                <option value="13:30">13:30</option>
+                <option value="19:00">19:00</option>
+                <option value="19:30">19:30</option>
+                <option value="20:00">20:00</option>
+                <option value="20:30">20:30</option>
+              </select>
+            </div>
+            <div>
+              <label class="block text-sm font-medium text-gray-700">Nombre de personnes</label>
+              <select [(ngModel)]="numberOfPeople" name="people"
+                      class="mt-1 block w-full rounded-button border-gray-300 shadow-sm focus:border-primary focus:ring focus:ring-primary focus:ring-opacity-50">
+                <option value="1">1 personne</option>
+                <option value="2">2 personnes</option>
+                <option value="3">3 personnes</option>
+                <option value="4">4 personnes</option>
+                <option value="5">5 personnes</option>
+                <option value="6">6 personnes</option>
+                <option value="7">7 personnes</option>
+                <option value="8">8 personnes</option>
+              </select>
+            </div>
+            <button type="submit"
+                    class="w-full bg-primary text-white py-2 px-4 rounded-button hover:bg-primary/90 transition-colors">
+              Réserver maintenant
+            </button>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Confirmation Modal -->
+<div *ngIf="showConfirmationModal"
+     class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+  <div class="bg-white p-8 rounded-lg max-w-md w-full mx-4">
+    <h3 class="text-xl font-bold text-gray-900 mb-4">Confirmation de réservation</h3>
+    <p class="text-gray-700 mb-6">
+      Votre réservation a été confirmée. Vous recevrez un email de confirmation dans quelques minutes.
+    </p>
+    <button (click)="closeModal()"
+            class="w-full bg-primary text-white py-2 px-4 rounded-button hover:bg-primary/90 transition-colors">
+      Fermer
+    </button>
+  </div>
+</div>
+
+<!-- Map Modal -->
+<div *ngIf="showMapModal"
+     class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+  <div class="bg-white p-4 rounded-lg max-w-4xl w-full mx-4">
+    <div class="flex justify-between items-center mb-4">
+      <h3 class="text-xl font-bold text-gray-900">Localisation de l'hôtel</h3>
+      <button (click)="closeMapModal()" class="text-gray-500 hover:text-gray-700">
+        <i class="ri-close-line text-2xl"></i>
+      </button>
+    </div>
+    <div class="h-[70vh] rounded-lg overflow-hidden">
+      <div class="w-full h-full bg-center bg-no-repeat bg-cover"
+           style="background-image: url('https://public.readdy.ai/gen_page/map_placeholder_1280x720.png');">
+      </div>
+    </div>
+    <div class="mt-4 flex justify-between items-center">
+      <div class="text-gray-700">
+        <p class="font-medium">{{ hotel.nom }}</p>
+        <p>{{ hotel.address }}</p>
+      </div>
+      <a [href]="getGoogleMapsUrl(hotel.address)"
+         target="_blank"
+         class="bg-primary text-white px-4 py-2 rounded-button hover:bg-primary/90 transition-colors flex items-center whitespace-nowrap">
+        <i class="ri-navigation-line mr-1"></i>
+        Itinéraire
+      </a>
+    </div>
+  </div>
+</div>
+
+<app-footer></app-footer>
