@@ -1,200 +1,216 @@
 <app-navbar></app-navbar>
 <main class="pt-16">
-    <!-- Hero Section -->
-    <section class="hero-section h-[600px] relative flex items-center">
-      <div class="absolute inset-0 bg-black bg-opacity-40"></div>
-      <div class="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-white">
-        <h1 class="text-5xl font-bold mb-6">Bienvenue à Sfax</h1>
-        <p class="text-xl mb-8 max-w-2xl">
-          Découvrez le charme unique de la deuxième plus grande ville de
-          Tunisie, où tradition et modernité se rencontrent harmonieusement.
-        </p>
-        <button
-          class="bg-primary text-white px-8 py-3 !rounded-button hover:bg-blue-700 whitespace-nowrap"
+  <!-- Hero Section -->
+  <section class="hero-section h-[600px] relative flex items-center" data-aos="fade-up">
+    <div class="absolute inset-0 bg-black bg-opacity-40"></div>
+    <div class="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-white">
+      <h1 class="text-5xl font-bold mb-6" data-aos="fade-up" data-aos-delay="100">Bienvenue à Sfax</h1>
+      <p class="text-xl mb-8 max-w-2xl" data-aos="fade-up" data-aos-delay="200">
+        Découvrez le charme unique de la deuxième plus grande ville de
+        Tunisie, où tradition et modernité se rencontrent harmonieusement.
+      </p>
+      <button
+        class="bg-primary text-white px-8 py-3 !rounded-button hover:bg-blue-700 whitespace-nowrap"
+        data-aos="fade-up"
+        data-aos-delay="300"
+      >
+        Découvrir Sfax
+      </button>
+    </div>
+  </section>
+
+  <!-- Accès Rapides -->
+  <section class="py-16 bg-gray-50" data-aos="fade-up">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <h2 class="text-3xl font-bold text-center mb-12" data-aos="fade-up" data-aos-delay="100">Accès Rapides</h2>
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+        <div
+          class="bg-white rounded-lg shadow-lg p-6 hover:shadow-xl transition-shadow cursor-pointer"
+          data-aos="zoom-in"
+          data-aos-delay="200"
         >
-          Découvrir Sfax
-        </button>
+          <div
+            class="w-12 h-12 flex items-center justify-center bg-primary bg-opacity-10 rounded-full mb-4"
+          >
+            <i class="ri-ancient-pavilion-line text-primary text-2xl"></i>
+          </div>
+          <h3 class="text-xl font-semibold mb-2">Sites Touristiques</h3>
+          <p class="text-gray-600">
+            Explorez les merveilles historiques et culturelles de Sfax
+          </p>
+        </div>
+        <div
+          class="bg-white rounded-lg shadow-lg p-6 hover:shadow-xl transition-shadow cursor-pointer"
+          data-aos="zoom-in"
+          data-aos-delay="300"
+        >
+          <div
+            class="w-12 h-12 flex items-center justify-center bg-primary bg-opacity-10 rounded-full mb-4"
+          >
+            <i class="ri-store-2-line text-primary text-2xl"></i>
+          </div>
+          <h3 class="text-xl font-semibold mb-2">Établissements</h3>
+          <p class="text-gray-600">
+            Trouvez les meilleurs restaurants, hôtels et commerces
+          </p>
+        </div>
+        <div
+          class="bg-white rounded-lg shadow-lg p-6 hover:shadow-xl transition-shadow cursor-pointer"
+          data-aos="zoom-in"
+          data-aos-delay="400"
+        >
+          <div
+            class="w-12 h-12 flex items-center justify-center bg-primary bg-opacity-10 rounded-full mb-4"
+          >
+            <i class="ri-calendar-event-line text-primary text-2xl"></i>
+          </div>
+          <h3 class="text-xl font-semibold mb-2">Événements</h3>
+          <p class="text-gray-600">
+            Ne manquez aucun événement important de la ville
+          </p>
+        </div>
+        <div
+          class="bg-white rounded-lg shadow-lg p-6 hover:shadow-xl transition-shadow cursor-pointer"
+          data-aos="zoom-in"
+          data-aos-delay="500"
+        >
+          <div
+            class="w-12 h-12 flex items-center justify-center bg-primary bg-opacity-10 rounded-full mb-4"
+          >
+            <i class="ri-price-tag-3-line text-primary text-2xl"></i>
+          </div>
+          <h3 class="text-xl font-semibold mb-2">Promotions</h3>
+          <p class="text-gray-600">
+            Découvrez les meilleures offres du moment
+          </p>
+        </div>
       </div>
-    </section>
-  
-    <!-- Accès Rapides -->
-    <section class="py-16 bg-gray-50">
-      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <h2 class="text-3xl font-bold text-center mb-12">Accès Rapides</h2>
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
-          <div
-            class="bg-white rounded-lg shadow-lg p-6 hover:shadow-xl transition-shadow cursor-pointer"
+    </div>
+  </section>
+
+  <!-- À Propos de Sfax -->
+  <section class="py-16" data-aos="fade-up">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+        <div>
+          <h2 class="text-3xl font-bold mb-6" data-aos="fade-up" data-aos-delay="100">À Propos de Sfax</h2>
+          <p class="text-gray-600 mb-6" data-aos="fade-up" data-aos-delay="200">
+            Sfax, joyau de la Méditerranée, est une ville qui conjugue
+            histoire millénaire et dynamisme économique. Avec sa médina
+            classée, ses souks animés et son port historique, elle offre aux
+            visiteurs une expérience authentique de la culture tunisienne.
+          </p>
+          <p class="text-gray-600 mb-8" data-aos="fade-up" data-aos-delay="300">
+            Centre économique majeur de la Tunisie, Sfax est également
+            reconnue pour sa gastronomie unique, ses traditions artisanales
+            et l'hospitalité de ses habitants.
+          </p>
+          <button
+            class="bg-primary text-white px-6 py-3 !rounded-button hover:bg-blue-700 whitespace-nowrap"
+            data-aos="fade-up"
+            data-aos-delay="400"
           >
-            <div
-              class="w-12 h-12 flex items-center justify-center bg-primary bg-opacity-10 rounded-full mb-4"
-            >
-              <i class="ri-ancient-pavilion-line text-primary text-2xl"></i>
-            </div>
-            <h3 class="text-xl font-semibold mb-2">Sites Touristiques</h3>
+            En savoir plus
+          </button>
+        </div>
+        <div class="relative h-[400px] rounded-lg overflow-hidden" data-aos="zoom-in" data-aos-delay="500">
+          <img
+            src="https://public.readdy.ai/ai/img_res/d86ed7ae9e9cb5aea20ad1a3bb7a5600.jpg"
+            alt="Médina de Sfax"
+            class="w-full h-full object-cover"
+          />
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Événements à Venir -->
+  <section class="py-16 bg-gray-50" data-aos="fade-up">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <h2 class="text-3xl font-bold text-center mb-12" data-aos="fade-up" data-aos-delay="100">Événements à Venir</h2>
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+        <div class="bg-white rounded-lg shadow-lg overflow-hidden" data-aos="zoom-in" data-aos-delay="200">
+          <img
+            src="https://public.readdy.ai/ai/img_res/ca485bfe176891f6d0aad52fc73960cf.jpg"
+            alt="Festival culturel"
+            class="w-full h-48 object-cover"
+          />
+          <div class="p-6">
+            <div class="text-sm text-primary mb-2">25 Mars 2025</div>
+            <h3 class="text-xl font-semibold mb-2">
+              Festival International de Sfax
+            </h3>
             <p class="text-gray-600">
-              Explorez les merveilles historiques et culturelles de Sfax
+              Une célébration de la culture et des arts avec des artistes
+              internationaux
             </p>
           </div>
-          <div
-            class="bg-white rounded-lg shadow-lg p-6 hover:shadow-xl transition-shadow cursor-pointer"
-          >
-            <div
-              class="w-12 h-12 flex items-center justify-center bg-primary bg-opacity-10 rounded-full mb-4"
-            >
-              <i class="ri-store-2-line text-primary text-2xl"></i>
-            </div>
-            <h3 class="text-xl font-semibold mb-2">Établissements</h3>
+        </div>
+        <div class="bg-white rounded-lg shadow-lg overflow-hidden" data-aos="zoom-in" data-aos-delay="300">
+          <img
+            src="https://public.readdy.ai/ai/img_res/990a1671b8fde43eb2741e59dc38a296.jpg"
+            alt="Conférence économique"
+            class="w-full h-48 object-cover"
+          />
+          <div class="p-6">
+            <div class="text-sm text-primary mb-2">2 Avril 2025</div>
+            <h3 class="text-xl font-semibold mb-2">Forum Économique de Sfax</h3>
             <p class="text-gray-600">
-              Trouvez les meilleurs restaurants, hôtels et commerces
+              Rencontre des acteurs économiques majeurs de la région
             </p>
           </div>
-          <div
-            class="bg-white rounded-lg shadow-lg p-6 hover:shadow-xl transition-shadow cursor-pointer"
-          >
-            <div
-              class="w-12 h-12 flex items-center justify-center bg-primary bg-opacity-10 rounded-full mb-4"
-            >
-              <i class="ri-calendar-event-line text-primary text-2xl"></i>
-            </div>
-            <h3 class="text-xl font-semibold mb-2">Événements</h3>
+        </div>
+        <div class="bg-white rounded-lg shadow-lg overflow-hidden" data-aos="zoom-in" data-aos-delay="400">
+          <img
+            src="https://public.readdy.ai/ai/img_res/f2c8068b222baf135f93b9cd92bf8a58.jpg"
+            alt="Festival gastronomique"
+            class="w-full h-48 object-cover"
+          />
+          <div class="p-6">
+            <div class="text-sm text-primary mb-2">15 Avril 2025</div>
+            <h3 class="text-xl font-semibold mb-2">Festival Gastronomique</h3>
             <p class="text-gray-600">
-              Ne manquez aucun événement important de la ville
-            </p>
-          </div>
-          <div
-            class="bg-white rounded-lg shadow-lg p-6 hover:shadow-xl transition-shadow cursor-pointer"
-          >
-            <div
-              class="w-12 h-12 flex items-center justify-center bg-primary bg-opacity-10 rounded-full mb-4"
-            >
-              <i class="ri-price-tag-3-line text-primary text-2xl"></i>
-            </div>
-            <h3 class="text-xl font-semibold mb-2">Promotions</h3>
-            <p class="text-gray-600">
-              Découvrez les meilleures offres du moment
+              Découverte des saveurs traditionnelles de Sfax
             </p>
           </div>
         </div>
       </div>
-    </section>
-  
-    <!-- À Propos de Sfax -->
-    <section class="py-16">
-      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div class="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
-          <div>
-            <h2 class="text-3xl font-bold mb-6">À Propos de Sfax</h2>
-            <p class="text-gray-600 mb-6">
-              Sfax, joyau de la Méditerranée, est une ville qui conjugue
-              histoire millénaire et dynamisme économique. Avec sa médina
-              classée, ses souks animés et son port historique, elle offre aux
-              visiteurs une expérience authentique de la culture tunisienne.
-            </p>
-            <p class="text-gray-600 mb-8">
-              Centre économique majeur de la Tunisie, Sfax est également
-              reconnue pour sa gastronomie unique, ses traditions artisanales
-              et l'hospitalité de ses habitants.
-            </p>
-            <button
-              class="bg-primary text-white px-6 py-3 !rounded-button hover:bg-blue-700 whitespace-nowrap"
-            >
-              En savoir plus
-            </button>
-          </div>
-          <div class="relative h-[400px] rounded-lg overflow-hidden">
-            <img
-              src="https://public.readdy.ai/ai/img_res/d86ed7ae9e9cb5aea20ad1a3bb7a5600.jpg"
-              alt="Médina de Sfax"
-              class="w-full h-full object-cover"
-            />
-          </div>
+    </div>
+  </section>
+
+  <!-- Découvrez Sfax -->
+  <section class="py-16" data-aos="fade-up">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <h2 class="text-3xl font-bold text-center mb-12" data-aos="fade-up" data-aos-delay="100">Découvrez Sfax</h2>
+      <div class="h-[500px] rounded-lg overflow-hidden relative" data-aos="zoom-in" data-aos-delay="200">
+        <iframe
+          src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d99698.86100013481!2d10.650697200146741!3d34.761366745189264!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x13002cda1486c695%3A0x22dfe0a62c50ce6f!2sSfax!5e1!3m2!1sfr!2stn!4v1743565598904!5m2!1sfr!2stn"
+          width="100%"
+          height="100%"
+          style="border:0;"
+          allowfullscreen=""
+          loading="lazy"
+          referrerpolicy="no-referrer-when-downgrade"
+        ></iframe>
+        <div class="absolute bottom-4 left-4 bg-white p-4 rounded-lg shadow-lg" data-aos="fade-up" data-aos-delay="300">
+          <h3 class="font-semibold mb-2">Points d'intérêt</h3>
+          <ul class="space-y-2">
+            <li class="flex items-center">
+              <i class="ri-map-pin-line text-primary mr-2"></i>
+              <span>Médina de Sfax</span>
+            </li>
+            <li class="flex items-center">
+              <i class="ri-map-pin-line text-primary mr-2"></i>
+              <span>Port de Sfax</span>
+            </li>
+            <li class="flex items-center">
+              <i class="ri-map-pin-line text-primary mr-2"></i>
+              <span>Musée Dar Jellouli</span>
+            </li>
+          </ul>
         </div>
       </div>
-    </section>
-  
-    <!-- Événements à Venir -->
-    <section class="py-16 bg-gray-50">
-      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <h2 class="text-3xl font-bold text-center mb-12">Événements à Venir</h2>
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-          <div class="bg-white rounded-lg shadow-lg overflow-hidden">
-            <img
-              src="https://public.readdy.ai/ai/img_res/ca485bfe176891f6d0aad52fc73960cf.jpg"
-              alt="Festival culturel"
-              class="w-full h-48 object-cover"
-            />
-            <div class="p-6">
-              <div class="text-sm text-primary mb-2">25 Mars 2025</div>
-              <h3 class="text-xl font-semibold mb-2">
-                Festival International de Sfax
-              </h3>
-              <p class="text-gray-600">
-                Une célébration de la culture et des arts avec des artistes
-                internationaux
-              </p>
-            </div>
-          </div>
-          <div class="bg-white rounded-lg shadow-lg overflow-hidden">
-            <img
-              src="https://public.readdy.ai/ai/img_res/990a1671b8fde43eb2741e59dc38a296.jpg"
-              alt="Conférence économique"
-              class="w-full h-48 object-cover"
-            />
-            <div class="p-6">
-              <div class="text-sm text-primary mb-2">2 Avril 2025</div>
-              <h3 class="text-xl font-semibold mb-2">Forum Économique de Sfax</h3>
-              <p class="text-gray-600">
-                Rencontre des acteurs économiques majeurs de la région
-              </p>
-            </div>
-          </div>
-          <div class="bg-white rounded-lg shadow-lg overflow-hidden">
-            <img
-              src="https://public.readdy.ai/ai/img_res/f2c8068b222baf135f93b9cd92bf8a58.jpg"
-              alt="Festival gastronomique"
-              class="w-full h-48 object-cover"
-            />
-            <div class="p-6">
-              <div class="text-sm text-primary mb-2">15 Avril 2025</div>
-              <h3 class="text-xl font-semibold mb-2">Festival Gastronomique</h3>
-              <p class="text-gray-600">
-                Découverte des saveurs traditionnelles de Sfax
-              </p>
-            </div>
-          </div>
-        </div>
-      </div>
-    </section>
-  
-    <!-- Découvrez Sfax -->
-    <section class="py-16">
-      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <h2 class="text-3xl font-bold text-center mb-12">Découvrez Sfax</h2>
-        <div class="h-[500px] rounded-lg overflow-hidden relative">
-          <div
-            id="map"
-            class="w-full h-full bg-cover bg-center"
-            style="background-image: url('https://public.readdy.ai/gen_page/map_placeholder_1280x720.png')"
-          ></div>
-          <div class="absolute bottom-4 left-4 bg-white p-4 rounded-lg shadow-lg">
-            <h3 class="font-semibold mb-2">Points d'intérêt</h3>
-            <ul class="space-y-2">
-              <li class="flex items-center">
-                <i class="ri-map-pin-line text-primary mr-2"></i>
-                <span>Médina de Sfax</span>
-              </li>
-              <li class="flex items-center">
-                <i class="ri-map-pin-line text-primary mr-2"></i>
-                <span>Port de Sfax</span>
-              </li>
-              <li class="flex items-center">
-                <i class="ri-map-pin-line text-primary mr-2"></i>
-                <span>Musée Dar Jellouli</span>
-              </li>
-            </ul>
-          </div>
-        </div>
-      </div>
-    </section>
-  </main>
-  <app-footer></app-footer>
+    </div>
+  </section>
+</main>
+<app-footer></app-footer>

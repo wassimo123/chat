@@ -29,7 +29,8 @@ import { PromotionsComponent } from './component/promotions/promotions.component
     ConnexionComponent,
     InscriptionComponent,
     ProfileComponent,
-    HomeComponent,
+    
+    
     
    
   
@@ -46,7 +47,7 @@ import { PromotionsComponent } from './component/promotions/promotions.component
     NavbarComponent,
     FooterComponent,
     PromotionsComponent,
-  
+    HomeComponent,
 ],
   providers: [],
   bootstrap: [AppComponent]

@@ -16,6 +16,7 @@ import { PromotionsComponent } from './component/promotions/promotions.component
 
 
 
+
 const routes: Routes = [
   { path: 'dashboard', component: TableauDeBordComponent }, 
   { path: 'hotels', component: HotelsComponent },
