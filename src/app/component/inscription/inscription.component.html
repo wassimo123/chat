@@ -10,7 +10,7 @@
         <div>
           <label class="text-sm font-medium text-gray-700">Nom</label>
           <div class="relative">
-            <input type="text" name="lastname" [(ngModel)]="user.lastname" 
+            <input type="text" name="lastname" [(ngModel)]="user.nom" 
               class="w-full rounded-lg border border-gray-300 py-3 px-4 pl-10 focus:ring-2 focus:ring-blue-500 text-sm"
               placeholder="Votre nom" required />
             <i class="ri-user-line absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"></i>
@@ -19,7 +19,7 @@
         <div>
           <label class="text-sm font-medium text-gray-700">Prénom</label>
           <div class="relative">
-            <input type="text" name="firstname" [(ngModel)]="user.firstname"
+            <input type="text" name="firstname" [(ngModel)]="user.prenom"
               class="w-full rounded-lg border border-gray-300 py-3 px-4 pl-10 focus:ring-2 focus:ring-blue-500 text-sm"
               placeholder="Votre prénom" required />
             <i class="ri-user-line absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"></i>
@@ -86,12 +86,24 @@
       <div>
         <label class="text-sm font-medium text-gray-700">Matricule fiscale</label>
         <div class="relative">
-          <input type="text" name="matricule" [(ngModel)]="user.matricule"
+          <input type="text" name="matricule" [(ngModel)]="user.matriculefiscale"
             class="w-full rounded-lg border border-gray-300 py-3 px-4 pl-10 focus:ring-2 focus:ring-blue-500 text-sm"
             placeholder="Votre matricule fiscale" required />
           <i class="ri-file-list-line absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"></i>
         </div>
       </div>
+
+      <!-- Date de création -->
+              <!-- Date de création -->
+                <div>
+             <label class="text-sm font-medium text-gray-700">Date de création</label>
+            <div class="relative">
+             <input type="date" name="dateCreation" [(ngModel)]="user.dateCreation"
+               class="w-full rounded-lg border border-gray-300 py-3 px-4 focus:ring-2 focus:ring-blue-500 text-sm"
+                 required />
+             </div>
+             </div>
+
 
       <!-- Conditions d'utilisation -->
       <div class="flex items-center gap-2">
@@ -110,12 +122,12 @@
       </button>
 
       <!-- Lien vers la connexion -->
-<p class="text-center text-sm text-gray-600 mt-4">
-  Déjà inscrit ?
-  <a (click)="goToLogin()" class="text-primary hover:text-primary/80 font-medium cursor-pointer">
-    Se connecter
-  </a>
-</p>
+      <p class="text-center text-sm text-gray-600 mt-4">
+        Déjà inscrit ?
+        <a (click)="goToLogin()" class="text-primary hover:text-primary/80 font-medium cursor-pointer">
+          Se connecter
+        </a>
+      </p>
     </form>
   </div>
 </div>

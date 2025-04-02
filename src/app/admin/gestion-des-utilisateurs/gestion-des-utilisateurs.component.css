@@ -11,6 +11,7 @@
 .hover\:text-primary-dark:hover {
   color: #4338CA; /* Une nuance plus foncée pour le hover */
 }
+
 .modal {
   position: fixed;
   top: 0;

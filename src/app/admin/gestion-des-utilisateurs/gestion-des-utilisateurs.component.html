@@ -5,17 +5,14 @@
       <div class="text-2xl font-['Pacifico'] text-primary">Sfax</div>
     </div>
     <nav class="mt-4">
-      <!-- Lien vers le tableau de bord -->
       <a routerLink="/dashboard" routerLinkActive="bg-gray-50 text-primary" class="flex items-center px-6 py-3 text-gray-600 hover:bg-gray-50 hover:text-primary">
         <i class="ri-dashboard-line mr-3"></i>
         <span>Tableau de bord</span>
       </a>
-      <!-- Lien vers la gestion des utilisateurs (page actuelle) -->
       <a routerLink="/users" routerLinkActive="bg-gray-50 text-primary" class="flex items-center px-6 py-3 text-gray-600 hover:bg-gray-50 hover:text-primary">
         <i class="ri-user-line mr-3"></i>
         <span>Utilisateurs</span>
       </a>
-      <!-- Lien vers les notifications -->
       <a routerLink="/notifications" routerLinkActive="bg-gray-50 text-primary" class="flex items-center px-6 py-3 text-gray-600 hover:bg-gray-50 hover:text-primary">
         <i class="ri-notification-line mr-3"></i>
         <span>Notifications</span>
@@ -37,14 +34,12 @@
           </div>
         </div>
         <div class="flex items-center space-x-4">
-          <!-- Bouton pour naviguer vers la page des notifications -->
           <button routerLink="/notifications" class="w-8 h-8 flex items-center justify-center text-gray-600 hover:text-primary relative">
             <i class="ri-notification-3-line"></i>
             <span class="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">
               {{ notificationCount }}
             </span>
           </button>
-          <!-- Menu de profil -->
           <div class="relative">
             <button id="profileButton" class="flex items-center space-x-2 cursor-pointer" (click)="toggleProfile()">
               <div class="w-8 h-8 rounded-full bg-gray-200 flex items-center justify-center">
@@ -76,7 +71,6 @@
     <!-- Contenu principal -->
     <main class="flex-1 overflow-auto p-6">
       <div class="px-4 py-6 sm:px-0">
-        <!-- Titre et bouton pour ajouter un utilisateur -->
         <div class="flex justify-between items-center mb-6">
           <h1 class="text-2xl font-semibold text-gray-900">Gestion Des Utilisateurs</h1>
           <button id="addUserBtn" class="bg-primary text-white px-4 py-2 rounded-button flex items-center space-x-2 cursor-pointer" (click)="openAddUserModal()">
@@ -85,10 +79,8 @@
           </button>
         </div>
 
-        <!-- Tableau des utilisateurs -->
         <div class="mt-8 bg-white rounded-lg shadow">
           <div class="p-6">
-            <!-- Filtres et recherche -->
             <div class="flex flex-col sm:flex-row justify-between items-center mb-6 space-y-4 sm:space-y-0">
               <div class="relative flex-1 max-w-sm">
                 <input type="text" placeholder="Rechercher..." class="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-button focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent" [(ngModel)]="tableSearchQuery" (input)="filterUsers()">
@@ -96,29 +88,27 @@
                   <i class="ri-search-line"></i>
                 </div>
               </div>
-              <div class="flex space-x-4">
-                <select class="border border-gray-300 rounded-button px-4 py-2 focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent" [(ngModel)]="statusFilter" (change)="filterUsers()">
-                  <option value="">Tous les statuts</option>
-                  <option value="Actif">Actif</option>
-                  <option value="Inactif">Inactif</option>
-                </select>
-              </div>
             </div>
-            <!-- Tableau -->
+
             <div class="overflow-x-auto">
               <table class="min-w-full divide-y divide-gray-200">
                 <thead>
                   <tr>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Matricule Fiscale</th>
                     <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Nom</th>
                     <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Prénom</th>
                     <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Email</th>
-                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Statut</th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Téléphone</th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Adresse</th>
                     <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Date de création</th>
                     <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
                   </tr>
                 </thead>
                 <tbody class="bg-white divide-y divide-gray-200">
                   <tr *ngFor="let user of filteredUsers">
+                    <td class="px-6 py-4 whitespace-nowrap">
+                      <div class="text-sm text-gray-900">{{ user.matriculeFiscale }}</div>
+                    </td>
                     <td class="px-6 py-4 whitespace-nowrap">
                       <div class="text-sm font-medium text-gray-900">{{ user.nom }}</div>
                     </td>
@@ -129,16 +119,17 @@
                       <div class="text-sm text-gray-900">{{ user.email }}</div>
                     </td>
                     <td class="px-6 py-4 whitespace-nowrap">
-                      <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full" [ngClass]="{'bg-green-100 text-green-800': user.statut === 'Actif', 'bg-red-100 text-red-800': user.statut === 'Inactif'}">
-                        {{ user.statut }}
-                      </span>
+                      <div class="text-sm text-gray-900">{{ user.telephone }}</div>
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap">
+                      <div class="text-sm text-gray-900">{{ user.adresse }}</div>
                     </td>
                     <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{{ user.dateCreation }}</td>
                     <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                       <button class="text-primary hover:text-primary-dark mr-3" (click)="editUser(user)">
                         <i class="ri-edit-line"></i>
                       </button>
-                      <button class="text-red-600 hover:text-red-900" (click)="archiveUser(user.id)">
+                      <button class="text-red-600 hover:text-red-900" (click)="archiveUser(user.matriculeFiscale)">
                         <i class="ri-archive-line"></i>
                       </button>
                     </td>
@@ -155,33 +146,56 @@
   <!-- Modal pour ajouter/modifier un utilisateur -->
   <div class="modal" [class.hidden]="!isModalOpen">
     <div class="fixed inset-0 flex items-center justify-center">
-      <div class="bg-white rounded-lg shadow-xl w-full max-w-md">
+      <div class="bg-white rounded-lg shadow-xl w-full max-w-2xl">
         <div class="p-6">
           <h2 class="text-xl font-semibold text-gray-900 mb-6">{{ modalTitle }}</h2>
           <form (ngSubmit)="saveUser()">
-            <div class="space-y-4">
-              <div>
+            <div class="flex flex-wrap -mx-2 space-y-4">
+              <!-- Matricule Fiscale et Nom -->
+              <div class="w-1/2 px-2">
+                <label class="block text-sm font-medium text-gray-700">Matricule Fiscale</label>
+                <input type="text" class="mt-1 block w-full border border-gray-300 rounded-button px-3 py-2 focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent" [(ngModel)]="currentUser.matriculeFiscale" name="matriculeFiscale" required>
+              </div>
+              <div class="w-1/2 px-2">
                 <label class="block text-sm font-medium text-gray-700">Nom</label>
-                <input type="text" class="mt-1 block w-full border border-gray-300 rounded-button px-3 py-2" [(ngModel)]="currentUser.nom" name="nom" required>
+                <input type="text" class="mt-1 block w-full border border-gray-300 rounded-button px-3 py-2 focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent" [(ngModel)]="currentUser.nom" name="nom" required>
               </div>
-              <div>
+
+              <!-- Prénom et Email -->
+              <div class="w-1/2 px-2">
                 <label class="block text-sm font-medium text-gray-700">Prénom</label>
-                <input type="text" class="mt-1 block w-full border border-gray-300 rounded-button px-3 py-2" [(ngModel)]="currentUser.prenom" name="prenom" required>
+                <input type="text" class="mt-1 block w-full border border-gray-300 rounded-button px-3 py-2 focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent" [(ngModel)]="currentUser.prenom" name="prenom" required>
               </div>
-              <div>
+              <div class="w-1/2 px-2">
                 <label class="block text-sm font-medium text-gray-700">Email</label>
-                <input type="email" class="mt-1 block w-full border border-gray-300 rounded-button px-3 py-2" [(ngModel)]="currentUser.email" name="email" required>
+                <input type="email" class="mt-1 block w-full border border-gray-300 rounded-button px-3 py-2 focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent" [(ngModel)]="currentUser.email" name="email" required>
               </div>
-              <div>
-                <label class="block text-sm font-medium text-gray-700">Statut</label>
-                <select class="mt-1 block w-full border border-gray-300 rounded-button px-3 py-2" [(ngModel)]="currentUser.statut" name="statut">
-                  <option value="Actif">Actif</option>
-                  <option value="Inactif">Inactif</option>
-                </select>
+
+              <!-- Mot de passe et Confirmer mot de passe -->
+              <div class="w-1/2 px-2">
+                <label class="block text-sm font-medium text-gray-700">Mot de passe</label>
+                <input type="password" class="mt-1 block w-full border border-gray-300 rounded-button px-3 py-2 focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent" [(ngModel)]="currentUser.password" name="password" required (input)="checkPasswordMatch()">
               </div>
-              <div>
+              <div class="w-1/2 px-2">
+                <label class="block text-sm font-medium text-gray-700">Confirmer le mot de passe</label>
+                <input type="password" class="mt-1 block w-full border border-gray-300 rounded-button px-3 py-2 focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent" [(ngModel)]="currentUser.confirmPassword" name="confirmPassword" required (input)="checkPasswordMatch()">
+                <div class="mt-1 text-xs" [ngClass]="passwordMatchClass">{{ passwordMatchMessage }}</div>
+              </div>
+
+              <!-- Téléphone et Adresse -->
+              <div class="w-1/2 px-2">
+                <label class="block text-sm font-medium text-gray-700">Téléphone</label>
+                <input type="tel" class="mt-1 block w-full border border-gray-300 rounded-button px-3 py-2 focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent" [(ngModel)]="currentUser.telephone" name="telephone" required>
+              </div>
+              <div class="w-1/2 px-2">
+                <label class="block text-sm font-medium text-gray-700">Adresse</label>
+                <input type="text" class="mt-1 block w-full border border-gray-300 rounded-button px-3 py-2 focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent" [(ngModel)]="currentUser.adresse" name="adresse" required>
+              </div>
+
+              <!-- Date de création -->
+              <div class="w-1/2 px-2">
                 <label class="block text-sm font-medium text-gray-700">Date de création</label>
-                <input type="date" class="mt-1 block w-full border border-gray-300 rounded-button px-3 py-2" [(ngModel)]="currentUser.dateCreation" name="dateCreation">
+                <input type="date" class="mt-1 block w-full border border-gray-300 rounded-button px-3 py-2 focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent" [(ngModel)]="currentUser.dateCreation" name="dateCreation">
               </div>
             </div>
             <div class="mt-6 flex justify-end space-x-3">

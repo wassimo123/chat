@@ -48,6 +48,7 @@ import { PromotionsComponent } from './component/promotions/promotions.component
     FooterComponent,
     PromotionsComponent,
     HomeComponent,
+    
 ],
   providers: [],
   bootstrap: [AppComponent]

@@ -1,5 +1,5 @@
 import { Component } from '@angular/core';
-import { Router } from '@angular/router'; // Importez le Router
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-inscription',
@@ -8,18 +8,19 @@ import { Router } from '@angular/router'; // Importez le Router
 })
 export class InscriptionComponent {
   user = {
-    lastname: '',
-    firstname: '',
+    nom: '',
+    prenom: '',
     email: '',
     password: '',
     confirmPassword: '',
     phone: '',
     address: '',
-    matricule: '',
-    terms: false
+    matriculefiscale: '',
+    terms: false,
+    dateCreation: this.formatDate(new Date()) // Date initialisée automatiquement
   };
 
-  constructor(private router: Router) {} // Injectez le Router dans le constructeur
+  constructor(private router: Router) {}
 
   onSubmit() {
     if (!this.user.terms) {
@@ -34,11 +35,13 @@ export class InscriptionComponent {
 
     console.log("Formulaire soumis avec succès :", this.user);
     alert("Inscription réussie !");
-    // Ici, tu peux envoyer les données à l'API backend via un service Angular
   }
 
   goToLogin() {
-    alert("Redirection vers la page de connexion.");
-    this.router.navigate(['/connexion']); // Maintenant, router est défini
+    this.router.navigate(['/connexion']);
+  }
+
+  private formatDate(date: Date): string {
+    return date.toISOString().split('T')[0]; // Format 'YYYY-MM-DD'
   }
 }
