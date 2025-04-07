@@ -1,6 +1,19 @@
 import { Component, OnInit, HostListener } from '@angular/core';
 import { UserService } from '../../services/user.service';
 
+interface User {
+  matriculeFiscale: string;
+  nom: string;
+  prenom: string;
+  email: string;
+  password?: string;
+  confirmPassword?: string;
+  telephone: string;
+  adresse: string;
+  dateCreation: string;
+  isArchived?: boolean;
+}
+
 @Component({
   selector: 'app-gestion-des-utilisateurs',
   templateUrl: './gestion-des-utilisateurs.component.html',
@@ -13,7 +26,7 @@ export class GestionDesUtilisateursComponent implements OnInit {
   isProfileMenuOpen: boolean = false;
   isModalOpen: boolean = false;
   modalTitle: string = 'Ajouter un utilisateur';
-  currentUser: any = { 
+  currentUser: User = { 
     matriculeFiscale: '', 
     nom: '', 
     prenom: '', 
@@ -38,18 +51,79 @@ export class GestionDesUtilisateursComponent implements OnInit {
   messageModalTitle: string = '';
   messageModalMessage: string = '';
 
-  users: any[] = [];
+  users: User[] = [];
   filteredUsers = [...this.users];
   notificationCount: number = 3;
 
   constructor(private userService: UserService) {}
 
-  ngOnInit() {
+  ngOnInit(): void {
+    this.loadUsers();
+  }
+
+  loadUsers() {
     this.userService.getUsers().subscribe(data => {
       this.users = data;
-      this.filteredUsers = [...this.users];
+      this.filteredUsers = this.users.filter(user => !user.isArchived); // Affiche uniquement les utilisateurs non archivés
     });
   }
+
+  // archiveUser(matriculeFiscale: string): void {
+  //   if (confirm('Êtes-vous sûr de vouloir archiver cet utilisateur ?')) {
+  //     this.userService.archiveUser(matriculeFiscale).subscribe(
+  //       response => {
+  //         console.log('Utilisateur archivé:', response);
+  //         // Recharger la liste des utilisateurs après archivage
+  //         this.loadUsers();
+  //         this.showMessageModal = true;
+  //         this.messageModalType = 'success';
+  //         this.messageModalTitle = 'Succès';
+  //         this.messageModalMessage = 'Utilisateur archivé avec succès.';
+  //       },
+  //       error => {
+  //         console.error('Erreur lors de l\'archivage :', error);
+  //         this.showMessageModal = true;
+  //         this.messageModalType = 'error';
+  //         this.messageModalTitle = 'Erreur';
+  //         this.messageModalMessage = error.error?.message || 'Erreur lors de l\'archivage.';
+  //       }
+  //     );
+  //   }
+  // }
+  archiveUser(matriculeFiscale: string): void {
+    if (!matriculeFiscale) {
+      console.warn('Matricule fiscale invalide.');
+      return;
+    }
+  
+    const confirmation = confirm('Êtes-vous sûr de vouloir archiver cet utilisateur ?');
+    if (!confirmation) return;
+  
+    this.userService.archiveUser(matriculeFiscale).subscribe({
+      next: (response) => {
+        console.log('Utilisateur archivé:', response);
+  
+        // Recharger uniquement les utilisateurs actifs (non archivés)
+        this.loadUsers();
+  
+        // Affichage du message de succès
+        this.showMessageModal = true;
+        this.messageModalType = 'success';
+        this.messageModalTitle = 'Succès';
+        this.messageModalMessage = 'Utilisateur archivé avec succès.';
+      },
+      error: (error) => {
+        console.error('Erreur lors de l\'archivage :', error);
+  
+        // Affichage du message d'erreur
+        this.showMessageModal = true;
+        this.messageModalType = 'error';
+        this.messageModalTitle = 'Erreur';
+        this.messageModalMessage = error?.error?.message || 'Erreur lors de l\'archivage.';
+      }
+    });
+  }
+  
 
   onSearch() {
     console.log('Recherche:', this.searchQuery);
@@ -58,7 +132,7 @@ export class GestionDesUtilisateursComponent implements OnInit {
   filterUsers() {
     this.filteredUsers = this.users.filter(user =>
       (!this.tableSearchQuery || 
-        `${user.matriculeFiscale} ${user.nom} ${user.prenom}`.toLowerCase().includes(this.tableSearchQuery.toLowerCase()))
+        `${user.matriculeFiscale} ${user.nom}${user.adresse} ${user.prenom}`.toLowerCase().includes(this.tableSearchQuery.toLowerCase()))
     );
   }
 
@@ -73,60 +147,102 @@ export class GestionDesUtilisateursComponent implements OnInit {
       confirmPassword: '',
       telephone: '', 
       adresse: '', 
-      dateCreation: '' 
+      dateCreation: '' ,
     };
     this.isModalOpen = true;
   }
 
-  editUser(user: any) {
+  editUser(user: User) {
     this.modalTitle = "Modifier l'utilisateur";
-    this.currentUser = { ...user };
+    this.currentUser = { ...user, password: undefined, confirmPassword: undefined };
     this.isModalOpen = true;
   }
-
   saveUser() {
     if (this.currentUser.matriculeFiscale && 
         this.currentUser.nom && 
         this.currentUser.prenom && 
         this.currentUser.email && 
-        this.currentUser.password && 
-        this.currentUser.confirmPassword &&
         this.currentUser.telephone && 
         this.currentUser.adresse) {
       
-      if (this.currentUser.password !== this.currentUser.confirmPassword) {
-        this.showMessageModal = true;
-        this.messageModalType = 'error';
-        this.messageModalTitle = 'Erreur';
-        this.messageModalMessage = 'Les mots de passe ne correspondent pas';
-        return;
-      }
-
-      if (!this.validatePassword(this.currentUser.password)) {
-        this.showMessageModal = true;
-        this.messageModalType = 'error';
-        this.messageModalTitle = 'Erreur de validation';
-        this.messageModalMessage = 'Le mot de passe ne respecte pas les critères de sécurité requis.';
-        return;
-      }
-
-      if (!this.currentUser.dateCreation) {
-        this.currentUser.dateCreation = new Date().toISOString();
-      }
-
-      this.userService.createUsers(this.currentUser).subscribe(
-        (response) => {
-          console.log('Utilisateur ajouté avec succès:', response);
-          this.users.push(response);
-          this.filterUsers();
-          this.closeModal();
-        },
-        (error) => {
-          console.error('Erreur lors de l\'ajout de l\'utilisateur:', error);
+      // Vérifier les mots de passe uniquement si les deux champs sont remplis
+      if (this.currentUser.password && this.currentUser.confirmPassword) {
+        if (this.currentUser.password !== this.currentUser.confirmPassword) {
+          this.showMessageModal = true;
+          this.messageModalType = 'error';
+          this.messageModalTitle = 'Erreur';
+          this.messageModalMessage = 'Les mots de passe ne correspondent pas';
+          return;
         }
-      );
+  
+        if (!this.validatePassword(this.currentUser.password)) {
+          this.showMessageModal = true;
+          this.messageModalType = 'error';
+          this.messageModalTitle = 'Erreur de validation';
+          this.messageModalMessage = 'Le mot de passe ne respecte pas les critères de sécurité requis.';
+          return;
+        }
+      }
+  
+      if (!this.currentUser.dateCreation) {
+        this.currentUser.dateCreation = new Date().toISOString().split('T')[0];
+      }
+  
+      // Créer un objet à envoyer au backend
+      const { password, confirmPassword, ...userToSave } = this.currentUser;
+      // Inclure password et confirmPassword uniquement s'ils sont remplis
+      const finalUserToSave = {
+        ...userToSave,
+        ...(password && confirmPassword ? { password, confirmPassword } : {})
+      };
+  
+      if (this.users.some(u => u.matriculeFiscale === this.currentUser.matriculeFiscale)) {
+        this.userService.updateUser(this.currentUser.matriculeFiscale, finalUserToSave).subscribe(
+          (response: User) => {
+            console.log('Utilisateur mis à jour avec succès:', response);
+            const index = this.users.findIndex(u => u.matriculeFiscale === response.matriculeFiscale);
+            this.users[index] = response;
+            this.filterUsers();
+            this.closeModal();
+            this.showMessageModal = true;
+            this.messageModalType = 'success';
+            this.messageModalTitle = 'Succès';
+            this.messageModalMessage = 'Utilisateur mis à jour avec succès.';
+          },
+          (error: any) => {
+            console.error('Erreur lors de la mise à jour de l\'utilisateur:', error);
+            this.showMessageModal = true;
+            this.messageModalType = 'error';
+            this.messageModalTitle = 'Erreur';
+            this.messageModalMessage = error.error?.message || 'Erreur lors de la mise à jour.';
+          }
+        );
+      } else {
+        this.userService.createUsers(finalUserToSave).subscribe(
+          (response: User) => {
+            console.log('Utilisateur ajouté avec succès:', response);
+            this.users.push(response);
+            this.filterUsers();
+            this.closeModal();
+            this.showMessageModal = true;
+            this.messageModalType = 'success';
+            this.messageModalTitle = 'Succès';
+            this.messageModalMessage = 'Utilisateur ajouté avec succès.';
+          },
+          (error: any) => {
+            console.error('Erreur lors de l\'ajout de l\'utilisateur:', error);
+            this.showMessageModal = true;
+            this.messageModalType = 'error';
+            this.messageModalTitle = 'Erreur';
+            this.messageModalMessage = error.error?.message || 'Erreur lors de l\'ajout.';
+          }
+        );
+      }
     } else {
-      console.warn("Veuillez remplir tous les champs obligatoires.");
+      this.showMessageModal = true;
+      this.messageModalType = 'error';
+      this.messageModalTitle = 'Erreur';
+      this.messageModalMessage = 'Veuillez remplir tous les champs obligatoires.';
     }
   }
 
@@ -145,12 +261,6 @@ export class GestionDesUtilisateursComponent implements OnInit {
     };
     this.passwordMatchMessage = '';
     this.passwordMatchClass = '';
-  }
-
-  archiveUser(id: number) {
-    if (confirm('Êtes-vous sûr de vouloir archiver cet utilisateur ?')) {
-      console.log('Utilisateur archivé:', id);
-    }
   }
 
   toggleProfile() {

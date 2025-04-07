@@ -13,8 +13,9 @@ import { HotelDetailComponent } from './component/hotel-detail/hotel-detail.comp
 import { HotelsComponent } from './component/hotels/hotels.component';
 import { EventComponent } from './component/event/event.component';
 import { PromotionsComponent } from './component/promotions/promotions.component';
-
-
+import { TermsComponent } from './terms/terms.component';
+import { PrivacyComponent } from './privacy/privacy.component';
+import { AcceptTermsComponent } from './accept-terms/accept-terms.component';
 
 
 const routes: Routes = [
@@ -32,9 +33,10 @@ const routes: Routes = [
   { path: 'navbar', component: NavbarComponent },
   { path: 'footer', component: FooterComponent },
   { path: 'connexion', redirectTo: '/connexion', pathMatch: 'full' },
-  { path: '', redirectTo: '/dashboard', pathMatch: 'full' }
-
-
+  { path: '', redirectTo: '/dashboard', pathMatch: 'full' },
+  { path: 'terms', component: TermsComponent },
+  { path: 'privacy', component: PrivacyComponent },
+  { path: 'accept-terms', component: AcceptTermsComponent },
 ];
 
 @NgModule({

@@ -110,9 +110,9 @@
         <input type="checkbox" name="terms" [(ngModel)]="user.terms"
           class="w-4 h-4 border-gray-300 text-blue-600 focus:ring-blue-500" required />
         <label class="text-sm text-gray-600">J'accepte les 
-          <button type="button" class="text-blue-600 hover:text-blue-800">conditions d'utilisation</button> 
+          <a [routerLink]="['/terms']" class="text-blue-600 hover:text-blue-800">conditions d'utilisation</a> 
           et la 
-          <button type="button" class="text-blue-600 hover:text-blue-800">politique de confidentialité</button>.
+          <a [routerLink]="['/privacy']" class="text-blue-600 hover:text-blue-800">politique de confidentialité</a>.
         </label>
       </div>
 

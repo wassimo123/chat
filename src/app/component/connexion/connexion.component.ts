@@ -1,4 +1,6 @@
 import { Component } from '@angular/core';
+import { Router } from '@angular/router';
+import { UserService } from '../../services/user.service';
 
 @Component({
   selector: 'app-connexion',
@@ -10,24 +12,43 @@ export class ConnexionComponent {
   password: string = '';
   rememberMe: boolean = false;
 
-  onSubmit() {
-    console.log('Email:', this.email);
-    console.log('Mot de passe:', this.password);
-    console.log('Se souvenir de moi:', this.rememberMe);
+  constructor(private router: Router, private userService: UserService) {}
 
-    alert('Connexion réussie ! Redirection en cours...');
-    setTimeout(() => {
-      window.location.href = '/dashboard'; // Change vers la page souhaitée
-    }, 2000);
+  onSubmit() {
+    this.userService.login({ email: this.email, password: this.password }).subscribe(
+      (response) => {
+        console.log('Connexion réussie:', response);
+        localStorage.setItem('token', response.token);
+        if (this.rememberMe) {
+          localStorage.setItem('user', JSON.stringify(response.user));
+        }
+        alert('Connexion réussie ! Redirection en cours...');
+        setTimeout(() => {
+          this.router.navigate(['/dashboard']);
+        }, 2000);
+      },
+      (error) => {
+        console.error('Erreur lors de la connexion:', error);
+        if (error.status === 403 && error.error.message === 'Nouvelles conditions d\'utilisation à accepter.') {
+          // Stocker le token temporaire pour accepter les conditions
+          localStorage.setItem('token', error.error.token);
+          this.router.navigate(['/accept-terms'], {
+            state: { user: error.error.user, latestTerms: error.error.latestTerms }
+          });
+        } else {
+          alert(error.error.message || 'Erreur lors de la connexion.');
+        }
+      }
+    );
   }
 
   forgotPassword() {
     alert('Redirection vers la page de récupération du mot de passe.');
-    window.location.href = '/mot-de-passe-oublie'; // Change l'URL si besoin
+    this.router.navigate(['/mot-de-passe-oublie']);
   }
 
   createAccount() {
     alert('Redirection vers la page d\'inscription.');
-    window.location.href = '/inscription'; // Change l'URL si besoin
+    this.router.navigate(['/inscription']);
   }
 }

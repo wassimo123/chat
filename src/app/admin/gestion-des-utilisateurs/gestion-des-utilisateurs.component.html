@@ -105,7 +105,8 @@
                   </tr>
                 </thead>
                 <tbody class="bg-white divide-y divide-gray-200">
-                  <tr *ngFor="let user of filteredUsers">
+                  <!-- <tr *ngFor="let user of filteredUsers">
+                    <tr *ngIf="!user.isArchived">
                     <td class="px-6 py-4 whitespace-nowrap">
                       <div class="text-sm text-gray-900">{{ user.matriculeFiscale }}</div>
                     </td>
@@ -133,7 +134,45 @@
                         <i class="ri-archive-line"></i>
                       </button>
                     </td>
-                  </tr>
+                  </tr> -->
+                  <ng-container *ngFor="let user of filteredUsers">
+                    <tr *ngIf="!user.isArchived">
+                      <td class="px-6 py-4 whitespace-nowrap">
+                        <div class="text-sm text-gray-900">{{ user.matriculeFiscale }}</div>
+                      </td>
+                      <td class="px-6 py-4 whitespace-nowrap">
+                        <div class="text-sm font-medium text-gray-900">{{ user.nom }}</div>
+                      </td>
+                      <td class="px-6 py-4 whitespace-nowrap">
+                        <div class="text-sm text-gray-900">{{ user.prenom }}</div>
+                      </td>
+                      <td class="px-6 py-4 whitespace-nowrap">
+                        <div class="text-sm text-gray-900">{{ user.email }}</div>
+                      </td>
+                      <td class="px-6 py-4 whitespace-nowrap">
+                        <div class="text-sm text-gray-900">{{ user.telephone }}</div>
+                      </td>
+                      <td class="px-6 py-4 whitespace-nowrap">
+                        <div class="text-sm text-gray-900">{{ user.adresse }}</div>
+                      </td>
+                      <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{{ user.dateCreation }}</td>
+                      <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                        <button class="text-primary hover:text-primary-dark mr-3" (click)="editUser(user)">
+                          <i class="ri-edit-line"></i>
+                        </button>
+                        <!-- <button class="text-red-600 hover:text-red-900" (click)="archiveUser(user.matriculeFiscale)">
+                          <i class="ri-archive-line"></i>
+                        </button> -->
+                        <button (click)="archiveUser(user.matriculeFiscale)" class="text-red-600 hover:text-red-900">
+                          <i class="ri-archive-line"></i> 
+                        </button>
+                      </td>
+                    </tr>
+                  </ng-container>
+                  
+                  
+                  
+                  
                 </tbody>
               </table>
             </div>

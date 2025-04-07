@@ -18,6 +18,9 @@ import { EventComponent } from './component/event/event.component';
 import { NavbarComponent } from "./component/navbar/navbar.component";
 import { FooterComponent } from "./component/footer/footer.component";
 import { PromotionsComponent } from './component/promotions/promotions.component';
+import { TermsComponent } from './terms/terms.component';
+import { PrivacyComponent } from './privacy/privacy.component';
+import { AcceptTermsComponent } from './accept-terms/accept-terms.component';
 
 
 @NgModule({
@@ -29,6 +32,9 @@ import { PromotionsComponent } from './component/promotions/promotions.component
     ConnexionComponent,
     InscriptionComponent,
     ProfileComponent,
+    TermsComponent,
+    PrivacyComponent,
+    AcceptTermsComponent,
     
     
     
