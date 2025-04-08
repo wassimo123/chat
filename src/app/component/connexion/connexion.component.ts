@@ -1,3 +1,4 @@
+// src/app/connexion/connexion.component.ts
 import { Component } from '@angular/core';
 import { Router } from '@angular/router';
 import { UserService } from '../../services/user.service';
@@ -5,7 +6,7 @@ import { UserService } from '../../services/user.service';
 @Component({
   selector: 'app-connexion',
   templateUrl: './connexion.component.html',
-  styleUrls: ['./connexion.component.css']
+  styleUrls: ['./connexion.component.css'],
 })
 export class ConnexionComponent {
   email: string = '';
@@ -30,10 +31,11 @@ export class ConnexionComponent {
       (error) => {
         console.error('Erreur lors de la connexion:', error);
         if (error.status === 403 && error.error.message === 'Nouvelles conditions d\'utilisation à accepter.') {
-          // Stocker le token temporaire pour accepter les conditions
-          localStorage.setItem('token', error.error.token);
+          const token = error.error.token;
+          console.log('Token stocké dans localStorage :', token);
+          localStorage.setItem('token', token);
           this.router.navigate(['/accept-terms'], {
-            state: { user: error.error.user, latestTerms: error.error.latestTerms }
+            state: { user: error.error.user, latestTerms: error.error.latestTerms },
           });
         } else {
           alert(error.error.message || 'Erreur lors de la connexion.');
@@ -43,12 +45,11 @@ export class ConnexionComponent {
   }
 
   forgotPassword() {
-    alert('Redirection vers la page de récupération du mot de passe.');
-    this.router.navigate(['/mot-de-passe-oublie']);
+    this.router.navigate(['/forgot-password']);
   }
 
   createAccount() {
-    alert('Redirection vers la page d\'inscription.');
+    alert("Redirection vers la page d'inscription.");
     this.router.navigate(['/inscription']);
   }
 }

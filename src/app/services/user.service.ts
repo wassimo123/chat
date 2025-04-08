@@ -1,9 +1,10 @@
+// src/app/services/user.service.ts
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Observable } from 'rxjs';
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class UserService {
   private apiUrl = 'http://localhost:5000/api';
@@ -12,8 +13,9 @@ export class UserService {
 
   private getHeaders(): HttpHeaders {
     const token = localStorage.getItem('token');
+    console.log('Token envoyé dans la requête /accept-terms :', token);
     return new HttpHeaders({
-      'Authorization': `Bearer ${token}` // Ajouter le token dans l'en-tête
+      Authorization: `Bearer ${token}`,
     });
   }
 
@@ -34,14 +36,28 @@ export class UserService {
   }
 
   createUsers(body: any): Observable<any> {
-    return this.http.post<any>(`${this.apiUrl}/users`, body);
+    const { confirmPassword, ...userData } = body;
+    return this.http.post<any>(`${this.apiUrl}/users`, userData);
   }
 
   updateUser(matricule: string, body: any): Observable<any> {
-    return this.http.put<any>(`${this.apiUrl}/users/matricule/${matricule}`, body);
+    const { confirmPassword, ...userData } = body;
+    return this.http.put<any>(`${this.apiUrl}/users/matricule/${matricule}`, userData, {
+      headers: this.getHeaders(),
+    });
   }
 
   archiveUser(matricule: string): Observable<any> {
     return this.http.patch<any>(`${this.apiUrl}/users/matricule/${matricule}`, {});
+  }
+
+  // Nouvelle méthode pour demander un lien de réinitialisation
+  forgotPassword(email: string): Observable<any> {
+    return this.http.post(`${this.apiUrl}/forgot-password`, { email });
+  }
+
+  // Nouvelle méthode pour réinitialiser le mot de passe
+  resetPassword(token: string, newPassword: string, confirmPassword: string): Observable<any> {
+    return this.http.post(`${this.apiUrl}/reset-password`, { token, newPassword, confirmPassword });
   }
 }

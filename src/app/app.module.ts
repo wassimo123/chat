@@ -21,6 +21,8 @@ import { PromotionsComponent } from './component/promotions/promotions.component
 import { TermsComponent } from './terms/terms.component';
 import { PrivacyComponent } from './privacy/privacy.component';
 import { AcceptTermsComponent } from './accept-terms/accept-terms.component';
+import { ForgotPasswordComponent } from './forgot-password/forgot-password.component';
+import { ResetPasswordComponent } from './reset-password/reset-password.component';
 
 
 @NgModule({
@@ -35,6 +37,8 @@ import { AcceptTermsComponent } from './accept-terms/accept-terms.component';
     TermsComponent,
     PrivacyComponent,
     AcceptTermsComponent,
+    ForgotPasswordComponent,
+    ResetPasswordComponent,
     
     
     

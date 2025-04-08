@@ -1,3 +1,4 @@
+// src/app/inscription/inscription.component.ts
 import { Component } from '@angular/core';
 import { Router } from '@angular/router';
 import { UserService } from '../../services/user.service';
@@ -5,7 +6,7 @@ import { UserService } from '../../services/user.service';
 @Component({
   selector: 'app-inscription',
   templateUrl: './inscription.component.html',
-  styleUrls: ['./inscription.component.css']
+  styleUrls: ['./inscription.component.css'],
 })
 export class InscriptionComponent {
   user = {
@@ -18,7 +19,7 @@ export class InscriptionComponent {
     address: '',
     matriculefiscale: '',
     terms: false,
-    dateCreation: this.formatDate(new Date())
+    dateCreation: this.formatDate(new Date()),
   };
 
   constructor(private router: Router, private userService: UserService) {}
@@ -30,7 +31,7 @@ export class InscriptionComponent {
     }
 
     if (this.user.password !== this.user.confirmPassword) {
-      alert("Les mots de passe ne correspondent pas.");
+      alert('Les mots de passe ne correspondent pas.');
       return;
     }
 
@@ -44,19 +45,18 @@ export class InscriptionComponent {
       telephone: this.user.phone,
       adresse: this.user.address,
       dateCreation: this.user.dateCreation,
-      terms: this.user.terms
+      terms: this.user.terms,
     }).subscribe(
       (response) => {
         console.log('Inscription réussie:', response);
-        // Stocker le token
         localStorage.setItem('token', response.token);
         localStorage.setItem('user', JSON.stringify(response.user));
         alert('Inscription réussie ! Vous allez être redirigé vers la page de connexion.');
         this.router.navigate(['/connexion']);
       },
       (error) => {
-        console.error('Erreur lors de l\'inscription:', error);
-        alert(error.error.message || 'Erreur lors de l\'inscription.');
+        console.error("Erreur lors de l'inscription:", error);
+        alert(error.error.message || "Erreur lors de l'inscription.");
       }
     );
   }

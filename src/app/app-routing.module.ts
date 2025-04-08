@@ -16,7 +16,8 @@ import { PromotionsComponent } from './component/promotions/promotions.component
 import { TermsComponent } from './terms/terms.component';
 import { PrivacyComponent } from './privacy/privacy.component';
 import { AcceptTermsComponent } from './accept-terms/accept-terms.component';
-
+import { ForgotPasswordComponent } from './forgot-password/forgot-password.component';
+import { ResetPasswordComponent } from './reset-password/reset-password.component';
 
 const routes: Routes = [
   { path: 'dashboard', component: TableauDeBordComponent }, 
@@ -32,11 +33,12 @@ const routes: Routes = [
   { path: 'home', component: HomeComponent }, 
   { path: 'navbar', component: NavbarComponent },
   { path: 'footer', component: FooterComponent },
-  { path: 'connexion', redirectTo: '/connexion', pathMatch: 'full' },
-  { path: '', redirectTo: '/dashboard', pathMatch: 'full' },
+  { path: '', redirectTo: '/connexion', pathMatch: 'full' },
   { path: 'terms', component: TermsComponent },
   { path: 'privacy', component: PrivacyComponent },
   { path: 'accept-terms', component: AcceptTermsComponent },
+  { path: 'forgot-password', component: ForgotPasswordComponent },
+  { path: 'reset-password', component: ResetPasswordComponent },
 ];
 
 @NgModule({
