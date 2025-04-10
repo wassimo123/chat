@@ -13,6 +13,10 @@
         <i class="ri-user-line mr-3"></i>
         <span>Utilisateurs</span>
       </a>
+      <a routerLink="/etablissements" routerLinkActive="bg-gray-50 text-primary" class="flex items-center px-6 py-3 text-gray-600 hover:bg-gray-50 hover:text-primary">
+        <i class="ri-building-line mr-3"></i>
+        <span>Établissements</span>
+      </a>
       <a routerLink="/notifications" routerLinkActive="bg-gray-50 text-primary" class="flex items-center px-6 py-3 text-gray-600 hover:bg-gray-50 hover:text-primary">
         <i class="ri-notification-line mr-3"></i>
         <span>Notifications</span>
@@ -53,10 +57,7 @@
                 <i class="ri-user-line mr-2"></i>
                 Mon profil
               </a>
-              <a class="px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 flex items-center" (click)="showPasswordModal()">
-                <i class="ri-lock-password-line mr-2"></i>
-                Changer de mot de passe
-              </a>
+
               <div class="border-t border-gray-100 my-1"></div>
               <a routerLink="/connexion" class="px-4 py-2 text-sm text-red-600 hover:bg-gray-100 flex items-center">
                 <i class="ri-logout-box-line mr-2"></i>
@@ -71,14 +72,22 @@
     <!-- Contenu principal -->
     <main class="flex-1 overflow-auto p-6">
       <div class="px-4 py-6 sm:px-0">
-        <div class="flex justify-between items-center mb-6">
-          <h1 class="text-2xl font-semibold text-gray-900">Gestion Des Utilisateurs</h1>
+        <div class="flex flex-col md:flex-row md:items-center justify-between mb-6">
+          <div>
+            <div class="flex items-center text-sm text-gray-500 mb-2">
+              <a routerLink="/dashboard" class="hover:text-primary">Tableau de bord</a>
+              <div class="w-4 h-4 flex items-center justify-center mx-1">
+                <i class="ri-arrow-right-s-line"></i>
+              </div>
+              <span class="font-medium text-gray-700">Gestion Des Utilisateurs</span>
+            </div>
+            <h1 class="text-2xl font-semibold text-gray-900">Gestion Des Utilisateurs</h1>
+          </div>
           <button id="addUserBtn" class="bg-primary text-white px-4 py-2 rounded-button flex items-center space-x-2 cursor-pointer" (click)="openAddUserModal()">
             <i class="ri-add-line"></i>
             <span>Ajouter un utilisateur</span>
           </button>
         </div>
-
         <div class="mt-8 bg-white rounded-lg shadow">
           <div class="p-6">
             <div class="flex flex-col sm:flex-row justify-between items-center mb-6 space-y-4 sm:space-y-0">

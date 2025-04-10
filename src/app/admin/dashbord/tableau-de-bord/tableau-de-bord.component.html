@@ -15,6 +15,14 @@
         <i class="ri-user-line mr-3"></i>
         <span>Utilisateurs</span>
       </a>
+      <a
+      routerLink="/etablissements"
+      routerLinkActive="bg-gray-50 text-primary"
+      class="flex items-center px-6 py-3 text-gray-600 hover:bg-gray-50 hover:text-primary"
+    >
+      <i class="ri-building-line mr-3"></i>
+      <span>Établissements</span>
+    </a>
       
       <!-- Lien vers les notifications -->
       <a routerLink="/notifications" routerLinkActive="bg-gray-50 text-primary" class="flex items-center px-6 py-3 text-gray-600 hover:bg-gray-50 hover:text-primary">
@@ -58,10 +66,6 @@
               <a routerLink="/profile" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 items-center">
                 <i class="ri-user-line mr-2"></i>
                 Mon profil
-              </a>
-              <a class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 items-center" (click)="showPasswordModal()">
-                <i class="ri-lock-password-line mr-2"></i>
-                Changer le mot de passe
               </a>
               <div class="border-t border-gray-100 my-1"></div>
               <a routerLink="/connexion" class="px-4 py-2 text-sm text-red-600 hover:bg-gray-100 flex items-center">
@@ -193,61 +197,4 @@
     </main>
   </div>
 
-  <!-- Modal pour changer le mot de passe -->
-  <div id="passwordModal" class="modal" [class.hidden]="!isPasswordModalOpen">
-    <div class="fixed inset-0 flex items-center justify-center">
-      <div class="bg-white rounded-lg shadow-xl w-full max-w-md">
-        <div class="p-6">
-          <h2 class="text-xl font-semibold text-gray-900 mb-6">Changer le mot de passe</h2>
-          <form (ngSubmit)="handlePasswordSubmit()">
-            <div class="space-y-4">
-              <div>
-                <label class="block text-sm font-medium text-gray-700">Mot de passe actuel</label>
-                <input type="password" [(ngModel)]="currentPassword" name="currentPassword" required class="mt-1 block w-full border border-gray-300 rounded-button px-3 py-2 focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent">
-              </div>
-              <div>
-                <label class="block text-sm font-medium text-gray-700">Nouveau mot de passe</label>
-                <input type="password" [(ngModel)]="newPassword" name="newPassword" required class="mt-1 block w-full border border-gray-300 rounded-button px-3 py-2 focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent" (input)="checkPasswordStrength()">
-                <div [ngClass]="passwordStrengthClass" class="password-strength"></div>
-                <div class="mt-2 text-xs text-gray-500">
-                  Le mot de passe doit contenir au moins :
-                  <ul class="list-disc list-inside">
-                    <li>8 caractères</li>
-                    <li>Une lettre majuscule</li>
-                    <li>Une lettre minuscule</li>
-                    <li>Un chiffre</li>
-                    <li>Un caractère spécial</li>
-                  </ul>
-                </div>
-              </div>
-              <div>
-                <label class="block text-sm font-medium text-gray-700">Confirmer le nouveau mot de passe</label>
-                <input type="password" [(ngModel)]="confirmPassword" name="confirmPassword" required class="mt-1 block w-full border border-gray-300 rounded-button px-3 py-2 focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent" (input)="checkPasswordMatch()">
-                <div class="mt-1 text-xs" [ngClass]="passwordMatchClass">{{ passwordMatchMessage }}</div>
-              </div>
-            </div>
-            <div class="mt-6 flex justify-end space-x-3">
-              <button type="button" class="px-4 py-2 border border-gray-300 rounded-button text-gray-700" (click)="closePasswordModal()">Annuler</button>
-              <button type="submit" class="px-4 py-2 bg-primary text-white rounded-button">Enregistrer</button>
-            </div>
-          </form>
-        </div>
-      </div>
-    </div>
-  </div>
-
-
-  <!-- Modal pour les messages d'erreur ou de succès -->
-  <div *ngIf="showMessageModal" class="fixed inset-0 flex items-center justify-center z-50">
-    <div class="bg-white rounded-lg shadow-xl p-6 max-w-sm w-full mx-4">
-      <div class="flex items-center mb-4" [ngClass]="messageModalType === 'error' ? 'text-red-600' : 'text-green-600'">
-        <i [ngClass]="messageModalType === 'error' ? 'ri-error-warning-line' : 'ri-checkbox-circle-line'" class="text-2xl mr-2"></i>
-        <h3 class="text-lg font-semibold">{{ messageModalTitle }}</h3>
-      </div>
-      <p class="text-gray-700 mb-6">{{ messageModalMessage }}</p>
-      <div class="flex justify-end">
-        <button (click)="closeMessageModal()" class="px-4 py-2 bg-primary text-white rounded-button">OK</button>
-      </div>
-    </div>
-  </div>
-</div>
+ 

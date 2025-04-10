@@ -194,95 +194,12 @@ export class TableauDeBordComponent implements OnInit, AfterViewInit {
 
 
 
-  // Afficher le modal pour changer le mot de passe
-  showPasswordModal() {
-    this.isPasswordModalOpen = true;
-    this.isProfileMenuOpen = false;
-  }
+  
 
-  // Fermer le modal pour changer le mot de passe
-  closePasswordModal() {
-    this.isPasswordModalOpen = false;
-    this.currentPassword = '';
-    this.newPassword = '';
-    this.confirmPassword = '';
-    this.passwordStrengthClass = '';
-    this.passwordMatchMessage = '';
-    this.passwordMatchClass = '';
-  }
+  
 
-  // Vérifier la force du mot de passe
-  checkPasswordStrength() {
-    const password = this.newPassword;
-    const hasLower = /[a-z]/.test(password);
-    const hasUpper = /[A-Z]/.test(password);
-    const hasNumber = /\d/.test(password);
-    const hasSpecial = /[!@#$%^&*(),.?":{}|<>]/.test(password);
-    const length = password.length >= 8;
-
-    const strength = [hasLower, hasUpper, hasNumber, hasSpecial, length].filter(Boolean).length;
-
-    if (strength <= 2) {
-      this.passwordStrengthClass = 'weak';
-    } else if (strength <= 4) {
-      this.passwordStrengthClass = 'medium';
-    } else {
-      this.passwordStrengthClass = 'strong';
-    }
-  }
-
-  // Vérifier si les mots de passe correspondent
-  checkPasswordMatch() {
-    if (this.confirmPassword) {
-      if (this.newPassword === this.confirmPassword) {
-        this.passwordMatchMessage = 'Les mots de passe correspondent';
-        this.passwordMatchClass = 'text-green-600';
-      } else {
-        this.passwordMatchMessage = 'Les mots de passe ne correspondent pas';
-        this.passwordMatchClass = 'text-red-600';
-      }
-    } else {
-      this.passwordMatchMessage = '';
-      this.passwordMatchClass = '';
-    }
-  }
-
-  // Valider le mot de passe selon les critères
-  validatePassword(password: string): boolean {
-    const hasLower = /[a-z]/.test(password);
-    const hasUpper = /[A-Z]/.test(password);
-    const hasNumber = /\d/.test(password);
-    const hasSpecial = /[!@#$%^&*(),.?":{}|<>]/.test(password);
-    const length = password.length >= 8;
-    return hasLower && hasUpper && hasNumber && hasSpecial && length;
-  }
-
-  // Soumettre le formulaire de changement de mot de passe
-  handlePasswordSubmit() {
-    if (!this.validatePassword(this.newPassword)) {
-      this.showMessageModal = true;
-      this.messageModalType = 'error';
-      this.messageModalTitle = 'Erreur de validation';
-      this.messageModalMessage = 'Le nouveau mot de passe ne respecte pas les critères de sécurité requis.';
-      return;
-    }
-
-    if (this.newPassword !== this.confirmPassword) {
-      this.showMessageModal = true;
-      this.messageModalType = 'error';
-      this.messageModalTitle = 'Erreur de validation';
-      this.messageModalMessage = 'Les nouveaux mots de passe ne correspondent pas.';
-      return;
-    }
-
-    // Ici, vous feriez normalement un appel API pour changer le mot de passe
-    this.showMessageModal = true;
-    this.messageModalType = 'success';
-    this.messageModalTitle = 'Succès';
-    this.messageModalMessage = 'Votre mot de passe a été modifié avec succès.';
-    this.closePasswordModal();
-  }
-
+  
+  
   // Afficher le modal pour ajouter/modifier un utilisateur
   showUserModal(title: string = 'Ajouter un utilisateur') {
     this.modalTitle = title;
