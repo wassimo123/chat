@@ -18,17 +18,16 @@ import { PrivacyComponent } from './privacy/privacy.component';
 import { AcceptTermsComponent } from './accept-terms/accept-terms.component';
 import { ForgotPasswordComponent } from './forgot-password/forgot-password.component';
 import { ResetPasswordComponent } from './reset-password/reset-password.component';
-import { GestionDesEvenementsComponent } from './admin/gestion-des-evenements/gestion-des-evenements.component';
-import { GestionDesPromotionsComponent } from './admin/gestion-des-promotions/gestion-des-promotions.component';
 import { GestionDesEtablissementsComponent } from './admin/gestion-des-etablissements/gestion-des-etablissements.component';
-
+import { GestionDesPromotionsComponent } from './admin/gestion-des-promotions/gestion-des-promotions.component';
+import { GestionDesEvenementsComponent } from './admin/gestion-des-evenements/gestion-des-evenements.component';
 
 
 const routes: Routes = [
   { path: 'dashboard', component: TableauDeBordComponent }, 
   { path: 'hotels', component: HotelsComponent },
   { path: 'hotel/:id', component: HotelDetailComponent },
-  { path: 'event', component: EventComponent },
+  { path: 'evenement', component: EventComponent },
   { path: 'promotion', component: PromotionsComponent },
   { path: 'users', component: GestionDesUtilisateursComponent }, 
   { path: 'notifications', component: NotificationComponent }, 
@@ -45,7 +44,10 @@ const routes: Routes = [
   { path: 'forgot-password', component: ForgotPasswordComponent },
   { path: 'reset-password', component: ResetPasswordComponent },
   { path: 'etablissements', component: GestionDesEtablissementsComponent },
- 
+  { path: 'promo', component: GestionDesPromotionsComponent },
+  { path: 'event', component: GestionDesEvenementsComponent },
+  
+  
   
   
 ];

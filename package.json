@@ -25,7 +25,7 @@
     "@ngneat/tailwind": "^7.0.3",
     "@types/google.maps": "^3.58.1",
     "aos": "^2.3.4",
-    "chart.js": "^4.4.8",
+    "chart.js": "^4.4.9",
     "cors": "^2.8.5",
     "dotenv": "^16.4.7",
     "echarts": "^5.6.0",

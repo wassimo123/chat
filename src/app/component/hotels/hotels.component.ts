@@ -4,6 +4,7 @@ import { CommonModule } from '@angular/common';
 import { NavbarComponent } from '../navbar/navbar.component';
 import { FooterComponent } from '../footer/footer.component';
 import { Router } from '@angular/router';
+import { EtablissementService } from '../../services/etablissement.service';
 
 interface FilterServices {
   Piscine: boolean;
@@ -32,74 +33,79 @@ export class HotelsComponent implements OnInit {
   };
   showFilters: boolean = false;
   sortOption: string = 'default';
+  isLoading: boolean = false;
+  errorMessage: string | null = null;
 
-  itemsPerPage: number = 3;
+  itemsPerPage: number = 10;
   currentItems: number = this.itemsPerPage;
 
-  hotels: any[] = [
-    {
-      id: 2,
-      nom: 'Royal Sfax',
-      type: 'Hôtel',
-      image: 'https://public.readdy.ai/ai/img_res/c331f3dc04a9a6af680b0e2947b16522.jpg',
-      rating: 5,
-      reviews: 256,
-      description: 'Hôtel 5 étoiles offrant un confort moderne.',
-      price: 320,
-      services: ['Piscine', 'Spa', 'Restaurant', 'Wifi'],
-      address: '456 Boulevard Royal, Sfax',
-      hours: '24/7',
-      phone: '+216 74 987 654'
-    },
-    {
-      id: 4,
-      nom: 'Hôtel Les Oliviers Palace',
-      type: 'Hôtel',
-      image: 'https://public.readdy.ai/ai/img_res/b1f351d8b3bbd3405fcf95c6d3a5355e.jpg',
-      rating: 4.8,
-      reviews: 128,
-      description: 'Situé au cœur de Sfax, l\'Hôtel Les Oliviers Palace offre une expérience de luxe unique.',
-      price: 320,
-      services: ['Piscine', 'Restaurant', 'Wifi'],
-      address: '321 Avenue des Oliviers, Sfax',
-      hours: '24/7',
-      phone: '+216 74 654 321'
-    },
-    {
-      id: 5,
-      nom: 'Hôtel Borj Dhiafa',
-      type: 'Hôtel',
-      image: 'https://public.readdy.ai/ai/img_res/f4c14da105f7b0748c2a51ad3034dfbb.jpg',
-      rating: 4.6,
-      reviews: 96,
-      description: 'Un cadre élégant et raffiné combinant confort moderne et architecture traditionnelle.',
-      price: 250,
-      services: ['Restaurant', 'Wifi'],
-      address: '654 Rue Borj Dhiafa, Sfax',
-      hours: '24/7',
-      phone: '+216 74 321 654'
-    },
-    {
-      id: 6,
-      nom: 'Hôtel Mercure Sfax',
-      type: 'Hôtel',
-      image: 'https://public.readdy.ai/ai/img_res/702d21ceeadc1c21e7a232d1f2dc6d1d.jpg',
-      rating: 4.7,
-      reviews: 156,
-      description: 'Idéal pour les voyageurs d\'affaires et les touristes avec des chambres modernes.',
-      price: 280,
-      services: ['Restaurant', 'Wifi'],
-      address: '987 Boulevard Mercure, Sfax',
-      hours: '24/7',
-      phone: '+216 74 789 123'
-    }
-  ];
+  hotels: any[] = [];
   filteredHotels: any[] = [];
 
-  constructor(private router: Router) {}
+  constructor(private router: Router, private etablissementService: EtablissementService) {}
 
   ngOnInit() {
-    this.filterHotels();
+    this.fetchHotels();
+  }
+
+  fetchHotels() {
+    this.isLoading = true;
+    this.errorMessage = null;
+    this.etablissementService.getHotels().subscribe({
+      next: (hotels) => {
+        // Map API response to match the component's expected structure
+        this.hotels = hotels.map(hotel => {
+          let imageUrl = 'https://r-xx.bstatic.com/xdata/images/hotel/608x352/281564416.webp?k=d34be48dc235d2aba463351d30aa399a184946441e78177d1ed6e66c427e5e81&o='; // Fallback placeholder
+      
+          if (hotel.photos?.length) {
+            const photo = hotel.photos[0];
+            if (typeof photo === 'string') {
+              imageUrl = `http://localhost:5000/${photo.replace(/\\/g, '/')}`;
+            } else if (photo instanceof File) {
+              imageUrl = URL.createObjectURL(photo);
+            }
+            console.log("imageUrl",imageUrl);
+          }
+      
+          return {
+            id: hotel.id,
+            nom: hotel.nom,
+            type: hotel.type,
+            image: imageUrl,
+            rating: 4,
+            reviews: 100,
+            description: hotel.description || 'Aucune description disponible',
+            price: 200,
+            services: hotel.services?.map((s: string) => this.normalizeService(s)) || [],
+            address: hotel.adresse,
+            hours: hotel.horaires?.is24_7 ? '24/7' : 'Horaires non spécifiés',
+            phone: hotel.telephone
+          };
+        });
+        this.filteredHotels = this.hotels; // Directly show all hotels
+        this.isLoading = false;
+      },
+      error: (error) => {
+        console.error('Error fetching hotels:', error);
+        this.errorMessage = 'Impossible de charger les hôtels. Veuillez réessayer plus tard.';
+        this.isLoading = false;
+      }
+    });
+  }
+
+  normalizeService(service: string): string {
+    switch (service.toLowerCase()) {
+      case 'wifi gratuit':
+        return 'Wifi';
+      case 'piscine':
+        return 'Piscine';
+      case 'spa':
+        return 'Spa';
+      case 'restaurant':
+        return 'Restaurant';
+      default:
+        return service;
+    }
   }
 
   filterHotels() {
@@ -136,7 +142,7 @@ export class HotelsComponent implements OnInit {
         this.filteredHotels.sort((a, b) => a.price - b.price);
         break;
       case 'priceDesc':
-        this.filteredHotels.sort((a, b) => b.price - a.price);
+        this.filteredHotels.sort((a, b) => b.price - b.price);
         break;
       case 'rating':
         this.filteredHotels.sort((a, b) => b.rating - a.rating);

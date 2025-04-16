@@ -36,8 +36,7 @@ export class UserService {
   }
 
   createUsers(body: any): Observable<any> {
-    const { confirmPassword, ...userData } = body;
-    return this.http.post<any>(`${this.apiUrl}/users`, userData);
+    return this.http.post<any>(`${this.apiUrl}/users`, body);
   }
 
   updateUser(matricule: string, body: any): Observable<any> {

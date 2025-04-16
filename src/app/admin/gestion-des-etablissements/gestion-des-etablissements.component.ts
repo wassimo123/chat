@@ -1,63 +1,10 @@
 import { Component, OnInit, AfterViewInit, ElementRef, ViewChild } from "@angular/core";
 import { Chart } from "chart.js";
 import { registerables } from "chart.js";
+import { EtablissementService } from "../../services/etablissement.service";
+import { Etablissement, Stats, Notification, Horaires, JourHoraire, ReseauxSociaux } from "../../models/etablissement.model";
 
-// Register all Chart.js components
 Chart.register(...registerables);
-
-interface ReseauxSociaux {
-  facebook: string;
-  instagram: string;
-  twitter: string;
-  linkedin: string;
-}
-
-interface JourHoraire {
-    open: string;
-    close: string;
-    closed: boolean;
-  }
-
-  interface Horaires {
-    lundi: JourHoraire;
-    mardi: JourHoraire;
-    mercredi: JourHoraire;
-    jeudi: JourHoraire;
-    vendredi: JourHoraire;
-    samedi: JourHoraire;
-    dimanche: JourHoraire;
-    is24_7: boolean;
-    specialHours?: string;
-  }
-
-  interface Etablissement {
-    id?: string;
-    nom: string;
-    adresse: string;
-    type: string;
-    statut: string;
-    visibility: "public" | "private";
-    codePostal?: string;
-    ville?: string;
-    pays?: string;
-    showMap: boolean;
-    telephone: string;
-    email: string;
-    siteWeb: string;
-    reseauxSociaux: ReseauxSociaux;
-    description: string;
-    services: string[];
-    horaires: Horaires;
-    photos: string[];
-    selected?: boolean;
-  }
-
-interface Stats {
-  total: number;
-  restaurants: number;
-  hotels: number;
-  commerces: number;
-}
 
 @Component({
   selector: "app-gestion-des-etablissements",
@@ -71,104 +18,17 @@ export class GestionDesEtablissementsComponent implements OnInit, AfterViewInit 
   typeChart: Chart | null = null;
   statusChart: Chart | null = null;
 
-  // Tableau des jours typé correctement
-  jours: (keyof Omit<Horaires, 'is24_7' | 'specialHours'>)[] = [
-    'lundi', 'mardi', 'mercredi', 'jeudi', 'vendredi', 'samedi', 'dimanche'
+  jours: (keyof Omit<Horaires, "is24_7" | "specialHours">)[] = [
+    "lundi",
+    "mardi",
+    "mercredi",
+    "jeudi",
+    "vendredi",
+    "samedi",
+    "dimanche",
   ];
 
-  etablissements: Etablissement[] = [
-    {
-      id: "#EST-001",
-      nom: "Le Gourmet Parisien",
-      adresse: "24 Rue de la Paix, 75002 Paris",
-      type: "Restaurant",
-      statut: "Actif",
-      visibility: "public",
-      showMap: false,
-      telephone: "",
-      email: "",
-      siteWeb: "",
-      reseauxSociaux: { facebook: "", instagram: "", twitter: "", linkedin: "" },
-      description: "",
-      services: [],
-      horaires: this.getDefaultHoraires(),
-      photos: [],
-      selected: false,
-    },
-    {
-      id: "#EST-002",
-      nom: "Hôtel Riviera",
-      adresse: "15 Avenue de la Méditerranée, 06000 Nice",
-      type: "Hôtel",
-      statut: "Actif",
-      visibility: "public",
-      showMap: false,
-      telephone: "",
-      email: "",
-      siteWeb: "",
-      reseauxSociaux: { facebook: "", instagram: "", twitter: "", linkedin: "" },
-      description: "",
-      services: [],
-      horaires: this.getDefaultHoraires(), // Correction de "horarios" en "horaires"
-      photos: [],
-      selected: false,
-    },
-    {
-      id: "#EST-003",
-      nom: "Boutique Élégance",
-      adresse: "45 Rue du Commerce, 69002 Lyon",
-      type: "Commerce",
-      statut: "En attente",
-      visibility: "public",
-      showMap: false,
-      telephone: "",
-      email: "",
-      siteWeb: "",
-      reseauxSociaux: { facebook: "", instagram: "", twitter: "", linkedin: "" },
-      description: "",
-      services: [],
-      horaires: this.getDefaultHoraires(),
-      photos: [],
-      selected: false,
-    },
-    {
-      id: "#EST-004",
-      nom: "Bistro Marseillais",
-      adresse: "12 Quai du Port, 13002 Marseille",
-      type: "Restaurant",
-      statut: "Suspendu",
-      visibility: "public",
-      showMap: false,
-      telephone: "",
-      email: "",
-      siteWeb: "",
-      reseauxSociaux: { facebook: "", instagram: "", twitter: "", linkedin: "" },
-      description: "",
-      services: [],
-      horaires: this.getDefaultHoraires(),
-      photos: [],
-      selected: false,
-    },
-    {
-      id: "#EST-005",
-      nom: "Château Bordeaux",
-      adresse: "8 Route des Vignes, 33000 Bordeaux",
-      type: "Hôtel",
-      statut: "Actif",
-      visibility: "public",
-      showMap: false,
-      telephone: "",
-      email: "",
-      siteWeb: "",
-      reseauxSociaux: { facebook: "", instagram: "", twitter: "", linkedin: "" },
-      description: "",
-      services: [],
-      horaires: this.getDefaultHoraires(),
-      photos: [],
-      selected: false,
-    },
-  ];
-
+  etablissements: Etablissement[] = [];
   filteredEtablissements: Etablissement[] = [];
   paginatedEtablissements: Etablissement[] = [];
   stats: Stats = { total: 0, restaurants: 0, hotels: 0, commerces: 0 };
@@ -192,24 +52,45 @@ export class GestionDesEtablissementsComponent implements OnInit, AfterViewInit 
   modalTitle = "";
   currentEtablissement: Etablissement = this.getDefaultEtablissement();
 
-  isDeleteModalOpen = false;
-  etablissementToDelete: Etablissement | null = null;
+  isArchiveModalOpen = false;
+  etablissementToArchive: Etablissement | null = null;
 
   selectAll = false;
   isProfileMenuOpen = false;
   notificationCount = 3;
   searchQuery = "";
 
-  constructor() {}
+  showMessageModal = false;
+  messageModalType: "success" | "error" = "success";
+  messageModalTitle = "";
+  messageModalMessage = "";
+
+  constructor(private etablissementService: EtablissementService) {}
 
   ngOnInit(): void {
-    this.filteredEtablissements = [...this.etablissements];
-    this.updateStats();
-    this.updatePagination();
+    this.loadEtablissements();
   }
 
   ngAfterViewInit(): void {
     this.initCharts();
+  }
+
+  loadEtablissements(): void {
+    this.etablissementService.getEtablissements().subscribe({
+      next: (etablissements: Etablissement[]) => {
+        this.etablissements = etablissements.map((e: Etablissement) => ({
+          ...e,
+          selected: false,
+        }));
+        this.filteredEtablissements = this.etablissements.filter(e => e.statut !== "Inactif");
+        this.updateStats();
+        this.updatePagination();
+        this.updateCharts();
+      },
+      error: (err: any) => {
+        this.showNotification("Erreur lors du chargement des établissements: " + err.message, "error");
+      },
+    });
   }
 
   initCharts(): void {
@@ -268,13 +149,13 @@ export class GestionDesEtablissementsComponent implements OnInit, AfterViewInit 
         const statusCounts = [
           this.etablissements.filter((e) => e.statut === "Actif").length,
           this.etablissements.filter((e) => e.statut === "En attente").length,
-          this.etablissements.filter((e) => e.statut === "Suspendu").length,
+          this.etablissements.filter((e) => e.statut === "Inactif").length,
         ];
 
         this.statusChart = new Chart(ctx, {
           type: "bar",
           data: {
-            labels: ["Actif", "En attente", "Suspendu"],
+            labels: ["Actif", "En attente", "Inactif"],
             datasets: [
               {
                 data: statusCounts,
@@ -324,7 +205,8 @@ export class GestionDesEtablissementsComponent implements OnInit, AfterViewInit 
       const matchesType = !this.selectedType || e.type === this.selectedType;
       const matchesStatus = !this.selectedStatus || e.statut === this.selectedStatus;
       const matchesLocation = !this.selectedLocation || e.adresse.includes(this.selectedLocation);
-      return matchesSearch && matchesType && matchesStatus && matchesLocation;
+      const isNotInactive = e.statut !== "Inactif";
+      return matchesSearch && matchesType && matchesStatus && matchesLocation && isNotInactive;
     });
     this.currentPage = 1;
     this.updatePagination();
@@ -345,7 +227,7 @@ export class GestionDesEtablissementsComponent implements OnInit, AfterViewInit 
       const statusCounts = [
         this.etablissements.filter((e) => e.statut === "Actif").length,
         this.etablissements.filter((e) => e.statut === "En attente").length,
-        this.etablissements.filter((e) => e.statut === "Suspendu").length,
+        this.etablissements.filter((e) => e.statut === "Inactif").length,
       ];
       this.statusChart.data.datasets[0].data = statusCounts;
       this.statusChart.update();
@@ -443,14 +325,6 @@ export class GestionDesEtablissementsComponent implements OnInit, AfterViewInit 
     this.filterEtablissements();
   }
 
-  resetFilters(): void {
-    this.tableSearchQuery = "";
-    this.selectedType = "";
-    this.selectedStatus = "";
-    this.selectedLocation = "";
-    this.filterEtablissements();
-  }
-
   toggleSelectAll(): void {
     this.selectAll = !this.selectAll;
     this.paginatedEtablissements.forEach((e) => (e.selected = this.selectAll));
@@ -467,7 +341,7 @@ export class GestionDesEtablissementsComponent implements OnInit, AfterViewInit 
       nom: "",
       adresse: "",
       type: "",
-      statut: "",
+      statut: "Actif",
       visibility: "public",
       showMap: false,
       telephone: "",
@@ -491,6 +365,7 @@ export class GestionDesEtablissementsComponent implements OnInit, AfterViewInit 
       samedi: { open: "", close: "", closed: false },
       dimanche: { open: "", close: "", closed: false },
       is24_7: false,
+      specialHours: "",
     };
   }
 
@@ -498,11 +373,10 @@ export class GestionDesEtablissementsComponent implements OnInit, AfterViewInit 
     this.modalTitle = "Ajouter un établissement";
     this.currentEtablissement = {
       ...this.getDefaultEtablissement(),
-      id: `#EST-${this.etablissements.length + 1}`,
     };
     this.isModalOpen = true;
     setTimeout(() => {
-      const modalContent = document.querySelector('.modal-content');
+      const modalContent = document.querySelector(".modal-content");
       if (modalContent) {
         modalContent.scrollTop = 0;
       }
@@ -523,39 +397,75 @@ export class GestionDesEtablissementsComponent implements OnInit, AfterViewInit 
   }
 
   saveEtablissement(): void {
-    if (this.modalTitle === "Ajouter un établissement") {
-      this.etablissements.push({ ...this.currentEtablissement });
-    } else {
-      const index = this.etablissements.findIndex((e) => e.id === this.currentEtablissement.id);
-      if (index !== -1) {
-        this.etablissements[index] = { ...this.currentEtablissement };
-      }
+    if (!this.currentEtablissement.nom || !this.currentEtablissement.type || !this.currentEtablissement.statut || !this.currentEtablissement.adresse) {
+      this.showNotification("Veuillez remplir tous les champs obligatoires (Nom, Type, Statut, Adresse).", "error");
+      return;
     }
-    this.closeModal();
-    this.updateStats();
-    this.filterEtablissements();
+
+    if (this.modalTitle === "Ajouter un établissement") {
+      this.etablissementService.addEtablissement(this.currentEtablissement).subscribe({
+        next: (response: Etablissement) => {
+          const newEtablissement: Etablissement = { ...response, selected: false };
+          console.log("newEtablissement:",newEtablissement);
+          this.etablissements.push(newEtablissement);
+          this.closeModal();
+          this.updateStats();
+          this.filterEtablissements();
+          this.showNotification("Établissement ajouté avec succès !", "success");
+        },
+        error: (err: any) => {
+          this.showNotification("Erreur lors de l’ajout: " + err.message, "error");
+        },
+      });
+    } else if (this.currentEtablissement.id) {
+      this.etablissementService.updateEtablissement(this.currentEtablissement.id, this.currentEtablissement).subscribe({
+        next: (response: Etablissement) => {
+          const updatedEtablissement: Etablissement = { ...response, selected: false };
+          const index = this.etablissements.findIndex((e) => e.id === updatedEtablissement.id);
+          if (index !== -1) this.etablissements[index] = updatedEtablissement;
+          this.closeModal();
+          this.updateStats();
+          this.filterEtablissements();
+          this.showNotification("Établissement modifié avec succès !", "success");
+        },
+        error: (err: any) => {
+          this.showNotification("Erreur lors de la mise à jour: " + err.message, "error");
+        },
+      });
+    }
   }
 
   closeModal(): void {
     this.isModalOpen = false;
   }
 
-  openDeleteModal(etablissement: Etablissement): void {
-    this.etablissementToDelete = etablissement;
-    this.isDeleteModalOpen = true;
+  openArchiveModal(etablissement: Etablissement): void {
+    this.etablissementToArchive = etablissement;
+    this.isArchiveModalOpen = true;
   }
 
-  closeDeleteModal(): void {
-    this.isDeleteModalOpen = false;
-    this.etablissementToDelete = null;
+  closeArchiveModal(): void {
+    this.isArchiveModalOpen = false;
+    this.etablissementToArchive = null;
   }
 
-  deleteEtablissement(): void {
-    if (this.etablissementToDelete) {
-      this.etablissements = this.etablissements.filter((e) => e.id !== this.etablissementToDelete!.id);
-      this.closeDeleteModal();
-      this.updateStats();
-      this.filterEtablissements();
+  archiveEtablissement(): void {
+    if (this.etablissementToArchive && this.etablissementToArchive.id) {
+      this.etablissementService.archiverEtablissement(this.etablissementToArchive.id).subscribe({
+        next: (response: Etablissement) => {
+          const index = this.etablissements.findIndex(e => e.id === response.id);
+          if (index !== -1) {
+            this.etablissements[index].statut = "Inactif";
+          }
+          this.closeArchiveModal();
+          this.updateStats();
+          this.filterEtablissements();
+          this.showNotification("Établissement archivé avec succès !", "success");
+        },
+        error: (err: any) => {
+          this.showNotification("Erreur lors de l’archivage: " + err.message, "error");
+        },
+      });
     }
   }
 
@@ -563,20 +473,14 @@ export class GestionDesEtablissementsComponent implements OnInit, AfterViewInit 
     console.log("Voir établissement:", etablissement);
   }
 
-  downloadList(): void {
-    console.log("Télécharger la liste");
-  }
-
-  printList(): void {
-    window.print();
-  }
-
   toggleProfile(): void {
     this.isProfileMenuOpen = !this.isProfileMenuOpen;
   }
 
   onSearch(): void {
-    console.log("Recherche:", this.searchQuery);
+    this.tableSearchQuery = this.searchQuery;
+    this.currentPage = 1;
+    this.filterEtablissements();
   }
 
   toggleService(service: string, event: Event): void {
@@ -608,6 +512,17 @@ export class GestionDesEtablissementsComponent implements OnInit, AfterViewInit 
 
   removePhoto(photo: string): void {
     this.currentEtablissement.photos = this.currentEtablissement.photos.filter((p) => p !== photo);
+  }
+
+  showNotification(message: string, type: "success" | "error"): void {
+    this.messageModalType = type;
+    this.messageModalTitle = type === "success" ? "Succès" : "Erreur";
+    this.messageModalMessage = message;
+    this.showMessageModal = true;
+  }
+
+  closeMessageModal(): void {
+    this.showMessageModal = false;
   }
 
   getTypeClass(type: string): string {
@@ -668,10 +583,60 @@ export class GestionDesEtablissementsComponent implements OnInit, AfterViewInit 
         return "bg-green-100 text-green-800";
       case "En attente":
         return "bg-yellow-100 text-yellow-800";
-      case "Suspendu":
+      case "Inactif":
         return "bg-red-100 text-red-800";
+      case "Archivé":
+        return "bg-gray-100 text-gray-800";
       default:
         return "bg-gray-100 text-gray-800";
     }
   }
+  onPhotoSelected(event: Event): void {
+    const input = event.target as HTMLInputElement;
+  
+    if (input.files && input.files.length) {
+      const files = Array.from(input.files);
+  
+      // Initialize the photos array if it's not set
+      if (!this.currentEtablissement.photos) {
+        this.currentEtablissement.photos = [];
+      }
+  
+      // Append selected files to the photos array
+      this.currentEtablissement.photos.push(...files);
+    }
+  }
+  
+  resolvePhotoUrl(photo: string | File): string {
+    if (photo instanceof File) {
+      return URL.createObjectURL(photo);
+    }
+    return photo;
+  }
+  
+  deletePhoto(photo: string | File): void {
+    // Only proceed if it's a File
+    if (photo instanceof File) {
+      const index = this.currentEtablissement.photos.indexOf(photo);
+      if (index !== -1) {
+        // Revoke the object URL if it's a file
+        URL.revokeObjectURL(this.resolvePhotoUrl(photo));
+        // Remove the photo from the array
+        this.currentEtablissement.photos.splice(index, 1);
+      }
+    }
+  }
+  
+  
+  ngOnDestroy() {
+    if (this.currentEtablissement.photos) {
+      this.currentEtablissement.photos.forEach(photo => {
+        if (photo instanceof File) {
+          URL.revokeObjectURL(this.resolvePhotoUrl(photo));
+        }
+      });
+    }
+  }
+  
+  
 }

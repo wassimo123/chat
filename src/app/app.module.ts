@@ -24,9 +24,10 @@ import { PrivacyComponent } from './privacy/privacy.component';
 import { AcceptTermsComponent } from './accept-terms/accept-terms.component';
 import { ForgotPasswordComponent } from './forgot-password/forgot-password.component';
 import { ResetPasswordComponent } from './reset-password/reset-password.component';
-import { GestionDesEvenementsComponent } from './admin/gestion-des-evenements/gestion-des-evenements.component';
-import { GestionDesPromotionsComponent } from './admin/gestion-des-promotions/gestion-des-promotions.component';
 import { GestionDesEtablissementsComponent } from './admin/gestion-des-etablissements/gestion-des-etablissements.component';
+import { GestionDesPromotionsComponent } from './admin/gestion-des-promotions/gestion-des-promotions.component';
+import { GestionDesEvenementsComponent } from './admin/gestion-des-evenements/gestion-des-evenements.component';
+
 
 
 
@@ -45,9 +46,11 @@ import { GestionDesEtablissementsComponent } from './admin/gestion-des-etablisse
     AcceptTermsComponent,
     ForgotPasswordComponent,
     ResetPasswordComponent,
-    GestionDesEvenementsComponent,
-    GestionDesPromotionsComponent,
     GestionDesEtablissementsComponent,
+    GestionDesPromotionsComponent,
+    GestionDesEvenementsComponent,
+   
+    
 
    
   
@@ -69,8 +72,8 @@ import { GestionDesEtablissementsComponent } from './admin/gestion-des-etablisse
     EventComponent,
     NavbarComponent,
     FooterComponent,
-    PromotionsComponent,
     HomeComponent,
+    PromotionsComponent,
     
 ],
   providers: [],
