@@ -1,497 +1,539 @@
+
 <div class="flex h-screen bg-gray-50 min-h-screen">
-    <!-- Sidebar -->
-    <aside class="w-64 bg-white shadow-sm">
-      <div class="h-16 flex items-center px-6">
-        <div class="text-2xl font-['Pacifico'] text-primary">Sfax</div>
-      </div>
-      <nav class="mt-4">
-        <a routerLink="/dashboard" routerLinkActive="bg-gray-50 text-primary" class="flex items-center px-6 py-3 text-gray-600 hover:bg-gray-50 hover:text-primary">
-          <i class="ri-dashboard-line mr-3"></i>
-          <span>Tableau de bord</span>
-        </a>
-        <a routerLink="/users" routerLinkActive="bg-gray-50 text-primary" class="flex items-center px-6 py-3 text-gray-600 hover:bg-gray-50 hover:text-primary">
-          <i class="ri-user-line mr-3"></i>
-          <span>Utilisateurs</span>
-        </a>
-        <a routerLink="/etablissements" routerLinkActive="bg-gray-50 text-primary" class="flex items-center px-6 py-3 text-gray-600 hover:bg-gray-50 hover:text-primary">
-          <i class="ri-building-line mr-3"></i>
-          <span>Établissements</span>
-        </a>
-        <a routerLink="/promo" routerLinkActive="bg-gray-50 text-primary" class="flex items-center px-6 py-3 text-gray-600 hover:bg-gray-50 hover:text-primary">
-          <i class="ri-price-tag-3-line mr-3"></i>
-          <span>Promotions</span>
-        </a>
-        <a routerLink="/event" routerLinkActive="bg-gray-50 text-primary" class="flex items-center px-6 py-3 text-gray-600 hover:bg-gray-50 hover:text-primary">
-          <i class="ri-calendar-line mr-3"></i>
-          <span>Événements</span>
-        </a>
-        <a routerLink="/notifications" routerLinkActive="bg-gray-50 text-primary" class="flex items-center px-6 py-3 text-gray-600 hover:bg-gray-50 hover:text-primary">
-          <i class="ri-notification-line mr-3"></i>
-          <span>Notifications</span>
-        </a>
-      </nav>
-    </aside>
-  
-    <!-- Main content -->
-    <div class="flex-1 flex flex-col">
-      <!-- Header -->
-      <header class="bg-white shadow-sm h-16">
-        <div class="h-full px-6 flex items-center justify-between">
-          <div class="flex items-center">
-            <div class="relative">
-              <input type="text" placeholder="Rechercher..." class="w-64 pl-10 pr-4 py-2 border border-gray-300 rounded-button focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent" [(ngModel)]="searchQuery" (input)="onSearch()">
-              <div class="absolute left-3 top-2.5 text-gray-400">
-                <i class="ri-search-line"></i>
-              </div>
+  <!-- Sidebar -->
+  <aside class="w-64 bg-white shadow-sm">
+    <div class="h-16 flex items-center px-6">
+      <div class="text-2xl font-['Pacifico'] text-primary">Sfax</div>
+    </div>
+    <nav class="mt-4">
+      <a routerLink="/dashboard" routerLinkActive="bg-gray-50 text-primary" class="flex items-center px-6 py-3 text-gray-600 hover:bg-gray-50 hover:text-primary">
+        <i class="ri-dashboard-line mr-3"></i>
+        <span>Tableau de bord</span>
+      </a>
+      <a routerLink="/users" routerLinkActive="bg-gray-50 text-primary" class="flex items-center px-6 py-3 text-gray-600 hover:bg-gray-50 hover:text-primary">
+        <i class="ri-user-line mr-3"></i>
+        <span>Utilisateurs</span>
+      </a>
+      <a routerLink="/etablissements" routerLinkActive="bg-gray-50 text-primary" class="flex items-center px-6 py-3 text-gray-600 hover:bg-gray-50 hover:text-primary">
+        <i class="ri-building-line mr-3"></i>
+        <span>Établissements</span>
+      </a>
+      <a routerLink="/promo" routerLinkActive="bg-gray-50 text-primary" class="flex items-center px-6 py-3 text-gray-600 hover:bg-gray-50 hover:text-primary">
+        <i class="ri-price-tag-3-line mr-3"></i>
+        <span>Promotions</span>
+      </a>
+      <a routerLink="/event" routerLinkActive="bg-gray-50 text-primary" class="flex items-center px-6 py-3 text-gray-600 hover:bg-gray-50 hover:text-primary">
+        <i class="ri-calendar-line mr-3"></i>
+        <span>Événements</span>
+      </a>
+      <a routerLink="/notifications" routerLinkActive="bg-gray-50 text-primary" class="flex items-center px-6 py-3 text-gray-600 hover:bg-gray-50 hover:text-primary">
+        <i class="ri-notification-line mr-3"></i>
+        <span>Notifications</span>
+      </a>
+    </nav>
+  </aside>
+
+  <!-- Main content -->
+  <div class="flex-1 flex flex-col">
+    <!-- Header -->
+    <header class="bg-white shadow-sm h-16">
+      <div class="h-full px-6 flex items-center justify-between">
+        <div class="flex items-center">
+          <div class="relative">
+            <input type="text" placeholder="Rechercher..." class="w-64 pl-10 pr-4 py-2 border border-gray-300 rounded-button focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent" [(ngModel)]="searchQuery" (input)="onSearch()">
+            <div class="absolute left-3 top-2.5 text-gray-400">
+              <i class="ri-search-line"></i>
             </div>
           </div>
-          <div class="flex items-center space-x-4">
-            <button routerLink="/notifications" class="w-8 h-8 flex items-center justify-center text-gray-600 hover:text-primary relative">
-              <i class="ri-notification-3-line"></i>
-              <span class="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">{{ notificationCount }}</span>
+        </div>
+        <div class="flex items-center space-x-4">
+          <button routerLink="/notifications" class="w-8 h-8 flex items-center justify-center text-gray-600 hover:text-primary relative">
+            <i class="ri-notification-3-line"></i>
+            <span class="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">{{ notificationCount }}</span>
+          </button>
+          <div class="relative">
+            <button id="profileButton" class="flex items-center space-x-2 cursor-pointer" (click)="toggleProfile()">
+              <div class="w-8 h-8 rounded-full bg-gray-200 flex items-center justify-center">
+                <i class="ri-user-line text-gray-600"></i>
+              </div>
+              <span class="text-gray-700">Admin</span>
+              <i class="ri-arrow-down-s-line ml-1 text-gray-600"></i>
             </button>
-            <div class="relative">
-              <button id="profileButton" class="flex items-center space-x-2 cursor-pointer" (click)="toggleProfile()">
-                <div class="w-8 h-8 rounded-full bg-gray-200 flex items-center justify-center">
-                  <i class="ri-user-line text-gray-600"></i>
+            <div id="profileMenu" class="absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-lg py-2 z-50" [class.hidden]="!isProfileMenuOpen">
+              <a routerLink="/profile" class="px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 flex items-center">
+                <i class="ri-user-line mr-2"></i> Mon profil
+              </a>
+              <div class="border-t border-gray-100 my-1"></div>
+              <a routerLink="/connexion" class="px-4 py-2 text-sm text-red-600 hover:bg-gray-100 flex items-center">
+                <i class="ri-logout-box-line mr-2"></i> Déconnexion
+              </a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <!-- Main -->
+    <main class="flex-1 overflow-auto p-6">
+      <!-- Message Modal -->
+      <div *ngIf="showMessageModal" class="fixed inset-0 flex items-center justify-center z-50">
+        <div class="bg-white rounded-lg shadow-xl p-6 max-w-sm w-full mx-4">
+          <div class="flex items-center mb-4" [ngClass]="messageModalType === 'error' ? 'text-red-600' : 'text-green-600'">
+            <i [ngClass]="messageModalType === 'error' ? 'ri-error-warning-line' : 'ri-checkbox-circle-line'" class="text-2xl mr-2"></i>
+            <h3 class="text-lg font-semibold">{{ messageModalTitle }}</h3>
+          </div>
+          <p class="text-gray-700 mb-6">{{ messageModalMessage }}</p>
+          <div class="flex justify-end">
+            <button (click)="closeMessageModal()" class="px-4 py-2 bg-primary text-white rounded-button">OK</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="px-4 py-6 sm:px-0">
+        <!-- Breadcrumb and title -->
+        <div class="flex flex-col md:flex-row md:items-center justify-between mb-6">
+          <div>
+            <div class="flex items-center text-sm text-gray-500 mb-2">
+              <a routerLink="/dashboard" class="hover:text-primary">Tableau de bord</a>
+              <div class="w-4 h-4 flex items-center justify-center mx-1">
+                <i class="ri-arrow-right-s-line"></i>
+              </div>
+              <span class="font-medium text-gray-700">Événements</span>
+            </div>
+            <h1 class="text-2xl font-semibold text-gray-900">Gestion des Événements</h1>
+          </div>
+          <button class="mt-4 md:mt-0 px-4 py-2 bg-primary text-white rounded-button flex items-center whitespace-nowrap" (click)="openAddEventModal()">
+            <div class="w-4 h-4 flex items-center justify-center mr-2">
+              <i class="ri-add-line"></i>
+            </div>
+            Ajouter un événement
+          </button>
+        </div>
+
+        <!-- Stats -->
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-6">
+          <div class="bg-white rounded-lg shadow-sm p-6">
+            <div class="flex items-center mb-4">
+              <div class="w-10 h-10 rounded-full bg-blue-100 flex items-center justify-center mr-3">
+                <div class="w-5 h-5 flex items-center justify-center text-blue-500">
+                  <i class="ri-calendar-line"></i>
                 </div>
-                <span class="text-gray-700">Admin</span>
-                <i class="ri-arrow-down-s-line ml-1 text-gray-600"></i>
-              </button>
-              <div id="profileMenu" class="absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-lg py-2 z-50" [class.hidden]="!isProfileMenuOpen">
-                <a routerLink="/profile" class="px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 flex items-center">
-                  <i class="ri-user-line mr-2"></i> Mon profil
-                </a>
-                <div class="border-t border-gray-100 my-1"></div>
-                <a routerLink="/connexion" class="px-4 py-2 text-sm text-red-600 hover:bg-gray-100 flex items-center">
-                  <i class="ri-logout-box-line mr-2"></i> Déconnexion
-                </a>
+              </div>
+              <h3 class="text-lg font-medium text-gray-900">Total des événements</h3>
+            </div>
+            <div class="flex items-baseline">
+              <span class="text-3xl font-bold text-primary">{{ stats.total }}</span>
+            </div>
+            <div class="mt-2 flex items-center text-sm">
+              <div class="text-green-500 flex items-center">
+                <div class="w-4 h-4 flex items-center justify-center">
+                  <i class="ri-arrow-up-line"></i>
+                </div>
+                <span>15% depuis le mois dernier</span>
+              </div>
+            </div>
+          </div>
+          <div class="bg-white rounded-lg shadow-sm p-6">
+            <div class="flex items-center mb-4">
+              <div class="w-10 h-10 rounded-full bg-green-100 flex items-center justify-center mr-3">
+                <div class="w-5 h-5 flex items-center justify-center text-green-500">
+                  <i class="ri-time-line"></i>
+                </div>
+              </div>
+              <h3 class="text-lg font-medium text-gray-900">Événements à venir</h3>
+            </div>
+            <div class="flex items-baseline">
+              <span class="text-3xl font-bold text-green-500">{{ stats.upcoming }}</span>
+            </div>
+            <div class="mt-2 flex items-center text-sm">
+              <div class="text-green-500 flex items-center">
+                <div class="w-4 h-4 flex items-center justify-center">
+                  <i class="ri-arrow-up-line"></i>
+                </div>
+                <span>8% depuis le mois dernier</span>
+              </div>
+            </div>
+          </div>
+          <div class="bg-white rounded-lg shadow-sm p-6">
+            <div class="flex items-center mb-4">
+              <div class="w-10 h-10 rounded-full bg-yellow-100 flex items-center justify-center mr-3">
+                <div class="w-5 h-5 flex items-center justify-center text-yellow-500">
+                  <i class="ri-user-line"></i>
+                </div>
+              </div>
+              <h3 class="text-lg font-medium text-gray-900">Total des participants</h3>
+            </div>
+            <div class="flex items-baseline">
+              <span class="text-3xl font-bold text-yellow-500">{{ stats.participants }}</span>
+            </div>
+            <div class="mt-2 flex items-center text-sm">
+              <div class="text-green-500 flex items-center">
+                <div class="w-4 h-4 flex items-center justify-center">
+                  <i class="ri-arrow-up-line"></i>
+                </div>
+                <span>12% depuis le mois dernier</span>
+              </div>
+            </div>
+          </div>
+          <div class="bg-white rounded-lg shadow-sm p-6">
+            <div class="flex items-center mb-4">
+              <div class="w-10 h-10 rounded-full bg-purple-100 flex items-center justify-center mr-3">
+                <div class="w-5 h-5 flex items-center justify-center text-purple-500">
+                  <i class="ri-bar-chart-line"></i>
+                </div>
+              </div>
+              <h3 class="text-lg font-medium text-gray-900">Taux de participation</h3>
+            </div>
+            <div class="flex items-baseline">
+              <span class="text-3xl font-bold text-purple-500">{{ stats.participationRate }}%</span>
+            </div>
+            <div class="mt-2 flex items-center text-sm">
+              <div class="text-red-500 flex items-center">
+                <div class="w-4 h-4 flex items-center justify-center">
+                  <i class="ri-arrow-down-line"></i>
+                </div>
+                <span>3% depuis le mois dernier</span>
               </div>
             </div>
           </div>
         </div>
-      </header>
-  
-      <!-- Main -->
-      <main class="flex-1 overflow-auto p-6">
-        <!-- Message Modal -->
-        <div *ngIf="showMessageModal" class="fixed inset-0 flex items-center justify-center z-50">
-          <div class="bg-white rounded-lg shadow-xl p-6 max-w-sm w-full mx-4">
-            <div class="flex items-center mb-4" [ngClass]="messageModalType === 'error' ? 'text-red-600' : 'text-green-600'">
-              <i [ngClass]="messageModalType === 'error' ? 'ri-error-warning-line' : 'ri-checkbox-circle-line'" class="text-2xl mr-2"></i>
-              <h3 class="text-lg font-semibold">{{ messageModalTitle }}</h3>
+
+        <!-- Charts -->
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
+          <div class="bg-white rounded-lg shadow-sm p-6">
+            <h3 class="text-lg font-medium text-gray-900 mb-4">Événements par mois</h3>
+            <div class="h-80">
+              <canvas #eventsByMonthChart></canvas>
             </div>
-            <p class="text-gray-700 mb-6">{{ messageModalMessage }}</p>
-            <div class="flex justify-end">
-              <button (click)="closeMessageModal()" class="px-4 py-2 bg-primary text-white rounded-button">OK</button>
+          </div>
+          <div class="bg-white rounded-lg shadow-sm p-6">
+            <h3 class="text-lg font-medium text-gray-900 mb-4">Événements par catégorie</h3>
+            <div class="h-80">
+              <canvas #eventsByCategoryChart></canvas>
             </div>
           </div>
         </div>
-  
-        <div class="px-4 py-6 sm:px-0">
-          <!-- Breadcrumb and title -->
-          <div class="flex flex-col md:flex-row md:items-center justify-between mb-6">
-            <div>
-              <div class="flex items-center text-sm text-gray-500 mb-2">
-                <a routerLink="/dashboard" class="hover:text-primary">Tableau de bord</a>
-                <div class="w-4 h-4 flex items-center justify-center mx-1">
+
+        <!-- Filters -->
+        <div class="bg-white rounded-lg shadow-sm p-6 mb-6">
+          <div class="flex flex-col md:flex-row md:items-center md:space-x-4">
+            <div class="flex items-center space-x-2 mb-4 md:mb-0">
+              <div class="relative">
+                <button class="flex items-center justify-between w-full md:w-40 px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-200 rounded-lg hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-primary whitespace-nowrap" (click)="toggleStatusFilter()">
+                  <span>{{ selectedStatus || 'Statut' }}</span>
+                  <div class="w-4 h-4 flex items-center justify-center ml-2">
+                    <i class="ri-arrow-down-s-line"></i>
+                  </div>
+                </button>
+                <div class="absolute mt-1 right-0 bg-white rounded-lg shadow-lg z-10" [class.hidden]="!showStatusFilter">
+                  <div class="py-1">
+                    <a class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 cursor-pointer" (click)="selectStatus('Tous')">Tous</a>
+                    <a class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 cursor-pointer" (click)="selectStatus('À venir')">À venir</a>
+                    <a class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 cursor-pointer" (click)="selectStatus('En cours')">En cours</a>
+                    <a class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 cursor-pointer" (click)="selectStatus('Terminé')">Passés</a>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="flex flex-col md:flex-row md:items-center space-y-4 md:space-y-0 md:space-x-4">
+              <div class="relative">
+                <button class="flex items-center justify-between w-full md:w-40 px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-200 rounded-lg hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-primary whitespace-nowrap" (click)="toggleSortFilter()">
+                  <span>{{ selectedSort || 'Trier par' }}</span>
+                  <div class="w-4 h-4 flex items-center justify-center ml-2">
+                    <i class="ri-arrow-down-s-line"></i>
+                  </div>
+                </button>
+                <div class="absolute mt-1 right-0 bg-white rounded-lg shadow-lg z-10" [class.hidden]="!showSortFilter">
+                  <div class="py-1">
+                    <a class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 cursor-pointer" (click)="selectSort('Nom')">Nom</a>
+                    <a class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 cursor-pointer" (click)="selectSort('Date')">Date</a>
+                    <a class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 cursor-pointer" (click)="selectSort('Participants')">Participants</a>
+                  </div>
+                </div>
+              </div>
+              <div class="relative flex-1">
+                <div class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
+                  <div class="w-5 h-5 flex items-center justify-center text-gray-400">
+                    <i class="ri-search-line"></i>
+                  </div>
+                </div>
+                <input type="text" class="bg-gray-50 border border-gray-200 text-gray-900 text-sm rounded-lg block w-full pl-10 p-2.5 focus:outline-none focus:ring-2 focus:ring-primary" placeholder="Rechercher un événement..." [(ngModel)]="tableSearchQuery" (input)="filterEvents()">
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Table -->
+        <div class="bg-white rounded-lg shadow-sm overflow-hidden mb-6">
+          <div class="flex items-center justify-between px-6 py-4 border-b border-gray-200">
+            <h3 class="text-lg font-medium text-gray-900">Liste des événements</h3>
+          </div>
+          <div class="overflow-x-auto">
+            <table class="min-w-full divide-y divide-gray-200">
+              <thead class="bg-gray-50">
+                <tr>
+                  <th scope="col" class="px-6 py-3 text-left">
+                    <div class="flex items-center">
+                      <div class="checkbox-custom" [class.checked]="selectAll" (click)="toggleSelectAll()"></div>
+                    </div>
+                  </th>
+                  <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    <div class="flex items-center">
+                      <span>Nom de l'événement</span>
+                      <button class="ml-1 text-gray-400 hover:text-gray-500" (click)="sortBy('nom')">
+                        <div class="w-4 h-4 flex items-center justify-center">
+                          <i [ngClass]="sortField === 'nom' && sortDirection === 'asc' ? 'ri-arrow-up-s-line' : 'ri-arrow-down-s-line'"></i>
+                        </div>
+                      </button>
+                    </div>
+                  </th>
+                  <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    <div class="flex items-center">
+                      <span>Date et heure</span>
+                      <button class="ml-1 text-gray-400 hover:text-gray-500" (click)="sortBy('date')">
+                        <div class="w-4 h-4 flex items-center justify-center">
+                          <i [ngClass]="sortField === 'date' && sortDirection === 'asc' ? 'ri-arrow-up-s-line' : 'ri-arrow-down-s-line'"></i>
+                        </div>
+                      </button>
+                    </div>
+                  </th>
+                  <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    <div class="flex items-center">
+                      <span>Lieu</span>
+                      <button class="ml-1 text-gray-400 hover:text-gray-500" (click)="sortBy('lieu')">
+                        <div class="w-4 h-4 flex items-center justify-center">
+                          <i [ngClass]="sortField === 'lieu' && sortDirection === 'asc' ? 'ri-arrow-up-s-line' : 'ri-arrow-down-s-line'"></i>
+                        </div>
+                      </button>
+                    </div>
+                  </th>
+                  <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    <div class="flex items-center">
+                      <span>Participants</span>
+                      <button class="ml-1 text-gray-400 hover:text-gray-500" (click)="sortBy('participants')">
+                        <div class="w-4 h-4 flex items-center justify-center">
+                          <i [ngClass]="sortField === 'participants' && sortDirection === 'asc' ? 'ri-arrow-up-s-line' : 'ri-arrow-down-s-line'"></i>
+                        </div>
+                      </button>
+                    </div>
+                  </th>
+                  <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Type d'établissement
+                  </th>
+                  <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Statut
+                  </th>
+                  <th scope="col" class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Actions
+                  </th>
+                </tr>
+              </thead>
+              <tbody class="bg-white divide-y divide-gray-200">
+                <tr *ngFor="let event of paginatedEvents" class="hover:bg-gray-50">
+                  <td class="px-6 py-4 whitespace-nowrap">
+                    <div class="checkbox-custom" [class.checked]="event.selected" (click)="toggleSelection(event)"></div>
+                  </td>
+                  <td class="px-6 py-4 whitespace-nowrap">
+                    <div class="flex items-center">
+                      <div class="w-10 h-10 rounded flex items-center justify-center mr-3" [ngClass]="getCategoryClass(event.categorie)">
+                        <div class="w-5 h-5 flex items-center justify-center" [ngClass]="getCategoryIconClass(event.categorie)">
+                          <i [ngClass]="getCategoryIcon(event.categorie)"></i>
+                        </div>
+                      </div>
+                      <div>
+                        <div class="text-sm font-medium text-gray-900">{{ event.nom }}</div>
+                        <div class="text-xs text-gray-500">{{ event.organisateur }}</div>
+                      </div>
+                    </div>
+                  </td>
+                  <td class="px-6 py-4 whitespace-nowrap">
+                    <div class="text-sm text-gray-900">{{ event.date | date:'mediumDate' }}</div>
+                    <div class="text-sm text-gray-500">{{ event.heureDebut }} - {{ event.heureFin }}</div>
+                  </td>
+                  <td class="px-6 py-4 whitespace-nowrap">
+                    <div class="text-sm text-gray-900">{{ event.lieu }}</div>
+                    <div class="text-sm text-gray-500">{{ event.ville }}</div>
+                  </td>
+                  <td class="px-6 py-4 whitespace-nowrap">
+                    <div class="flex items-center">
+                      <div class="w-5 h-5 flex items-center justify-center text-gray-500 mr-1">
+                        <i class="ri-user-line"></i>
+                      </div>
+                      <span>{{ event.participants }} / {{ event.capacite }}</span>
+                    </div>
+                  </td>
+                  <td class="px-6 py-4 whitespace-nowrap">
+                    <span class="px-2 py-1 text-xs font-medium rounded-full bg-blue-100 text-blue-800">
+                      {{ event.typeEtablissement }}
+                    </span>
+                  </td>
+                  <td class="px-6 py-4 whitespace-nowrap">
+                    <span class="px-2 py-1 text-xs font-medium rounded-full" [ngClass]="getStatusBadgeClass(event.statut)">
+                      {{ event.statut }}
+                    </span>
+                  </td>
+                  <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                    <div class="flex items-center justify-end space-x-2">
+                      <button class="p-1 text-gray-500 hover:text-indigo-500 rounded-full hover:bg-indigo-50" (click)="viewEvent(event)">
+                        <div class="w-5 h-5 flex items-center justify-center">
+                          <i class="ri-eye-line"></i>
+                        </div>
+                      </button>
+                      <button class="p-1 text-blue-500 rounded-full hover:bg-blue-50" (click)="editEvent(event)">
+                        <div class="w-5 h-5 flex items-center justify-center">
+                          <i class="ri-pencil-line"></i>
+                        </div>
+                      </button>
+                      <button class="p-1 text-red-500 rounded-full hover:bg-red-50" (click)="openArchiveModal(event)">
+                        <div class="w-5 h-5 flex items-center justify-center">
+                          <i class="ri-archive-line"></i>
+                        </div>
+                      </button>
+                    </div>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          <div class="px-6 py-4 border-t border-gray-200 flex items-center justify-between">
+            <div class="text-sm text-gray-500">
+              Affichage de {{ (currentPage - 1) * itemsPerPage + 1 }} à {{ getEndIndex() }} sur {{ filteredEvents.length }} événements
+            </div>
+            <div class="flex items-center space-x-2">
+              <button class="w-8 h-8 flex items-center justify-center text-gray-500 hover:text-gray-700 rounded-full border border-gray-200" [disabled]="currentPage === 1" (click)="previousPage()">
+                <div class="w-4 h-4 flex items-center justify-center">
+                  <i class="ri-arrow-left-s-line"></i>
+                </div>
+              </button>
+              <button *ngFor="let page of getPages()" class="w-8 h-8 flex items-center justify-center rounded-full border border-gray-200" [ngClass]="{'text-white bg-primary': currentPage === page, 'text-gray-500 hover:text-gray-700': currentPage !== page}" (click)="goToPage(page)">
+                {{ page }}
+              </button>
+              <button class="w-8 h-8 flex items-center justify-center text-gray-500 hover:text-gray-700 rounded-full border border-gray-200" [disabled]="currentPage === totalPages" (click)="nextPage()">
+                <div class="w-4 h-4 flex items-center justify-center">
                   <i class="ri-arrow-right-s-line"></i>
                 </div>
-                <span class="font-medium text-gray-700">Événements</span>
-              </div>
-              <h1 class="text-2xl font-semibold text-gray-900">Gestion des Événements</h1>
-            </div>
-            <button class="mt-4 md:mt-0 px-4 py-2 bg-primary text-white rounded-button flex items-center whitespace-nowrap" (click)="openAddEventModal()">
-              <div class="w-4 h-4 flex items-center justify-center mr-2">
-                <i class="ri-add-line"></i>
-              </div>
-              Ajouter un événement
-            </button>
-          </div>
-  
-          <!-- Stats -->
-          <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-6">
-            <div class="bg-white rounded-lg shadow-sm p-6">
-              <div class="flex items-center mb-4">
-                <div class="w-10 h-10 rounded-full bg-blue-100 flex items-center justify-center mr-3">
-                  <div class="w-5 h-5 flex items-center justify-center text-blue-500">
-                    <i class="ri-calendar-line"></i>
-                  </div>
-                </div>
-                <h3 class="text-lg font-medium text-gray-900">Total des événements</h3>
-              </div>
-              <div class="flex items-baseline">
-                <span class="text-3xl font-bold text-primary">{{ stats.total }}</span>
-              </div>
-              <div class="mt-2 flex items-center text-sm">
-                <div class="text-green-500 flex items-center">
-                  <div class="w-4 h-4 flex items-center justify-center">
-                    <i class="ri-arrow-up-line"></i>
-                  </div>
-                  <span>15% depuis le mois dernier</span>
-                </div>
-              </div>
-            </div>
-            <div class="bg-white rounded-lg shadow-sm p-6">
-              <div class="flex items-center mb-4">
-                <div class="w-10 h-10 rounded-full bg-green-100 flex items-center justify-center mr-3">
-                  <div class="w-5 h-5 flex items-center justify-center text-green-500">
-                    <i class="ri-time-line"></i>
-                  </div>
-                </div>
-                <h3 class="text-lg font-medium text-gray-900">Événements à venir</h3>
-              </div>
-              <div class="flex items-baseline">
-                <span class="text-3xl font-bold text-green-500">{{ stats.upcoming }}</span>
-              </div>
-              <div class="mt-2 flex items-center text-sm">
-                <div class="text-green-500 flex items-center">
-                  <div class="w-4 h-4 flex items-center justify-center">
-                    <i class="ri-arrow-up-line"></i>
-                  </div>
-                  <span>8% depuis le mois dernier</span>
-                </div>
-              </div>
-            </div>
-            <div class="bg-white rounded-lg shadow-sm p-6">
-              <div class="flex items-center mb-4">
-                <div class="w-10 h-10 rounded-full bg-yellow-100 flex items-center justify-center mr-3">
-                  <div class="w-5 h-5 flex items-center justify-center text-yellow-500">
-                    <i class="ri-user-line"></i>
-                  </div>
-                </div>
-                <h3 class="text-lg font-medium text-gray-900">Total des participants</h3>
-              </div>
-              <div class="flex items-baseline">
-                <span class="text-3xl font-bold text-yellow-500">{{ stats.participants }}</span>
-              </div>
-              <div class="mt-2 flex items-center text-sm">
-                <div class="text-green-500 flex items-center">
-                  <div class="w-4 h-4 flex items-center justify-center">
-                    <i class="ri-arrow-up-line"></i>
-                  </div>
-                  <span>12% depuis le mois dernier</span>
-                </div>
-              </div>
-            </div>
-            <div class="bg-white rounded-lg shadow-sm p-6">
-              <div class="flex items-center mb-4">
-                <div class="w-10 h-10 rounded-full bg-purple-100 flex items-center justify-center mr-3">
-                  <div class="w-5 h-5 flex items-center justify-center text-purple-500">
-                    <i class="ri-bar-chart-line"></i>
-                  </div>
-                </div>
-                <h3 class="text-lg font-medium text-gray-900">Taux de participation</h3>
-              </div>
-              <div class="flex items-baseline">
-                <span class="text-3xl font-bold text-purple-500">{{ stats.participationRate }}%</span>
-              </div>
-              <div class="mt-2 flex items-center text-sm">
-                <div class="text-red-500 flex items-center">
-                  <div class="w-4 h-4 flex items-center justify-center">
-                    <i class="ri-arrow-down-line"></i>
-                  </div>
-                  <span>3% depuis le mois dernier</span>
-                </div>
-              </div>
+              </button>
             </div>
           </div>
-  
-          <!-- Filters -->
-          <div class="bg-white rounded-lg shadow-sm p-6 mb-6">
-            <div class="flex flex-col md:flex-row md:items-center md:space-x-4">
-              <div class="flex items-center space-x-2 mb-4 md:mb-0">
-                <div class="inline-flex rounded-full px-1 py-1 bg-gray-100">
-                  <button class="tab-button px-4 py-1.5 text-sm font-medium rounded-full" [ngClass]="{'active': selectedStatus === 'Tous'}" (click)="selectStatus('Tous')">Tous</button>
-                  <button class="tab-button px-4 py-1.5 text-sm font-medium rounded-full" [ngClass]="{'active': selectedStatus === 'À venir'}" (click)="selectStatus('À venir')">À venir</button>
-                  <button class="tab-button px-4 py-1.5 text-sm font-medium rounded-full" [ngClass]="{'active': selectedStatus === 'En cours'}" (click)="selectStatus('En cours')">En cours</button>
-                  <button class="tab-button px-4 py-1.5 text-sm font-medium rounded-full" [ngClass]="{'active': selectedStatus === 'Terminé'}" (click)="selectStatus('Terminé')">Passés</button>
-                </div>
-              </div>
-              <div class="flex flex-col md:flex-row md:items-center space-y-4 md:space-y-0 md:space-x-4">
-                <div class="relative">
-                  <button class="flex items-center justify-between w-full md:w-40 px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-200 rounded-lg hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-primary whitespace-nowrap" (click)="toggleSortFilter()">
-                    <span>{{ selectedSort || 'Trier par' }}</span>
-                    <div class="w-4 h-4 flex items-center justify-center ml-2">
-                      <i class="ri-arrow-down-s-line"></i>
-                    </div>
-                  </button>
-                  <div class="absolute mt-1 right-0 bg-white rounded-lg shadow-lg z-10" [class.hidden]="!showSortFilter">
-                    <div class="py-1">
-                      <a class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 cursor-pointer" (click)="selectSort('Nom')">Nom</a>
-                      <a class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 cursor-pointer" (click)="selectSort('Date')">Date</a>
-                      <a class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 cursor-pointer" (click)="selectSort('Participants')">Participants</a>
-                    </div>
-                  </div>
-                </div>
-                <div class="relative flex-1">
-                  <div class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
-                    <div class="w-5 h-5 flex items-center justify-center text-gray-400">
-                      <i class="ri-search-line"></i>
-                    </div>
-                  </div>
-                  <input type="text" class="bg-gray-50 border border-gray-200 text-gray-900 text-sm rounded-lg block w-full pl-10 p-2.5 focus:outline-none focus:ring-2 focus:ring-primary" placeholder="Rechercher un événement..." [(ngModel)]="tableSearchQuery" (input)="filterEvents()">
-                </div>
-              </div>
-            </div>
-          </div>
-  
-          <!-- Table -->
-          <div class="_Disabled bg-white rounded-lg shadow-sm overflow-hidden mb-6">
-            <div class="flex items-center justify-between px-6 py-4 border-b border-gray-200">
-              <h3 class="text-lg font-medium text-gray-900">Liste des événements</h3>
-            </div>
-            <div class="overflow-x-auto">
-              <table class="min-w-full divide-y divide-gray-200">
-                <thead class="bg-gray-50">
-                  <tr>
-                    <th scope="col" class="px-6 py-3 text-left">
-                      <div class="flex items-center">
-                        <div class="checkbox-custom" [class.checked]="selectAll" (click)="toggleSelectAll()"></div>
-                      </div>
-                    </th>
-                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      <div class="flex items-center">
-                        <span>Nom de l'événement</span>
-                        <button class="ml-1 text-gray-400 hover:text-gray-500" (click)="sortBy('nom')">
-                          <div class="w-4 h-4 flex items-center justify-center">
-                            <i [ngClass]="sortField === 'nom' && sortDirection === 'asc' ? 'ri-arrow-up-s-line' : 'ri-arrow-down-s-line'"></i>
-                          </div>
-                        </button>
-                      </div>
-                    </th>
-                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      <div class="flex items-center">
-                        <span>Date et heure</span>
-                        <button class="ml-1 text-gray-400 hover:text-gray-500" (click)="sortBy('date')">
-                          <div class="w-4 h-4 flex items-center justify-center">
-                            <i [ngClass]="sortField === 'date' && sortDirection === 'asc' ? 'ri-arrow-up-s-line' : 'ri-arrow-down-s-line'"></i>
-                          </div>
-                        </button>
-                      </div>
-                    </th>
-                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      <div class="flex items-center">
-                        <span>Lieu</span>
-                        <button class="ml-1 text-gray-400 hover:text-gray-500" (click)="sortBy('lieu')">
-                          <div class="w-4 h-4 flex items-center justify-center">
-                            <i [ngClass]="sortField === 'lieu' && sortDirection === 'asc' ? 'ri-arrow-up-s-line' : 'ri-arrow-down-s-line'"></i>
-                          </div>
-                        </button>
-                      </div>
-                    </th>
-                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      <div class="flex items-center">
-                        <span>Participants</span>
-                        <button class="ml-1 text-gray-400 hover:text-gray-500" (click)="sortBy('participants')">
-                          <div class="w-4 h-4 flex items-center justify-center">
-                            <i [ngClass]="sortField === 'participants' && sortDirection === 'asc' ? 'ri-arrow-up-s-line' : 'ri-arrow-down-s-line'"></i>
-                          </div>
-                        </button>
-                      </div>
-                    </th>
-                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      Statut
-                    </th>
-                    <th scope="col" class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      Actions
-                    </th>
-                  </tr>
-                </thead>
-                <tbody class="bg-white divide-y divide-gray-200">
-                  <tr *ngFor="let event of paginatedEvents" class="hover:bg-gray-50">
-                    <td class="px-6 py-4 whitespace-nowrap">
-                      <div class="checkbox-custom" [class.checked]="event.selected" (click)="toggleSelection(event)"></div>
-                    </td>
-                    <td class="px-6 py-4 whitespace-nowrap">
-                      <div class="flex items-center">
-                        <div class="w-10 h-10 rounded flex items-center justify-center mr-3" [ngClass]="getCategoryClass(event.categorie)">
-                          <div class="w-5 h-5 flex items-center justify-center" [ngClass]="getCategoryIconClass(event.categorie)">
-                            <i [ngClass]="getCategoryIcon(event.categorie)"></i>
-                          </div>
-                        </div>
-                        <div>
-                          <div class="text-sm font-medium text-gray-900">{{ event.nom }}</div>
-                          <div class="text-xs text-gray-500">{{ event.organisateur }}</div>
-                        </div>
-                      </div>
-                    </td>
-                    <td class="px-6 py-4 whitespace-nowrap">
-                      <div class="text-sm text-gray-900">{{ event.date | date:'mediumDate' }}</div>
-                      <div class="text-sm text-gray-500">{{ event.heureDebut }} - {{ event.heureFin }}</div>
-                    </td>
-                    <td class="px-6 py-4 whitespace-nowrap">
-                      <div class="text-sm text-gray-900">{{ event.lieu }}</div>
-                      <div class="text-sm text-gray-500">{{ event.ville }}</div>
-                    </td>
-                    <td class="px-6 py-4 whitespace-nowrap">
-                      <div class="flex items-center">
-                        <div class="w-5 h-5 flex items-center justify-center text-gray-500 mr-1">
-                          <i class="ri-user-line"></i>
-                        </div>
-                        <span>{{ event.participants }} / {{ event.capacite }}</span>
-                      </div>
-                    </td>
-                    <td class="px-6 py-4 whitespace-nowrap">
-                      <span class="px-2 py-1 text-xs font-medium rounded-full" [ngClass]="getStatusBadgeClass(event.statut)">
-                        {{ event.statut }}
-                      </span>
-                    </td>
-                    <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                      <div class="flex items-center justify-end space-x-2">
-                        <button class="p-1 text-gray-500 hover:text-indigo-500 rounded-full hover:bg-indigo-50" (click)="viewEvent(event)">
-                          <div class="w-5 h-5 flex items-center justify-center">
-                            <i class="ri-eye-line"></i>
-                          </div>
-                        </button>
-                        <button class="p-1 text-gray-500 hover:text-blue-500 rounded-full hover:bg-blue-50" (click)="editEvent(event)">
-                          <div class="w-5 h-5 flex items-center justify-center">
-                            <i class="ri-pencil-line"></i>
-                          </div>
-                        </button>
-                        <button class="p-1 text-gray-500 hover:text-red-500 rounded-full hover:bg-red-50" (click)="openDeleteModal(event)">
-                          <div class="w-5 h-5 flex items-center justify-center">
-                            <i class="ri-delete-bin-line"></i>
-                          </div>
-                        </button>
-                      </div>
-                    </td>
-                  </tr>
-                </tbody>
-              </table>
-            </div>
-            <div class="px-6 py-4 border-t border-gray-200 flex items-center justify-between">
-              <div class="text-sm text-gray-500">
-                Affichage de {{ (currentPage - 1) * itemsPerPage + 1 }} à {{ getEndIndex() }} sur {{ filteredEvents.length }} événements
-              </div>
-              <div class="flex items-center space-x-2">
-                <button class="w-8 h-8 flex items-center justify-center text-gray-500 hover:text-gray-700 rounded-full border border-gray-200" [disabled]="currentPage === 1" (click)="previousPage()">
-                  <div class="w-4 h-4 flex items-center justify-center">
-                    <i class="ri-arrow-left-s-line"></i>
-                  </div>
-                </button>
-                <button *ngFor="let page of getPages()" class="w-8 h-8 flex items-center justify-center rounded-full border border-gray-200" [ngClass]="{'text-white bg-primary': currentPage === page, 'text-gray-500 hover:text-gray-700': currentPage !== page}" (click)="goToPage(page)">
-                  {{ page }}
-                </button>
-                <button class="w-8 h-8 flex items-center justify-center text-gray-500 hover:text-gray-700 rounded-full border border-gray-200" [disabled]="currentPage === totalPages" (click)="nextPage()">
-                  <div class="w-4 h-4 flex items-center justify-center">
-                    <i class="ri-arrow-right-s-line"></i>
-                  </div>
-                </button>
-              </div>
-            </div>
-          </div>
-  
-          <!-- Charts -->
-          <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
-            <div class="bg-white rounded-lg shadow-sm p-6">
-              <h3 class="text-lg font-medium text-gray-900 mb-4">Événements par mois</h3>
-              <div class="h-80">
-                <canvas #eventsByMonthChart></canvas>
-              </div>
-            </div>
-            <div class="bg-white rounded-lg shadow-sm p-6">
-              <h3 class="text-lg font-medium text-gray-900 mb-4">Événements par catégorie</h3>
-              <div class="h-80">
-                <canvas #eventsByCategoryChart></canvas>
-              </div>
-            </div>
-          </div>
-        </div>
-      </main>
-    </div>
-  
-    <!-- Add/Edit Event Modal -->
-    <div class="fixed inset-0 bg-gray-900 bg-opacity-50 flex items-center justify-center z-50 overflow-y-auto" [class.hidden]="!isModalOpen">
-      <div class="bg-white rounded-lg shadow-xl w-full max-w-lg m-4">
-        <div class="p-6 modal-content overflow-y-auto max-h-[90vh]">
-          <h2 class="text-xl font-semibold text-gray-900 mb-6">{{ modalTitle }}</h2>
-          <form (ngSubmit)="saveEvent()">
-            <div class="space-y-4">
-              <div>
-                <label for="event-name" class="block text-sm font-medium text-gray-700">Nom de l'événement <span class="text-red-500">*</span></label>
-                <input id="event-name" type="text" [(ngModel)]="currentEvent.nom" name="nom" class="mt-1 block w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-primary" required>
-              </div>
-              <div class="grid grid-cols-2 gap-4">
-                <div>
-                  <label for="event-date" class="block text-sm font-medium text-gray-700">Date <span class="text-red-500">*</span></label>
-                  <input id="event-date" type="date" [(ngModel)]="currentEvent.date" name="date" class="mt-1 block w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-primary" required>
-                </div>
-                <div>
-                  <label for="event-time" class="block text-sm font-medium text-gray-700">Heure de début <span class="text-red-500">*</span></label>
-                  <input id="event-time" type="time" [(ngModel)]="currentEvent.heureDebut" name="heureDebut" class="mt-1 block w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-primary" required>
-                </div>
-              </div>
-              <div>
-                <label for="event-end-time" class="block text-sm font-medium text-gray-700">Heure de fin</label>
-                <input id="event-end-time" type="time" [(ngModel)]="currentEvent.heureFin" name="heureFin" class="mt-1 block w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-primary">
-              </div>
-              <div>
-                <label for="event-location" class="block text-sm font-medium text-gray-700">Lieu <span class="text-red-500">*</span></label>
-                <input id="event-location" type="text" [(ngModel)]="currentEvent.lieu" name="lieu" class="mt-1 block w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-primary" required>
-              </div>
-              <div>
-                <label for="event-city" class="block text-sm font-medium text-gray-700">Ville <span class="text-red-500">*</span></label>
-                <input id="event-city" type="text" [(ngModel)]="currentEvent.ville" name="ville" class="mt-1 block w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-primary" required>
-              </div>
-              <div>
-                <label for="event-capacity" class="block text-sm font-medium text-gray-700">Capacité maximale <span class="text-red-500">*</span></label>
-                <input id="event-capacity" type="number" [(ngModel)]="currentEvent.capacite" name="capacite" class="mt-1 block w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-primary" required>
-              </div>
-              <div>
-                <label for="event-category" class="block text-sm font-medium text-gray-700">Catégorie <span class="text-red-500">*</span></label>
-                <select id="event-category" [(ngModel)]="currentEvent.categorie" name="categorie" class="mt-1 block w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-primary" required>
-                  <option value="" disabled>Sélectionnez une catégorie</option>
-                  <option>Gastronomie</option>
-                  <option>Musique</option>
-                  <option>Littérature</option>
-                  <option>Cinéma</option>
-                  <option>Art</option>
-                  <option>Sport</option>
-                  <option>Autre</option>
-                </select>
-              </div>
-              <div>
-                <label for="event-organizer" class="block text-sm font-medium text-gray-700">Organisateur</label>
-                <input id="event-organizer" type="text" [(ngModel)]="currentEvent.organisateur" name="organisateur" class="mt-1 block w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-primary">
-              </div>
-              <div>
-                <label for="event-description" class="block text-sm font-medium text-gray-700">Description</label>
-                <textarea id="event-description" [(ngModel)]="currentEvent.description" name="description" rows="3" class="mt-1 block w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-primary"></textarea>
-              </div>
-              <div class="flex items-center">
-                <label class="custom-switch">
-                  <input type="checkbox" [(ngModel)]="currentEvent.estPublic" name="estPublic">
-                  <span class="switch-slider"></span>
-                </label>
-                <span class="ml-3 text-sm text-gray-700">Événement public</span>
-              </div>
-            </div>
-            <div class="mt-6 flex justify-end space-x-3">
-              <button type="button" class="px-4 py-2 border border-gray-300 rounded-lg text-gray-700" (click)="closeModal()">Annuler</button>
-              <button type="submit" class="px-4 py-2 bg-primary text-white rounded-lg">Enregistrer</button>
-            </div>
-          </form>
         </div>
       </div>
-    </div>
-  
-    <!-- Delete Modal -->
-    <div class="fixed inset-0 bg-gray-900 bg-opacity-50 flex items-center justify-center z-50" [class.hidden]="!isDeleteModalOpen">
-      <div class="bg-white rounded-lg shadow-lg max-w-md w-full p-6">
-        <div class="text-center mb-6">
-          <div class="w-16 h-16 rounded-full bg-red-100 flex items-center justify-center mx-auto mb-4">
-            <div class="w-8 h-8 flex items-center justify-center text-red-500">
-              <i class="ri-delete-bin-line"></i>
+    </main>
+  </div>
+
+  <!-- Add/Edit Event Modal -->
+  <div class="fixed inset-0 bg-gray-900 bg-opacity-50 flex items-center justify-center z-50 overflow-y-auto" [class.hidden]="!isModalOpen">
+    <div class="bg-white rounded-lg shadow-xl w-full max-w-lg m-4">
+      <div class="p-6 modal-content overflow-y-auto max-h-[90vh]">
+        <h2 class="text-xl font-semibold text-gray-900 mb-6">{{ modalTitle }}</h2>
+        <form (ngSubmit)="saveEvent()">
+          <div class="space-y-4">
+            <div>
+              <label for="event-name" class="block text-sm font-medium text-gray-700">Nom de l'événement <span class="text-red-500">*</span></label>
+              <input id="event-name" type="text" [(ngModel)]="currentEvent.nom" name="nom" class="mt-1 block w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-primary" required>
+            </div>
+            <div class="grid grid-cols-2 gap-4">
+              <div>
+                <label for="event-date" class="block text-sm font-medium text-gray-700">Date <span class="text-red-500">*</span></label>
+                <input id="event-date" type="date" [(ngModel)]="currentEvent.date" name="date" class="mt-1 block w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-primary" required>
+              </div>
+              <div>
+                <label for="event-time" class="block text-sm font-medium text-gray-700">Heure de début <span class="text-red-500">*</span></label>
+                <input id="event-time" type="time" [(ngModel)]="currentEvent.heureDebut" name="heureDebut" class="mt-1 block w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-primary" required>
+              </div>
+            </div>
+            <div>
+              <label for="event-end-time" class="block text-sm font-medium text-gray-700">Heure de fin</label>
+              <input id="event-end-time" type="time" [(ngModel)]="currentEvent.heureFin" name="heureFin" class="mt-1 block w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-primary">
+            </div>
+            <div>
+              <label for="event-location" class="block text-sm font-medium text-gray-700">Lieu <span class="text-red-500">*</span></label>
+              <input id="event-location" type="text" [(ngModel)]="currentEvent.lieu" name="lieu" class="mt-1 block w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-primary" required>
+            </div>
+            <div>
+              <label for="event-city" class="block text-sm font-medium text-gray-700">Ville <span class="text-red-500">*</span></label>
+              <input id="event-city" type="text" [(ngModel)]="currentEvent.ville" name="ville" class="mt-1 block w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-primary" required>
+            </div>
+            <div>
+              <label for="event-capacity" class="block text-sm font-medium text-gray-700">Capacité maximale <span class="text-red-500">*</span></label>
+              <input id="event-capacity" type="number" [(ngModel)]="currentEvent.capacite" name="capacite" class="mt-1 block w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-primary" required>
+            </div>
+            <div>
+              <label for="event-category" class="block text-sm font-medium text-gray-700">Catégorie <span class="text-red-500">*</span></label>
+              <select id="event-category" [(ngModel)]="currentEvent.categorie" name="categorie" class="mt-1 block w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-primary" required>
+                <option value="" disabled>Sélectionnez une catégorie</option>
+                <option>Gastronomie</option>
+                <option>Musique</option>
+                <option>Littérature</option>
+                <option>Cinéma</option>
+                <option>Art</option>
+                <option>Sport</option>
+                <option>Autre</option>
+              </select>
+            </div>
+            <div>
+              <label for="event-typeEtablissement" class="block text-sm font-medium text-gray-700">Type d'établissement <span class="text-red-500">*</span></label>
+              <select id="event-typeEtablissement" [(ngModel)]="currentEvent.typeEtablissement" name="typeEtablissement" class="mt-1 block w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-primary" required>
+                <option value="" disabled>Sélectionnez un type</option>
+                <option>Restaurant</option>
+                <option>Hôtel</option>
+                <option>Café</option>
+              </select>
+            </div>
+            <div>
+              <label for="event-status" class="block text-sm font-medium text-gray-700">Statut <span class="text-red-500">*</span></label>
+              <select id="event-status" [(ngModel)]="currentEvent.statut" name="statut" class="mt-1 block w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-primary" required>
+                <option value="" disabled>Sélectionnez un statut</option>
+                <option>À venir</option>
+                <option>En cours</option>
+                <option>Terminé</option>
+              </select>
+            </div>
+            <div>
+              <label for="event-photos" class="block text-sm font-medium text-gray-700">Photos de l'événement</label>
+              <input id="event-photos" type="file" accept="image/*" multiple (change)="onPhotosChange($event)" class="mt-1 block w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-primary">
+              <div class="mt-2 grid grid-cols-3 gap-2" *ngIf="photoPreviews.length > 0">
+                <div *ngFor="let preview of photoPreviews; let i = index" class="relative">
+                  <img [src]="preview" alt="Aperçu de la photo" class="w-full h-24 object-cover rounded-lg">
+                  <button type="button" class="absolute top-1 right-1 bg-red-500 text-white rounded-full w-6 h-6 flex items-center justify-center" (click)="removePhoto(i)">
+                    <i class="ri-close-line"></i>
+                  </button>
+                </div>
+              </div>
+            </div>
+            <div>
+              <label for="event-organizer" class="block text-sm font-medium text-gray-700">Organisateur</label>
+              <input id="event-organizer" type="text" [(ngModel)]="currentEvent.organisateur" name="organisateur" class="mt-1 block w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-primary">
+            </div>
+            <div>
+              <label for="event-description" class="block text-sm font-medium text-gray-700">Description</label>
+              <textarea id="event-description" [(ngModel)]="currentEvent.description" name="description" rows="3" class="mt-1 block w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-primary"></textarea>
             </div>
           </div>
-          <h3 class="text-lg font-medium text-gray-900 mb-2">Confirmer la suppression</h3>
-          <p class="text-sm text-gray-500">Êtes-vous sûr de vouloir supprimer cet événement ? Cette action est irréversible.</p>
-        </div>
-        <div class="flex items-center justify-end space-x-3">
-          <button class="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-200 rounded-lg hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-primary whitespace-nowrap" (click)="closeDeleteModal()">Annuler</button>
-          <button class="px-4 py-2 text-sm font-medium text-white bg-red-500 rounded-lg hover:bg-red-600 focus:outline-none focus:ring-2 focus:ring-red-500 whitespace-nowrap" (click)="deleteEvent()">Supprimer</button>
-        </div>
+          <div class="mt-6 flex justify-end space-x-3">
+            <button type="button" class="px-4 py-2 border border-gray-300 rounded-lg text-gray-700" (click)="closeModal()">Annuler</button>
+            <button type="submit" class="px-4 py-2 bg-primary text-white rounded-lg">Enregistrer</button>
+          </div>
+        </form>
       </div>
     </div>
   </div>
+
+  <!-- Archive Modal -->
+  <div class="fixed inset-0 bg-gray-900 bg-opacity-50 flex items-center justify-center z-50" [class.hidden]="!isArchiveModalOpen">
+    <div class="bg-white rounded-lg shadow-lg max-w-md w-full p-6">
+      <div class="text-center mb-6">
+        <div class="w-16 h-16 rounded-full bg-red-100 flex items-center justify-center mx-auto mb-4">
+          <div class="w-8 h-8 flex items-center justify-center text-red-500">
+            <i class="ri-archive-line"></i>
+          </div>
+        </div>
+        <h3 class="text-lg font-medium text-gray-900 mb-2">Confirmer l'archivage</h3>
+        <p class="text-sm text-gray-500">Êtes-vous sûr de vouloir archiver cet événement ? Il ne sera plus visible dans la liste principale.</p>
+      </div>
+      <div class="flex items-center justify-end space-x-3">
+        <button class="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-200 rounded-lg hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-primary whitespace-nowrap" (click)="closeArchiveModal()">Annuler</button>
+        <button class="px-4 py-2 text-sm font-medium text-white bg-red-500 rounded-lg hover:bg-red-600 focus:ring-2 focus:ring-red-500 whitespace-nowrap" (click)="archiveEvent()">Archiver</button>
+      </div>
+    </div>
+  </div>
+</div>

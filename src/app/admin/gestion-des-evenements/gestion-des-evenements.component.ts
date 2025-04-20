@@ -28,6 +28,7 @@ export class GestionDesEvenementsComponent implements OnInit, AfterViewInit {
   selectedStatus = 'Tous';
   selectedSort = '';
   showSortFilter = false;
+  showStatusFilter = false;
 
   sortField = '';
   sortDirection: 'asc' | 'desc' = 'asc';
@@ -42,6 +43,11 @@ export class GestionDesEvenementsComponent implements OnInit, AfterViewInit {
 
   isDeleteModalOpen = false;
   eventToDelete: Evenement | null = null;
+
+  isArchiveModalOpen = false;
+  eventToArchive: Evenement | null = null;
+
+  photoPreviews: string[] = [];
 
   selectAll = false;
   isProfileMenuOpen = false;
@@ -123,14 +129,17 @@ export class GestionDesEvenementsComponent implements OnInit, AfterViewInit {
         this.eventsByCategoryChart = new Chart(ctx, {
           type: 'pie',
           data: {
-            labels: ['Gastronomie', 'Musique', 'Littérature', 'Cinéma'],
+            labels: ['Gastronomie', 'Musique', 'Littérature', 'Cinéma', 'Art', 'Sport', 'Autre'],
             datasets: [{
-              data: [24, 18, 15, 12],
+              data: [24, 18, 15, 12, 10, 8, 5], 
               backgroundColor: [
-                'rgba(87, 181, 231, 1)',
-                'rgba(141, 211, 199, 1)',
+                'rgba(87, 181, 231, 1)', 
+                'rgba(141, 211, 199, 1)', 
                 'rgba(251, 191, 114, 1)',
-                'rgba(252, 141, 98, 1)'
+                'rgba(252, 141, 98, 1)', 
+                'rgba(186, 147, 216, 1)', 
+                'rgba(104, 211, 145, 1)',
+                'rgba(163, 163, 163, 1)' 
               ],
               borderWidth: 2,
               borderColor: '#fff'
@@ -192,9 +201,12 @@ export class GestionDesEvenementsComponent implements OnInit, AfterViewInit {
         Gastronomie: 0,
         Musique: 0,
         Littérature: 0,
-        Cinéma: 0
+        Cinéma: 0,
+        Art: 0,
+        Sport: 0,
+        Autre: 0
       };
-      const validCategories = ['Gastronomie', 'Musique', 'Littérature', 'Cinéma'];
+      const validCategories = ['Gastronomie', 'Musique', 'Littérature', 'Cinéma', 'Art', 'Sport', 'Autre'];
       this.filteredEvents.forEach(e => {
         if (validCategories.includes(e.categorie)) {
           categoryCounts[e.categorie]++;
@@ -273,6 +285,12 @@ export class GestionDesEvenementsComponent implements OnInit, AfterViewInit {
 
   toggleSortFilter(): void {
     this.showSortFilter = !this.showSortFilter;
+    this.showStatusFilter = false;
+  }
+
+  toggleStatusFilter(): void {
+    this.showStatusFilter = !this.showStatusFilter;
+    this.showSortFilter = false;
   }
 
   selectSort(sort: string): void {
@@ -283,6 +301,7 @@ export class GestionDesEvenementsComponent implements OnInit, AfterViewInit {
 
   selectStatus(status: string): void {
     this.selectedStatus = status;
+    this.showStatusFilter = false;
     this.filterEvents();
   }
 
@@ -312,6 +331,7 @@ export class GestionDesEvenementsComponent implements OnInit, AfterViewInit {
       description: '',
       estPublic: true,
       statut: 'À venir',
+      typeEtablissement: 'Restaurant',
       selected: false
     };
   }
@@ -319,6 +339,7 @@ export class GestionDesEvenementsComponent implements OnInit, AfterViewInit {
   openAddEventModal(): void {
     this.modalTitle = 'Ajouter un événement';
     this.currentEvent = this.getDefaultEvent();
+    this.photoPreviews = [];
     this.isModalOpen = true;
     setTimeout(() => {
       const modalContent = document.querySelector('.modal-content');
@@ -331,11 +352,12 @@ export class GestionDesEvenementsComponent implements OnInit, AfterViewInit {
   editEvent(event: Evenement): void {
     this.modalTitle = 'Modifier un événement';
     this.currentEvent = { ...event };
+    this.photoPreviews = [];
     this.isModalOpen = true;
   }
 
   saveEvent(): void {
-    if (!this.currentEvent.nom || !this.currentEvent.date || !this.currentEvent.heureDebut || !this.currentEvent.lieu || !this.currentEvent.ville || !this.currentEvent.capacite || !this.currentEvent.categorie) {
+    if (!this.currentEvent.nom || !this.currentEvent.date || !this.currentEvent.heureDebut || !this.currentEvent.lieu || !this.currentEvent.ville || !this.currentEvent.capacite || !this.currentEvent.categorie || !this.currentEvent.typeEtablissement) {
       this.showNotification('Veuillez remplir tous les champs obligatoires.', 'error');
       return;
     }
@@ -372,6 +394,7 @@ export class GestionDesEvenementsComponent implements OnInit, AfterViewInit {
 
   closeModal(): void {
     this.isModalOpen = false;
+    this.photoPreviews = [];
   }
 
   openDeleteModal(event: Evenement): void {
@@ -399,6 +422,57 @@ export class GestionDesEvenementsComponent implements OnInit, AfterViewInit {
         }
       });
     }
+  }
+
+  openArchiveModal(event: Evenement): void {
+    this.eventToArchive = event;
+    this.isArchiveModalOpen = true;
+  }
+
+  closeArchiveModal(): void {
+    this.isArchiveModalOpen = false;
+    this.eventToArchive = null;
+  }
+
+  archiveEvent(): void {
+    if (this.eventToArchive && this.eventToArchive.id) {
+      this.evenementService.updateEvenement(this.eventToArchive.id, {
+        ...this.eventToArchive,
+        statut: 'Terminé'
+      }).subscribe({
+        next: (response: Evenement) => {
+          const index = this.evenements.findIndex((e) => e.id === response.id);
+          if (index !== -1) {
+            this.evenements[index] = { ...response, selected: false };
+          }
+          this.closeArchiveModal();
+          this.updateStats();
+          this.filterEvents();
+          this.showNotification('Événement archivé avec succès !', 'success');
+        },
+        error: (err: any) => {
+          this.showNotification('Erreur lors de l’archivage: ' + err.message, 'error');
+        }
+      });
+    }
+  }
+
+  onPhotosChange(event: Event): void {
+    const input = event.target as HTMLInputElement;
+    if (input.files && input.files.length > 0) {
+      this.photoPreviews = [];
+      Array.from(input.files).forEach(file => {
+        const reader = new FileReader();
+        reader.onload = (e: any) => {
+          this.photoPreviews.push(e.target.result as string);
+        };
+        reader.readAsDataURL(file);
+      });
+    }
+  }
+
+  removePhoto(index: number): void {
+    this.photoPreviews.splice(index, 1);
   }
 
   viewEvent(event: Evenement): void {
@@ -432,6 +506,9 @@ export class GestionDesEvenementsComponent implements OnInit, AfterViewInit {
       case 'Musique': return 'bg-blue-100';
       case 'Littérature': return 'bg-yellow-100';
       case 'Cinéma': return 'bg-red-100';
+      case 'Art': return 'bg-purple-100';
+      case 'Sport': return 'bg-green-200';
+      case 'Autre': return 'bg-gray-100';
       default: return 'bg-gray-100';
     }
   }
@@ -442,6 +519,9 @@ export class GestionDesEvenementsComponent implements OnInit, AfterViewInit {
       case 'Musique': return 'text-blue-500';
       case 'Littérature': return 'text-yellow-500';
       case 'Cinéma': return 'text-red-500';
+      case 'Art': return 'text-purple-500';
+      case 'Sport': return 'text-green-600';
+      case 'Autre': return 'text-gray-500';
       default: return 'text-gray-500';
     }
   }
@@ -452,6 +532,9 @@ export class GestionDesEvenementsComponent implements OnInit, AfterViewInit {
       case 'Musique': return 'ri-music-line';
       case 'Littérature': return 'ri-book-open-line';
       case 'Cinéma': return 'ri-movie-line';
+      case 'Art': return 'ri-paint-brush-line';
+      case 'Sport': return 'ri-run-line';
+      case 'Autre': return 'ri-calendar-line';
       default: return 'ri-calendar-line';
     }
   }

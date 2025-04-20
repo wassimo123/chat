@@ -21,7 +21,8 @@ export class EvenementService {
       organisateur: 'Restaurant Le Gourmet',
       description: '',
       estPublic: true,
-      statut: 'À venir'
+      statut: 'À venir',
+      typeEtablissement: 'Restaurant'
     },
     {
       id: '2',
@@ -37,7 +38,8 @@ export class EvenementService {
       organisateur: 'Association Musicale',
       description: '',
       estPublic: true,
-      statut: 'À venir'
+      statut: 'À venir',
+      typeEtablissement: 'Café'
     },
     {
       id: '3',
@@ -53,7 +55,8 @@ export class EvenementService {
       organisateur: 'Bibliothèque Nationale',
       description: '',
       estPublic: true,
-      statut: 'En cours'
+      statut: 'En cours',
+      typeEtablissement: 'Hôtel'
     },
     {
       id: '4',
@@ -69,7 +72,8 @@ export class EvenementService {
       organisateur: 'Mairie de Bordeaux',
       description: '',
       estPublic: true,
-      statut: 'Terminé'
+      statut: 'Terminé',
+      typeEtablissement: 'Restaurant'
     },
     {
       id: '5',
@@ -85,7 +89,8 @@ export class EvenementService {
       organisateur: 'Cinéma Lumière',
       description: '',
       estPublic: true,
-      statut: 'Terminé'
+      statut: 'Terminé',
+      typeEtablissement: 'Hôtel'
     }
   ];
 
