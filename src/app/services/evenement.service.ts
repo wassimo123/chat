@@ -1,120 +1,83 @@
 import { Injectable } from '@angular/core';
-import { Observable, of } from 'rxjs';
+import { HttpClient, HttpErrorResponse } from '@angular/common/http';
+import { Observable, throwError } from 'rxjs';
+import { catchError, map } from 'rxjs/operators';
 import { Evenement } from '../models/evenement.model';
 
 @Injectable({
   providedIn: 'root'
 })
 export class EvenementService {
-  private evenements: Evenement[] = [
-    {
-      id: '1',
-      nom: 'Soirée Dégustation de Vins',
-      date: '2025-04-15',
-      heureDebut: '19:00',
-      heureFin: '22:00',
-      lieu: 'Cave Saint-Michel',
-      ville: 'Paris, France',
-      capacite: 100,
-      participants: 86,
-      categorie: 'Gastronomie',
-      organisateur: 'Restaurant Le Gourmet',
-      description: '',
-      estPublic: true,
-      statut: 'À venir',
-      typeEtablissement: 'Restaurant'
-    },
-    {
-      id: '2',
-      nom: 'Festival de Jazz',
-      date: '2025-05-20',
-      heureDebut: '00:00',
-      heureFin: '23:59',
-      lieu: 'Parc des Expositions',
-      ville: 'Lyon, France',
-      capacite: 500,
-      participants: 245,
-      categorie: 'Musique',
-      organisateur: 'Association Musicale',
-      description: '',
-      estPublic: true,
-      statut: 'À venir',
-      typeEtablissement: 'Café'
-    },
-    {
-      id: '3',
-      nom: 'Salon du Livre',
-      date: '2025-04-06',
-      heureDebut: '10:00',
-      heureFin: '18:00',
-      lieu: 'Centre des Congrès',
-      ville: 'Marseille, France',
-      capacite: 200,
-      participants: 112,
-      categorie: 'Littérature',
-      organisateur: 'Bibliothèque Nationale',
-      description: '',
-      estPublic: true,
-      statut: 'En cours',
-      typeEtablissement: 'Hôtel'
-    },
-    {
-      id: '4',
-      nom: 'Fête de la Gastronomie',
-      date: '2025-03-12',
-      heureDebut: '11:00',
-      heureFin: '23:00',
-      lieu: 'Place des Quinconces',
-      ville: 'Bordeaux, France',
-      capacite: 400,
-      participants: 325,
-      categorie: 'Gastronomie',
-      organisateur: 'Mairie de Bordeaux',
-      description: '',
-      estPublic: true,
-      statut: 'Terminé',
-      typeEtablissement: 'Restaurant'
-    },
-    {
-      id: '5',
-      nom: 'Festival du Film',
-      date: '2025-02-02',
-      heureDebut: '14:00',
-      heureFin: '23:00',
-      lieu: 'Cinéma Lumière',
-      ville: 'Nice, France',
-      capacite: 200,
-      participants: 178,
-      categorie: 'Cinéma',
-      organisateur: 'Cinéma Lumière',
-      description: '',
-      estPublic: true,
-      statut: 'Terminé',
-      typeEtablissement: 'Hôtel'
+  private apiUrl = 'http://localhost:5000/api/evenements';
+  private typeEtabUrl = 'http://localhost:5000/api/etablissements';
+
+  constructor(private http: HttpClient) {}
+
+  private handleError(error: HttpErrorResponse): Observable<never> {
+    let errorMessage = 'Une erreur est survenue lors de la requête.';
+    if (error.error && error.error.message) {
+      errorMessage = error.error.message;
+    } else if (error.status === 0) {
+      errorMessage = 'Erreur réseau : impossible de se connecter au serveur.';
     }
-  ];
+    return throwError(() => new Error(errorMessage));
+  }
 
   getEvenements(): Observable<Evenement[]> {
-    return of(this.evenements);
+    return this.http.get<any[]>(this.apiUrl).pipe(
+      map(events =>
+        events.map(event => ({
+          ...event,
+          id: event._id,
+          date: event.date ? new Date(event.date).toISOString().split('T')[0] : '' // Ensure date is in YYYY-MM-DD format
+        }))
+      ),
+      catchError(this.handleError)
+    );
   }
 
-  addEvenement(evenement: Evenement): Observable<Evenement> {
-    const newEvenement = { ...evenement, id: Math.random().toString(36).substr(2, 9) };
-    this.evenements.push(newEvenement);
-    return of(newEvenement);
+  addEvenement(data: FormData): Observable<Evenement> {
+    return this.http.post<any>(this.apiUrl, data).pipe(
+      map(response => ({
+        ...response,
+        id: response._id,
+        date: response.date ? new Date(response.date).toISOString().split('T')[0] : ''
+      })),
+      catchError(this.handleError)
+    );
   }
 
-  updateEvenement(id: string, evenement: Evenement): Observable<Evenement> {
-    const index = this.evenements.findIndex(e => e.id === id);
-    if (index !== -1) {
-      this.evenements[index] = { ...evenement, id };
-      return of(this.evenements[index]);
-    }
-    throw new Error('Événement non trouvé');
+  updateEvenement(id: string, data: FormData): Observable<Evenement> {
+    return this.http.put<any>(`${this.apiUrl}/${id}`, data).pipe(
+      map(response => ({
+        ...response,
+        id: response._id,
+        date: response.date ? new Date(response.date).toISOString().split('T')[0] : ''
+      })),
+      catchError(this.handleError)
+    );
   }
 
-  deleteEvenement(id: string): Observable<void> {
-    this.evenements = this.evenements.filter(e => e.id !== id);
-    return of();
+  archiveEvenement(id: string): Observable<Evenement> {
+    return this.http.patch<any>(`${this.apiUrl}/${id}/archive`, {}).pipe(
+      map(response => {
+        
+        return {
+          ...response,
+          id: response._id,
+          date: response.date ? new Date(response.date).toISOString().split('T')[0] : ''
+        };
+      }),
+      catchError((error: HttpErrorResponse) => {
+       
+        return this.handleError(error);
+      })
+    );
+  }
+
+  getEtablissementsByType(type: string): Observable<{ _id: string; nom: string }[]> {
+    return this.http.get<{ _id: string; nom: string }[]>(`${this.typeEtabUrl}/type/${type}`).pipe(
+      catchError(this.handleError)
+    );
   }
 }

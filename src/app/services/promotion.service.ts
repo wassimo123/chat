@@ -33,6 +33,7 @@ export interface Promotion {
 })
 export class PromotionService {
   private apiUrl = 'http://localhost:5000/api/promotions';
+  private typeEtabUrl = 'http://localhost:5000/api/etablissements';
 
   constructor(private http: HttpClient) { }
 
@@ -64,6 +65,7 @@ export class PromotionService {
   // Ajouter une nouvelle promotion
   addPromotion(promotion: Promotion, photos: File[]): Observable<Promotion> {
     const formData = new FormData();
+    console.log('promo: ',promotion);
     formData.append('name', promotion.name);
     formData.append('establishmentId', promotion.establishmentId.toString());
     formData.append('discount', promotion.discount);
@@ -118,4 +120,10 @@ export class PromotionService {
       catchError(this.handleError)
     );
   }
+
+
+  getEtablissementsByType(type: string): Observable<any[]> {
+    return this.http.get<any[]>(`${this.typeEtabUrl}/type/${type}`);
+  }
+  
 }

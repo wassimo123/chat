@@ -363,12 +363,35 @@
                 <input id="promo-name" type="text" name="promo-name" [(ngModel)]="currentPromotion.name" class="mt-1 block w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-primary" placeholder="Saisissez le nom de la promotion" required>
               </div>
               <div>
-                <label for="promo-establishment" class="block text-sm font-medium text-gray-700 mb-1">Établissement <span class="text-red-500">*</span></label>
-                <select id="promo-establishment" name="promo-establishment" [(ngModel)]="currentPromotion.establishmentId" class="mt-1 block w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-primary" required>
-                  <option value="" disabled>Sélectionnez un établissement</option>
-                  <option *ngFor="let establishment of establishments" [value]="establishment.id">{{ establishment.name }}</option>
-                </select>
+                <label for="establishment-type" class="block text-sm font-medium text-gray-700 mb-1">
+                  Type d'Établissement <span class="text-red-500">*</span>
+                </label>
+                <select id="establishment-type"
+                name="type"  
+                [(ngModel)]="selectedType"
+                (change)="onTypeChange()"
+                class="mt-1 block w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-primary"
+                required>
+          <option value="" disabled selected>Sélectionnez type établissement</option>
+          <option *ngFor="let type of availableTypes" [value]="type">{{ type }}</option>
+        </select>
               </div>
+              
+              <!-- Dropdown to select the establishment based on selected type -->
+              <div>
+                <label for="promo-establishment" class="block text-sm font-medium text-gray-700 mb-1">
+                  Nom Établissement <span class="text-red-500">*</span>
+                </label>
+                <select id="nom-establishment"
+        name="etablissementID"  
+        [(ngModel)]="currentPromotion.establishmentId"
+        class="mt-1 block w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-primary"
+        required>
+  <option value="" disabled>Sélectionnez un établissement</option>
+  <option *ngFor="let etab of etablissementsType" [value]="etab._id">{{ etab.nom }}</option>
+</select>
+              </div>
+
               <div>
                 <label for="promo-type" class="block text-sm font-medium text-gray-700 mb-1">Type de promotion <span class="text-red-500">*</span></label>
                 <select id="promo-type" name="promo-type" [(ngModel)]="currentPromotion.type" class="mt-1 block w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-primary" required>

@@ -1,4 +1,3 @@
-
 <div class="flex h-screen bg-gray-50 min-h-screen">
   <!-- Sidebar -->
   <aside class="w-64 bg-white shadow-sm">
@@ -217,6 +216,7 @@
         <!-- Filters -->
         <div class="bg-white rounded-lg shadow-sm p-6 mb-6">
           <div class="flex flex-col md:flex-row md:items-center md:space-x-4">
+            <!-- Statut Filter -->
             <div class="flex items-center space-x-2 mb-4 md:mb-0">
               <div class="relative">
                 <button class="flex items-center justify-between w-full md:w-40 px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-200 rounded-lg hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-primary whitespace-nowrap" (click)="toggleStatusFilter()">
@@ -235,6 +235,27 @@
                 </div>
               </div>
             </div>
+            <!-- Type d'établissement Filter -->
+            <div class="flex items-center space-x-2 mb-4 md:mb-0">
+              <div class="relative">
+                <button class="flex items-center justify-between w-full md:w-40 px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-200 rounded-lg hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-primary whitespace-nowrap" (click)="toggleTypeEtablissementFilter()">
+                  <span>{{ selectedTypeEtablissement || 'Type d\'établissement' }}</span>
+                  <div class="w-4 h-4 flex items-center justify-center ml-2">
+                    <i class="ri-arrow-down-s-line"></i>
+                  </div>
+                </button>
+                <div class="absolute mt-1 right-0 bg-white rounded-lg shadow-lg z-10" [class.hidden]="!showTypeEtablissementFilter">
+                  <div class="py-1">
+                    <a class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 cursor-pointer" (click)="selectTypeEtablissement('Tous')">Tous</a>
+                    <a class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 cursor-pointer" (click)="selectTypeEtablissement('Restaurant')">Restaurant</a>
+                    <a class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 cursor-pointer" (click)="selectTypeEtablissement('Hôtel')">Hôtel</a>
+                    <a class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 cursor-pointer" (click)="selectTypeEtablissement('Café')">Café</a>
+                    <a class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 cursor-pointer" (click)="selectTypeEtablissement('Sfax')">Sfax</a>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <!-- Sort and Search -->
             <div class="flex flex-col md:flex-row md:items-center space-y-4 md:space-y-0 md:space-x-4">
               <div class="relative">
                 <button class="flex items-center justify-between w-full md:w-40 px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-200 rounded-lg hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-primary whitespace-nowrap" (click)="toggleSortFilter()">
@@ -472,11 +493,19 @@
             </div>
             <div>
               <label for="event-typeEtablissement" class="block text-sm font-medium text-gray-700">Type d'établissement <span class="text-red-500">*</span></label>
-              <select id="event-typeEtablissement" [(ngModel)]="currentEvent.typeEtablissement" name="typeEtablissement" class="mt-1 block w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-primary" required>
+              <select id="event-typeEtablissement" [(ngModel)]="currentEvent.typeEtablissement" name="typeEtablissement" (change)="onTypeChange()" class="mt-1 block w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-primary" required>
                 <option value="" disabled>Sélectionnez un type</option>
                 <option>Restaurant</option>
                 <option>Hôtel</option>
                 <option>Café</option>
+                <option>Sfax</option>
+              </select>
+            </div>
+            <div>
+              <label for="event-establishment" class="block text-sm font-medium text-gray-700">Nom Établissement <span class="text-red-500">*</span></label>
+              <select id="event-establishment" [(ngModel)]="currentEvent.establishmentId" name="establishmentId" class="mt-1 block w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-primary" required>
+                <option value="" disabled>Sélectionnez un établissement</option>
+                <option *ngFor="let etab of etablissementsType" [value]="etab._id">{{ etab.nom }}</option>
               </select>
             </div>
             <div>

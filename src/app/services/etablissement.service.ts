@@ -64,13 +64,19 @@ export class EtablissementService {
   }
 
   getHotels(): Observable<Etablissement[]> {
-    return this.http.get<EtablissementRaw[]>(`${this.apiUrl}/hotels`, { headers: this.getHeaders() }).pipe(
+    return this.http.get<EtablissementRaw[]>(`${this.apiUrl}/type/Hôtel`, { headers: this.getHeaders() }).pipe(
       map(rawEtablissements => rawEtablissements.map(raw => this.mapToEtablissement(raw))),
       catchError(this.handleError)
     );
+    //return this.http.get<any[]>(`${this.apiUrl}/type/Hôtel`);
+
   }
-  
-  
+  getCafes(): Observable<Etablissement[]> {
+    return this.http.get<any[]>(`${this.apiUrl}/type/Café`);
+  }
+  getRestaurants(): Observable<Etablissement[]> {
+    return this.http.get<any[]>(`${this.apiUrl}/type/Restaurant`);
+  }
   // Récupérer tous les établissements
   getEtablissements(): Observable<Etablissement[]> {
     return this.http.get<EtablissementRaw[]>(this.apiUrl, { headers: this.getHeaders() }).pipe(
@@ -81,7 +87,7 @@ export class EtablissementService {
 
   // Récupérer un établissement par ID
   getEtablissementById(id: string): Observable<Etablissement> {
-    return this.http.get<EtablissementRaw>(`${this.apiUrl}/${id}`, { headers: this.getHeaders() }).pipe(
+    return this.http.get<EtablissementRaw>(`${this.apiUrl}/id/${id}`, { headers: this.getHeaders() }).pipe(
       map(raw => this.mapToEtablissement(raw)),
       catchError(this.handleError)
     );

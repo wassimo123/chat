@@ -17,13 +17,13 @@
             </button>
             <div class="absolute left-0 mt-2 w-48 bg-white rounded-md shadow-lg py-1 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300">
               <a routerLink="/hotels" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Hôtel</a>
-              <a routerLink="/etablissements/cafe" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Café</a>
-              <a routerLink="/etablissements/restaurant" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Restaurant</a>
-              <a routerLink="/etablissements/commerce" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Commerce</a>
+              <a routerLink="/cafes" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Café</a>
+              <a routerLink="/restaurants" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Restaurant</a>
+              
             </div>
           </div>
           
-          <a routerLink="/event" class="text-gray-700 hover:text-primary">Evenements</a>
+          <a routerLink="/evenement" class="text-gray-700 hover:text-primary">Evenements</a>
           <a routerLink="/promotion" class="text-gray-700 hover:text-primary">Promotions</a>
           <a routerLink="/Experience" class="text-gray-700 hover:text-primary">Experience</a>
         </div>
@@ -72,10 +72,10 @@
             </svg>
           </button>
           <div class="pl-4 space-y-1" *ngIf="isEtablissementsOpen">
-            <a routerLink="/hotels" class="block px-3 py-2 text-base font-medium text-gray-700 hover:text-primary">Hôtel</a>
+            <!--<a routerLink="/hotels" class="block px-3 py-2 text-base font-medium text-gray-700 hover:text-primary">Hôtel</a>-->
+            <a routerLink="/etablissements/hotels" class="block px-3 py-2 text-base font-medium text-gray-700 hover:text-primary">Hôtel</a>
             <a routerLink="/etablissements/cafe" class="block px-3 py-2 text-base font-medium text-gray-700 hover:text-primary">Café</a>
             <a routerLink="/etablissements/restaurant" class="block px-3 py-2 text-base font-medium text-gray-700 hover:text-primary">Restaurant</a>
-            <a routerLink="/etablissements/commerce" class="block px-3 py-2 text-base font-medium text-gray-700 hover:text-primary">Commerce</a>
           </div>
         </div>
         

@@ -4,6 +4,7 @@ import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, RouterLink } from '@angular/router';
 import { NavbarComponent } from '../navbar/navbar.component';
 import { FooterComponent } from '../footer/footer.component';
+import { EtablissementService } from '../../services/etablissement.service';
 
 @Component({
   selector: 'app-hotel-detail',
@@ -79,18 +80,29 @@ export class HotelDetailComponent implements OnInit {
     }
   ];
 
-  constructor(private route: ActivatedRoute) {}
+  constructor(private route: ActivatedRoute, private etablissementService: EtablissementService) {}
 
   ngOnInit() {
     this.route.paramMap.subscribe(params => {
-      const id = Number(params.get('id'));
-      this.hotel = this.hotels.find(h => h.id === id) || null;
-      if (!this.hotel) {
-        console.error(`Aucun hôtel trouvé avec l'ID ${id}`);
+      const id = params.get('id');
+      console.log("ID reçu:", id);
+  
+      if (id) {
+        this.etablissementService.getEtablissementById(id).subscribe({
+          next: (hotel) => {
+            this.hotel = hotel;
+            console.log("Hôtel récupéré :", hotel);
+          },
+          error: (err) => {
+            console.error("Erreur lors du chargement de l'hôtel :", err);
+          }
+        });
+      } else {
+        console.error("Aucun ID fourni dans l'URL");
       }
     });
   }
-
+  
   getStars(rating: number): number[] {
     return Array(Math.floor(rating)).fill(0);
   }
@@ -118,5 +130,11 @@ export class HotelDetailComponent implements OnInit {
 
   getGoogleMapsUrl(address: string): string {
     return `https://maps.google.com/?q=${encodeURIComponent(address)}`;
+  }
+  goToWebsite(url:any) {
+    console.log("url: ",url);
+    if (url) {
+      window.open(url, '_blank'); // Opens in a new tab
+    }
   }
 }

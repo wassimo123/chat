@@ -33,11 +33,11 @@ export class GestionDesPromotionsComponent implements OnInit, AfterViewInit {
 
   promotions: Promotion[] = [];
   establishments: Establishment[] = [
-    { id: 1, name: "Le Bistrot Parisien" },
-    { id: 2, name: "Café de la Place" },
-    { id: 3, name: "Restaurant La Méditerranée" },
-    { id: 4, name: "Brasserie du Commerce" },
-    { id: 5, name: "L'Atelier Gourmand" }
+    { id: 1, name: "Café" },
+    { id: 2, name: "Hôtel" },
+    { id: 3, name: "Restaurant" },
+    
+   
   ];
 
   stats: PromoStats = { total: 0, percentage: 0, fixed: 0, freeitem: 0, bundle: 0, special: 0 };
@@ -80,7 +80,24 @@ export class GestionDesPromotionsComponent implements OnInit, AfterViewInit {
   ngAfterViewInit(): void {
     this.initCharts();
   }
-
+  availableTypes: string[] = ['Hôtel', 'Restaurant', 'Café']; // You can modify this list based on your backend
+  selectedType: string = '';
+  etablissementsType: any[] = [];
+  
+  onTypeChange(): void {
+    if (this.selectedType) {
+      console.log("type");
+      this.promotionService.getEtablissementsByType(this.selectedType).subscribe({
+        next: (etabs) => {
+          this.etablissementsType = etabs;
+          console.log("etabs: ", etabs)
+        },
+        error: () => {
+          this.showNotification('Erreur lors du chargement des établissements', 'error');
+        }
+      });
+    }
+  }
   loadPromotions(): void {
     this.promotionService.getPromotions().subscribe({
       next: (promotions) => {
@@ -604,4 +621,17 @@ export class GestionDesPromotionsComponent implements OnInit, AfterViewInit {
         return 'Inconnu';
     }
   }
+
+  loadEtablissementsByType(type: string): void {
+    this.promotionService.getEtablissementsByType(type).subscribe({
+      next: (etabs) => {
+        this.etablissementsType = etabs;
+      },
+      error: (err) => {
+        this.showNotification('Erreur lors du chargement des établissements par type', 'error');
+      }
+    });
+  }
+  
+  
 }

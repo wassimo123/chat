@@ -11,6 +11,8 @@ import { NavbarComponent } from './component/navbar/navbar.component';
 import { FooterComponent } from './component/footer/footer.component';
 import { HotelDetailComponent } from './component/hotel-detail/hotel-detail.component';
 import { HotelsComponent } from './component/hotels/hotels.component';
+import { RestaurantComponent } from './component/restaurant/restaurant.component';
+import { CafeComponent } from './component/cafe/cafe.component';
 import { EventComponent } from './component/event/event.component';
 import { PromotionsComponent } from './component/promotions/promotions.component';
 import { TermsComponent } from './terms/terms.component';
@@ -26,7 +28,9 @@ import { GestionDesEvenementsComponent } from './admin/gestion-des-evenements/ge
 const routes: Routes = [
   { path: 'dashboard', component: TableauDeBordComponent }, 
   { path: 'hotels', component: HotelsComponent },
-  { path: 'hotel/:id', component: HotelDetailComponent },
+  { path: 'cafes', component: CafeComponent },
+  { path: 'restaurants', component: RestaurantComponent },
+  { path: 'etablissements/:id', component: HotelDetailComponent },
   { path: 'evenement', component: EventComponent },
   { path: 'promotion', component: PromotionsComponent },
   { path: 'users', component: GestionDesUtilisateursComponent }, 

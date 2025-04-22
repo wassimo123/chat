@@ -1,0 +1,44 @@
+@import url('https://fonts.googleapis.com/css2?family=Pacifico&display=swap');
+@import url('https://cdn.jsdelivr.net/npm/remixicon@4.5.0/fonts/remixicon.css');
+
+:host {
+  display: block;
+}
+
+.bg-gray-50 {
+  background-color: #F9FAFB;
+}
+
+.text-primary {
+  color: #4F46E5;
+}
+
+.bg-primary {
+  background-color: #4F46E5;
+}
+
+.rounded-button {
+  border-radius: 8px;
+}
+
+.hover\:shadow-md:hover {
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+}
+
+.transition-shadow {
+  transition: box-shadow 0.3s ease-in-out;
+}
+
+.container {
+  max-width: 1280px;
+}
+
+.form-checkbox:checked {
+  background-color: #4F46E5;
+  border-color: #4F46E5;
+}
+
+.filter-active {
+  background-color: #4F46E5;
+  color: white;
+}

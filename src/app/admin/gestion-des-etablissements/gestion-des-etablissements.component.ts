@@ -194,7 +194,7 @@ export class GestionDesEtablissementsComponent implements OnInit, AfterViewInit 
     this.stats.total = this.etablissements.length;
     this.stats.restaurants = this.etablissements.filter((e) => e.type === "Restaurant").length;
     this.stats.hotels = this.etablissements.filter((e) => e.type === "Hôtel").length;
-    this.stats.commerces = this.etablissements.filter((e) => e.type === "Commerce").length;
+    this.stats.commerces = this.etablissements.filter((e) => e.type === "Café").length;
   }
 
   filterEtablissements(): void {

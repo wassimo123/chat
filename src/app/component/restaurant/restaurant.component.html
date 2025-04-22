@@ -2,7 +2,7 @@
 
 <main class="pt-24 pb-12">
   <div class="container mx-auto px-4">
-    <h1 class="text-3xl font-bold text-gray-900 mb-8">Hôtels à Sfax</h1>
+    <h1 class="text-3xl font-bold text-gray-900 mb-8">Restaurants à Sfax</h1>
 
     <!-- Filters and Sort -->
     <div class="flex flex-wrap gap-4 items-center justify-between mb-8">
@@ -94,7 +94,7 @@
         <div class="p-6">
           <div class="flex items-center gap-2 mb-2">
             <span class="text-xs font-medium px-2 py-1 rounded-full bg-green-100 text-green-800">
-              Hôtel
+              Restaurant
             </span>
           </div>
           <h3 class="text-xl font-semibold mb-2">{{hotel.nom}}</h3>
@@ -105,16 +105,12 @@
           <p class="text-gray-600 mb-4">{{hotel.description}}</p>
           <div class="flex items-center justify-between">
             <!--<span class="text-lg font-bold">{{hotel.price}} DT/nuit</span>-->
-            <!--<button 
+            <button 
             class="bg-primary text-white px-4 py-2 rounded-button hover:bg-primary/90"
             (click)="goToWebsite(hotel.siteWeb)">
             Consulter
-          </button>-->
-          <button 
-          class="bg-primary text-white px-4 py-2 rounded-button hover:bg-primary/90"
-          (click)="goToDetails(hotel)">
-          Voir Details
-        </button>
+          </button>
+          
           </div>
         </div>
       </div>

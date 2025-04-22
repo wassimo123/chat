@@ -12,9 +12,11 @@ export interface Evenement {
   organisateur: string;
   description: string;
   estPublic: boolean;
-  statut: 'À venir' | 'En cours' | 'Terminé';
-  typeEtablissement: 'Restaurant' | 'Hôtel' | 'Café'| 'Sfax'; // Updated property
+  statut: '' | 'À venir' | 'En cours' | 'Terminé';
+  typeEtablissement: '' | 'Restaurant' | 'Hôtel' | 'Café' | 'Sfax';
+  establishmentId: string;
   selected?: boolean;
+  photos?: string[]; // Added photos
 }
 
 export interface Stats {

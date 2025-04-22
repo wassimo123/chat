@@ -3,6 +3,8 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { NavbarComponent } from '../navbar/navbar.component';
 import { FooterComponent } from '../footer/footer.component';
+import { PromotionService } from '../../services/promotion.service';
+import { Router } from '@angular/router';
 
 interface Promotion {
   id: number;
@@ -35,6 +37,9 @@ interface FilterOption {
   styleUrls: ['./promotions.component.css'],
 })
 export class PromotionsComponent implements OnInit {
+    constructor(private router: Router, private promotionsService: PromotionService) {}
+    promos: any[] = [];
+
   promotions: Promotion[] = [
     {
       id: 1,
@@ -175,9 +180,24 @@ export class PromotionsComponent implements OnInit {
   sortOption: string = 'recent';
   personalizedAlerts: boolean = false;
 
-  ngOnInit() {
-    this.filteredPromotions = [...this.promotions];
-  }
+/*ngOnInit(): void {
+  this.promotionsService.getPromotions().subscribe({
+    next: (promotions) => {
+      console.log("promos:", promotions);
+      this.promos = promotions;
+      this.filteredPromotions = promotions; // move it here
+    },
+    error: (error) => {
+      console.error('Erreur lors du chargement des promotions:', error);
+    }
+  });
+}
+*/
+
+ngOnInit() {
+  this.filteredPromotions = [...this.promotions];
+}
+  
 
   filterPromotions() {
     this.filteredPromotions = this.promotions.filter((promo) => {

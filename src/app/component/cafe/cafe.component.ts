@@ -14,13 +14,13 @@ interface FilterServices {
 }
 
 @Component({
-  selector: 'app-hotels',
+  selector: 'app-cafe',
   standalone: true,
   imports: [CommonModule, FormsModule, NavbarComponent, FooterComponent],
-  templateUrl: './hotels.component.html',
-  styleUrls: ['./hotels.component.css']
+  templateUrl: './cafe.component.html',
+  styleUrls: ['./cafe.component.css']
 })
-export class HotelsComponent implements OnInit {
+export class CafeComponent implements OnInit {
   searchQuery: string = '';
   filterPriceMin: number | null = null;
   filterPriceMax: number | null = null;
@@ -51,11 +51,10 @@ export class HotelsComponent implements OnInit {
   fetchHotels() {
     this.isLoading = true;
     this.errorMessage = null;
-    this.etablissementService.getHotels().subscribe({
+    this.etablissementService.getCafes().subscribe({
       next: (hotels) => {
         // Map API response to match the component's expected structure
         this.hotels = hotels.map(hotel => {
-          //console.log("hotel details: ",hotel);
           let imageUrl = 'https://r-xx.bstatic.com/xdata/images/hotel/608x352/281564416.webp?k=d34be48dc235d2aba463351d30aa399a184946441e78177d1ed6e66c427e5e81&o='; // Fallback placeholder
       
           if (hotel.photos?.length) {
@@ -81,7 +80,7 @@ export class HotelsComponent implements OnInit {
             address: hotel.adresse,
             hours: hotel.horaires?.is24_7 ? '24/7' : 'Horaires non spécifiés',
             phone: hotel.telephone,
-            siteWeb: hotel.siteWeb
+            siteWeb:hotel.siteWeb
           };
         });
         this.filteredHotels = this.hotels; // Directly show all hotels
@@ -190,17 +189,11 @@ export class HotelsComponent implements OnInit {
 
     return this.currentItems < filtered.length;
   }
+
   goToWebsite(url:any) {
     if (url) {
       window.open(url, '_blank'); // Opens in a new tab
     }
-  }
-  goToDetails(hotel: any): void {
-    console.log("hotel:", hotel);
-    if (!hotel.id) {
-      console.error('Hotel ID is undefined!');
-      return;
-    }
-    this.router.navigate(['/etablissements', hotel.id]);
+
   }
 }

@@ -14,6 +14,9 @@ import { ProfileComponent } from './admin/profile/profile.component';
 import { HomeComponent } from './component/home/home.component';
 import { HttpClientModule } from '@angular/common/http';
 import { HotelsComponent } from './component/hotels/hotels.component';
+import { RestaurantComponent } from './component/restaurant/restaurant.component';
+import { CafeComponent } from './component/cafe/cafe.component';
+
 import { HotelDetailComponent } from './component/hotel-detail/hotel-detail.component';
 import { EventComponent } from './component/event/event.component';
 import { NavbarComponent } from "./component/navbar/navbar.component";
@@ -27,6 +30,7 @@ import { ResetPasswordComponent } from './reset-password/reset-password.componen
 import { GestionDesEtablissementsComponent } from './admin/gestion-des-etablissements/gestion-des-etablissements.component';
 import { GestionDesPromotionsComponent } from './admin/gestion-des-promotions/gestion-des-promotions.component';
 import { GestionDesEvenementsComponent } from './admin/gestion-des-evenements/gestion-des-evenements.component';
+
 
 
 
@@ -74,6 +78,8 @@ import { GestionDesEvenementsComponent } from './admin/gestion-des-evenements/ge
     FooterComponent,
     HomeComponent,
     PromotionsComponent,
+    RestaurantComponent,
+    CafeComponent ,
     
 ],
   providers: [],
