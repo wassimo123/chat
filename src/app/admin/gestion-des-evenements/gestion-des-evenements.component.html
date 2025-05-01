@@ -1,4 +1,4 @@
-<div class="flex h-screen bg-gray-50 min-h-screen">
+<div class="flex h-screen bg-gray-50 min-h-screen overflow-x-hidden">
   <!-- Sidebar -->
   <aside class="w-64 bg-white shadow-sm">
     <div class="h-16 flex items-center px-6">
@@ -33,7 +33,7 @@
   </aside>
 
   <!-- Main content -->
-  <div class="flex-1 flex flex-col">
+  <div *ngIf="isAuthenticated; else notAuthenticated" class="flex-1 flex flex-col">
     <!-- Header -->
     <header class="bg-white shadow-sm h-16">
       <div class="h-full px-6 flex items-center justify-between">
@@ -48,7 +48,9 @@
         <div class="flex items-center space-x-4">
           <button routerLink="/notifications" class="w-8 h-8 flex items-center justify-center text-gray-600 hover:text-primary relative">
             <i class="ri-notification-3-line"></i>
-            <span class="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">{{ notificationCount }}</span>
+            <span class="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">
+              {{ notifications.length }}
+            </span>
           </button>
           <div class="relative">
             <button id="profileButton" class="flex items-center space-x-2 cursor-pointer" (click)="toggleProfile()">
@@ -63,7 +65,7 @@
                 <i class="ri-user-line mr-2"></i> Mon profil
               </a>
               <div class="border-t border-gray-100 my-1"></div>
-              <a routerLink="/connexion" class="px-4 py-2 text-sm text-red-600 hover:bg-gray-100 flex items-center">
+              <a (click)="logout()" class="px-4 py-2 text-sm text-red-600 hover:bg-gray-100 flex items-center cursor-pointer">
                 <i class="ri-logout-box-line mr-2"></i> Déconnexion
               </a>
             </div>
@@ -73,7 +75,7 @@
     </header>
 
     <!-- Main -->
-    <main class="flex-1 overflow-auto p-6">
+    <main class="flex-1 overflow-auto px-2 py-6 max-w-full">
       <!-- Message Modal -->
       <div *ngIf="showMessageModal" class="fixed inset-0 flex items-center justify-center z-50">
         <div class="bg-white rounded-lg shadow-xl p-6 max-w-sm w-full mx-4">
@@ -88,12 +90,12 @@
         </div>
       </div>
 
-      <div class="px-4 py-6 sm:px-0">
+      <div class="px-4 py-6 sm:px-0 max-w-full">
         <!-- Breadcrumb and title -->
         <div class="flex flex-col md:flex-row md:items-center justify-between mb-6">
           <div>
             <div class="flex items-center text-sm text-gray-500 mb-2">
-              <a routerLink="/dashboard" class="hover:text-primary">Tableau de bord</a>
+              <a routerLink="/event" class="hover:text-primary">Tableau de bord</a>
               <div class="w-4 h-4 flex items-center justify-center mx-1">
                 <i class="ri-arrow-right-s-line"></i>
               </div>
@@ -110,88 +112,88 @@
         </div>
 
         <!-- Stats -->
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-6">
-          <div class="bg-white rounded-lg shadow-sm p-6">
-            <div class="flex items-center mb-4">
-              <div class="w-10 h-10 rounded-full bg-blue-100 flex items-center justify-center mr-3">
-                <div class="w-5 h-5 flex items-center justify-center text-blue-500">
-                  <i class="ri-calendar-line"></i>
-                </div>
-              </div>
-              <h3 class="text-lg font-medium text-gray-900">Total des événements</h3>
-            </div>
-            <div class="flex items-baseline">
-              <span class="text-3xl font-bold text-primary">{{ stats.total }}</span>
-            </div>
-            <div class="mt-2 flex items-center text-sm">
-              <div class="text-green-500 flex items-center">
-                <div class="w-4 h-4 flex items-center justify-center">
-                  <i class="ri-arrow-up-line"></i>
-                </div>
-                <span>15% depuis le mois dernier</span>
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
+          <div class="bg-white rounded-lg shadow-sm p-4 flex items-center">
+            <div class="w-10 h-10 rounded-full bg-blue-100 flex items-center justify-center mr-3">
+              <div class="w-5 h-5 flex items-center justify-center text-blue-500">
+                <i class="ri-calendar-line"></i>
               </div>
             </div>
-          </div>
-          <div class="bg-white rounded-lg shadow-sm p-6">
-            <div class="flex items-center mb-4">
-              <div class="w-10 h-10 rounded-full bg-green-100 flex items-center justify-center mr-3">
-                <div class="w-5 h-5 flex items-center justify-center text-green-500">
-                  <i class="ri-time-line"></i>
-                </div>
+            <div>
+              <h3 class="text-sm font-medium text-gray-900">Total des événements</h3>
+              <div class="flex items-baseline">
+                <span class="text-2xl font-bold text-blue-500">{{ stats.total }}</span>
               </div>
-              <h3 class="text-lg font-medium text-gray-900">Événements à venir</h3>
-            </div>
-            <div class="flex items-baseline">
-              <span class="text-3xl font-bold text-green-500">{{ stats.upcoming }}</span>
-            </div>
-            <div class="mt-2 flex items-center text-sm">
-              <div class="text-green-500 flex items-center">
-                <div class="w-4 h-4 flex items-center justify-center">
-                  <i class="ri-arrow-up-line"></i>
+              <div class="mt-1 flex items-center text-xs">
+                <div class="text-green-500 flex items-center">
+                  <div class="w-3 h-3 flex items-center justify-center">
+                    <i class="ri-arrow-up-line"></i>
+                  </div>
+                  <span>15% depuis le mois dernier</span>
                 </div>
-                <span>8% depuis le mois dernier</span>
               </div>
             </div>
           </div>
-          <div class="bg-white rounded-lg shadow-sm p-6">
-            <div class="flex items-center mb-4">
-              <div class="w-10 h-10 rounded-full bg-yellow-100 flex items-center justify-center mr-3">
-                <div class="w-5 h-5 flex items-center justify-center text-yellow-500">
-                  <i class="ri-user-line"></i>
-                </div>
+          <div class="bg-white rounded-lg shadow-sm p-4 flex items-center">
+            <div class="w-10 h-10 rounded-full bg-green-100 flex items-center justify-center mr-3">
+              <div class="w-5 h-5 flex items-center justify-center text-green-500">
+                <i class="ri-time-line"></i>
               </div>
-              <h3 class="text-lg font-medium text-gray-900">Total des participants</h3>
             </div>
-            <div class="flex items-baseline">
-              <span class="text-3xl font-bold text-yellow-500">{{ stats.participants }}</span>
-            </div>
-            <div class="mt-2 flex items-center text-sm">
-              <div class="text-green-500 flex items-center">
-                <div class="w-4 h-4 flex items-center justify-center">
-                  <i class="ri-arrow-up-line"></i>
+            <div>
+              <h3 class="text-sm font-medium text-gray-900">Événements à venir</h3>
+              <div class="flex items-baseline">
+                <span class="text-2xl font-bold text-green-500">{{ stats.upcoming }}</span>
+              </div>
+              <div class="mt-1 flex items-center text-xs">
+                <div class="text-green-500 flex items-center">
+                  <div class="w-3 h-3 flex items-center justify-center">
+                    <i class="ri-arrow-up-line"></i>
+                  </div>
+                  <span>8% depuis le mois dernier</span>
                 </div>
-                <span>12% depuis le mois dernier</span>
               </div>
             </div>
           </div>
-          <div class="bg-white rounded-lg shadow-sm p-6">
-            <div class="flex items-center mb-4">
-              <div class="w-10 h-10 rounded-full bg-purple-100 flex items-center justify-center mr-3">
-                <div class="w-5 h-5 flex items-center justify-center text-purple-500">
-                  <i class="ri-bar-chart-line"></i>
+          <div class="bg-white rounded-lg shadow-sm p-4 flex items-center">
+            <div class="w-10 h-10 rounded-full bg-indigo-100 flex items-center justify-center mr-3">
+              <div class="w-5 h-5 flex items-center justify-center text-indigo-500">
+                <i class="ri-play-circle-line"></i>
+              </div>
+            </div>
+            <div>
+              <h3 class="text-sm font-medium text-gray-900">Événements En cours</h3>
+              <div class="flex items-baseline">
+                <span class="text-2xl font-bold text-indigo-500">{{ stats.inProgress }}</span>
+              </div>
+              <div class="mt-1 flex items-center text-xs">
+                <div class="text-red-500 flex items-center">
+                  <div class="w-3 h-3 flex items-center justify-center">
+                    <i class="ri-arrow-down-line"></i>
+                  </div>
+                  <span>3% depuis le mois dernier</span>
                 </div>
               </div>
-              <h3 class="text-lg font-medium text-gray-900">Taux de participation</h3>
             </div>
-            <div class="flex items-baseline">
-              <span class="text-3xl font-bold text-purple-500">{{ stats.participationRate }}%</span>
+          </div>
+          <div class="bg-white rounded-lg shadow-sm p-4 flex items-center">
+            <div class="w-10 h-10 rounded-full bg-gray-100 flex items-center justify-center mr-3">
+              <div class="w-5 h-5 flex items-center justify-center text-gray-500">
+                <i class="ri-stop-circle-line"></i>
+              </div>
             </div>
-            <div class="mt-2 flex items-center text-sm">
-              <div class="text-red-500 flex items-center">
-                <div class="w-4 h-4 flex items-center justify-center">
-                  <i class="ri-arrow-down-line"></i>
+            <div>
+              <h3 class="text-sm font-medium text-gray-900">Événements Terminé</h3>
+              <div class="flex items-baseline">
+                <span class="text-2xl font-bold text-gray-500">{{ stats.completed }}</span>
+              </div>
+              <div class="mt-1 flex items-center text-xs">
+                <div class="text-green-500 flex items-center">
+                  <div class="w-3 h-3 flex items-center justify-center">
+                    <i class="ri-arrow-up-line"></i>
+                  </div>
+                  <span>2% depuis le mois dernier</span>
                 </div>
-                <span>3% depuis le mois dernier</span>
               </div>
             </div>
           </div>
@@ -199,16 +201,16 @@
 
         <!-- Charts -->
         <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
-          <div class="bg-white rounded-lg shadow-sm p-6">
+          <div class="bg-white rounded-lg shadow-sm p-6 w-full max-w-full">
             <h3 class="text-lg font-medium text-gray-900 mb-4">Événements par mois</h3>
-            <div class="h-80">
-              <canvas #eventsByMonthChart></canvas>
+            <div class="h-80 w-full">
+              <canvas #eventsByMonthChart class="w-full"></canvas>
             </div>
           </div>
-          <div class="bg-white rounded-lg shadow-sm p-6">
+          <div class="bg-white rounded-lg shadow-sm p-6 w-full max-w-full">
             <h3 class="text-lg font-medium text-gray-900 mb-4">Événements par catégorie</h3>
-            <div class="h-80">
-              <canvas #eventsByCategoryChart></canvas>
+            <div class="h-80 w-full">
+              <canvas #eventsByCategoryChart class="w-full"></canvas>
             </div>
           </div>
         </div>
@@ -257,21 +259,6 @@
             </div>
             <!-- Sort and Search -->
             <div class="flex flex-col md:flex-row md:items-center space-y-4 md:space-y-0 md:space-x-4">
-              <div class="relative">
-                <button class="flex items-center justify-between w-full md:w-40 px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-200 rounded-lg hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-primary whitespace-nowrap" (click)="toggleSortFilter()">
-                  <span>{{ selectedSort || 'Trier par' }}</span>
-                  <div class="w-4 h-4 flex items-center justify-center ml-2">
-                    <i class="ri-arrow-down-s-line"></i>
-                  </div>
-                </button>
-                <div class="absolute mt-1 right-0 bg-white rounded-lg shadow-lg z-10" [class.hidden]="!showSortFilter">
-                  <div class="py-1">
-                    <a class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 cursor-pointer" (click)="selectSort('Nom')">Nom</a>
-                    <a class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 cursor-pointer" (click)="selectSort('Date')">Date</a>
-                    <a class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 cursor-pointer" (click)="selectSort('Participants')">Participants</a>
-                  </div>
-                </div>
-              </div>
               <div class="relative flex-1">
                 <div class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
                   <div class="w-5 h-5 flex items-center justify-center text-gray-400">
@@ -310,10 +297,10 @@
                   </th>
                   <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                     <div class="flex items-center">
-                      <span>Date et heure</span>
-                      <button class="ml-1 text-gray-400 hover:text-gray-500" (click)="sortBy('date')">
+                      <span>Dates et heures</span>
+                      <button class="ml-1 text-gray-400 hover:text-gray-500" (click)="sortBy('dateDebut')">
                         <div class="w-4 h-4 flex items-center justify-center">
-                          <i [ngClass]="sortField === 'date' && sortDirection === 'asc' ? 'ri-arrow-up-s-line' : 'ri-arrow-down-s-line'"></i>
+                          <i [ngClass]="sortField === 'dateDebut' && sortDirection === 'asc' ? 'ri-arrow-up-s-line' : 'ri-arrow-down-s-line'"></i>
                         </div>
                       </button>
                     </div>
@@ -329,20 +316,23 @@
                     </div>
                   </th>
                   <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    <div class="flex items-center">
-                      <span>Participants</span>
-                      <button class="ml-1 text-gray-400 hover:text-gray-500" (click)="sortBy('participants')">
-                        <div class="w-4 h-4 flex items-center justify-center">
-                          <i [ngClass]="sortField === 'participants' && sortDirection === 'asc' ? 'ri-arrow-up-s-line' : 'ri-arrow-down-s-line'"></i>
-                        </div>
-                      </button>
-                    </div>
-                  </th>
-                  <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                     Type d'établissement
                   </th>
                   <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                     Statut
+                  </th>
+                  <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Visibilité
+                  </th>
+                  <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    <div class="flex items-center">
+                      <span>Prix</span>
+                      <button class="ml-1 text-gray-400 hover:text-gray-500" (click)="sortBy('prix')">
+                        <div class="w-4 h-4 flex items-center justify-center">
+                          <i [ngClass]="sortField === 'prix' && sortDirection === 'asc' ? 'ri-arrow-up-s-line' : 'ri-arrow-down-s-line'"></i>
+                        </div>
+                      </button>
+                    </div>
                   </th>
                   <th scope="col" class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
                     Actions
@@ -368,7 +358,7 @@
                     </div>
                   </td>
                   <td class="px-6 py-4 whitespace-nowrap">
-                    <div class="text-sm text-gray-900">{{ event.date | date:'mediumDate' }}</div>
+                    <div class="text-sm text-gray-900">{{ event.dateDebut | date:'mediumDate' }} - {{ event.dateFin | date:'mediumDate' }}</div>
                     <div class="text-sm text-gray-500">{{ event.heureDebut }} - {{ event.heureFin }}</div>
                   </td>
                   <td class="px-6 py-4 whitespace-nowrap">
@@ -376,21 +366,23 @@
                     <div class="text-sm text-gray-500">{{ event.ville }}</div>
                   </td>
                   <td class="px-6 py-4 whitespace-nowrap">
-                    <div class="flex items-center">
-                      <div class="w-5 h-5 flex items-center justify-center text-gray-500 mr-1">
-                        <i class="ri-user-line"></i>
-                      </div>
-                      <span>{{ event.participants }} / {{ event.capacite }}</span>
-                    </div>
-                  </td>
-                  <td class="px-6 py-4 whitespace-nowrap">
                     <span class="px-2 py-1 text-xs font-medium rounded-full bg-blue-100 text-blue-800">
                       {{ event.typeEtablissement }}
                     </span>
                   </td>
                   <td class="px-6 py-4 whitespace-nowrap">
-                    <span class="px-2 py-1 text-xs font-medium rounded-full" [ngClass]="getStatusBadgeClass(event.statut)">
+                    <span class="px-2 py-1 text-xs font-medium rounded-full whitespace-nowrap" [ngClass]="getStatusBadgeClass(event.statut)">
                       {{ event.statut }}
+                    </span>
+                  </td>
+                  <td class="px-6 py-4 whitespace-nowrap">
+                    <span class="px-2 py-1 text-xs font-medium rounded-full whitespace-nowrap" [ngClass]="event.estPublic ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'">
+                      {{ event.estPublic ? 'Public' : 'Privé' }}
+                    </span>
+                  </td>
+                  <td class="px-6 py-4 whitespace-nowrap">
+                    <span class="px-2 py-1 text-xs font-medium rounded-full whitespace-nowrap" [ngClass]="event.prix.estGratuit ? 'bg-green-100 text-green-800' : 'bg-yellow-100 text-yellow-800'">
+                      {{ event.prix.estGratuit ? 'Gratuit' : (event.prix.montant + ' TND') }}
                     </span>
                   </td>
                   <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
@@ -441,6 +433,15 @@
     </main>
   </div>
 
+  <!-- Si l'utilisateur n'est pas authentifié -->
+  <ng-template #notAuthenticated>
+    <div class="flex h-screen items-center justify-center bg-gray-50">
+      <div class="text-center">
+        <p class="text-lg font-semibold text-gray-700">Redirection en cours...</p>
+      </div>
+    </div>
+  </ng-template>
+
   <!-- Add/Edit Event Modal -->
   <div class="fixed inset-0 bg-gray-900 bg-opacity-50 flex items-center justify-center z-50 overflow-y-auto" [class.hidden]="!isModalOpen">
     <div class="bg-white rounded-lg shadow-xl w-full max-w-lg m-4">
@@ -454,17 +455,23 @@
             </div>
             <div class="grid grid-cols-2 gap-4">
               <div>
-                <label for="event-date" class="block text-sm font-medium text-gray-700">Date <span class="text-red-500">*</span></label>
-                <input id="event-date" type="date" [(ngModel)]="currentEvent.date" name="date" class="mt-1 block w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-primary" required>
+                <label for="event-date-debut" class="block text-sm font-medium text-gray-700">Date de début <span class="text-red-500">*</span></label>
+                <input id="event-date-debut" type="date" [(ngModel)]="currentEvent.dateDebut" name="dateDebut" class="mt-1 block w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-primary" required>
               </div>
+              <div>
+                <label for="event-date-fin" class="block text-sm font-medium text-gray-700">Date de fin <span class="text-red-500">*</span></label>
+                <input id="event-date-fin" type="date" [(ngModel)]="currentEvent.dateFin" name="dateFin" class="mt-1 block w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-primary" required>
+              </div>
+            </div>
+            <div class="grid grid-cols-2 gap-4">
               <div>
                 <label for="event-time" class="block text-sm font-medium text-gray-700">Heure de début <span class="text-red-500">*</span></label>
                 <input id="event-time" type="time" [(ngModel)]="currentEvent.heureDebut" name="heureDebut" class="mt-1 block w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-primary" required>
               </div>
-            </div>
-            <div>
-              <label for="event-end-time" class="block text-sm font-medium text-gray-700">Heure de fin</label>
-              <input id="event-end-time" type="time" [(ngModel)]="currentEvent.heureFin" name="heureFin" class="mt-1 block w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-primary">
+              <div>
+                <label for="event-end-time" class="block text-sm font-medium text-gray-700">Heure de fin</label>
+                <input id="event-end-time" type="time" [(ngModel)]="currentEvent.heureFin" name="heureFin" class="mt-1 block w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-primary">
+              </div>
             </div>
             <div>
               <label for="event-location" class="block text-sm font-medium text-gray-700">Lieu <span class="text-red-500">*</span></label>
@@ -488,6 +495,8 @@
                 <option>Cinéma</option>
                 <option>Art</option>
                 <option>Sport</option>
+                <option>Conférences</option>
+                <option>Festivals</option>
                 <option>Autre</option>
               </select>
             </div>
@@ -518,12 +527,30 @@
               </select>
             </div>
             <div>
-              <label for="event-photos" class="block text-sm font-medium text-gray-700">Photos de l'événement</label>
-              <input id="event-photos" type="file" accept="image/*" multiple (change)="onPhotosChange($event)" class="mt-1 block w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-primary">
-              <div class="mt-2 grid grid-cols-3 gap-2" *ngIf="photoPreviews.length > 0">
-                <div *ngFor="let preview of photoPreviews; let i = index" class="relative">
-                  <img [src]="preview" alt="Aperçu de la photo" class="w-full h-24 object-cover rounded-lg">
-                  <button type="button" class="absolute top-1 right-1 bg-red-500 text-white rounded-full w-6 h-6 flex items-center justify-center" (click)="removePhoto(i)">
+              <label for="event-is-public" class="block text-sm font-medium text-gray-700">Visibilité <span class="text-red-500">*</span></label>
+              <div class="mt-1 flex items-center">
+                <input id="event-is-public" type="checkbox" [(ngModel)]="currentEvent.estPublic" name="estPublic" class="mr-2">
+                <label for="event-is-public" class="text-sm text-gray-700">Événement public</label>
+              </div>
+            </div>
+            <div>
+              <label for="event-is-free" class="block text-sm font-medium text-gray-700">Prix <span class="text-red-500">*</span></label>
+              <div class="mt-1 flex items-center">
+                <input id="event-is-free" type="checkbox" [(ngModel)]="currentEvent.prix.estGratuit" name="estGratuit" class="mr-2">
+                <label for="event-is-free" class="text-sm text-gray-700">Événement gratuit</label>
+              </div>
+              <div *ngIf="!currentEvent.prix.estGratuit" class="mt-2">
+                <label for="event-price" class="block text-sm font-medium text-gray-700">Montant (TND) <span class="text-red-500">*</span></label>
+                <input id="event-price" type="number" [(ngModel)]="currentEvent.prix.montant" name="montant" min="0" class="mt-1 block w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-primary" required>
+              </div>
+            </div>
+            <div>
+              <label for="event-photo" class="block text-sm font-medium text-gray-700">Photo de l'événement</label>
+              <input id="event-photo" type="file" accept="image/*" (change)="onPhotoChange($event)" class="mt-1 block w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-primary">
+              <div class="mt-2" *ngIf="photoPreview">
+                <div class="relative">
+                  <img [src]="photoPreview" alt="Aperçu de la photo" class="w-full h-24 object-cover rounded-lg" (error)="handleImageError()">
+                  <button type="button" class="absolute top-1 right-1 bg-red-500 text-white rounded-full w-6 h-6 flex items-center justify-center" (click)="removePhoto()">
                     <i class="ri-close-line"></i>
                   </button>
                 </div>
@@ -539,15 +566,15 @@
             </div>
           </div>
           <div class="mt-6 flex justify-end space-x-3">
-            <button type="button" class="px-4 py-2 border border-gray-300 rounded-lg text-gray-700" (click)="closeModal()">Annuler</button>
-            <button type="submit" class="px-4 py-2 bg-primary text-white rounded-lg">Enregistrer</button>
+            <button type="button" class="px-4 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50" (click)="closeModal()">Annuler</button>
+            <button type="submit" class="px-4 py-2 bg-primary text-white rounded-lg hover:bg-primary-dark">Enregistrer</button>
           </div>
         </form>
       </div>
     </div>
   </div>
 
-  <!-- Archive Modal -->
+  <!-- Archive Confirmation Modal -->
   <div class="fixed inset-0 bg-gray-900 bg-opacity-50 flex items-center justify-center z-50" [class.hidden]="!isArchiveModalOpen">
     <div class="bg-white rounded-lg shadow-lg max-w-md w-full p-6">
       <div class="text-center mb-6">

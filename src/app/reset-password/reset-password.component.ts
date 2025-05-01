@@ -1,4 +1,3 @@
-// src/app/reset-password/reset-password.component.ts
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { UserService } from '../services/user.service';
@@ -14,6 +13,8 @@ export class ResetPasswordComponent implements OnInit {
   confirmPassword: string = '';
   message: string = '';
   error: string = '';
+  showNewPassword: boolean = false; // Propriété pour gérer la visibilité du nouveau mot de passe
+  showConfirmPassword: boolean = false; // Propriété pour gérer la visibilité de la confirmation du mot de passe
 
   constructor(
     private route: ActivatedRoute,
@@ -29,6 +30,16 @@ export class ResetPasswordComponent implements OnInit {
         this.error = 'Token manquant. Veuillez utiliser le lien envoyé par email.';
       }
     });
+  }
+
+  // Méthode pour basculer la visibilité du nouveau mot de passe
+  toggleNewPasswordVisibility() {
+    this.showNewPassword = !this.showNewPassword;
+  }
+
+  // Méthode pour basculer la visibilité de la confirmation du mot de passe
+  toggleConfirmPasswordVisibility() {
+    this.showConfirmPassword = !this.showConfirmPassword;
   }
 
   onSubmit() {

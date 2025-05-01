@@ -1,0 +1,369 @@
+<div class="flex h-screen bg-gray-50 min-h-screen">
+  <!-- Sidebar: Menu de navigation latéral -->
+  <aside class="w-64 bg-white shadow-sm">
+    <div class="h-16 flex items-center px-6">
+      <div class="text-2xl font-['Pacifico'] text-primary">Sfax</div>
+    </div>
+    <nav class="mt-4">
+      <a routerLink="/partenaire" routerLinkActive="bg-gray-50 text-primary" class="flex items-center px-6 py-3 text-gray-600 hover:bg-gray-50 hover:text-primary">
+        <i class="ri-home-line mr-3"></i>
+        <span>Accueil</span>
+      </a>
+      <a routerLink="/partenaire-etablissements" routerLinkActive="bg-gray-50 text-primary" class="flex items-center px-6 py-3 text-gray-600 hover:bg-gray-50 hover:text-primary">
+        <i class="ri-building-line mr-3"></i>
+        <span>Établissements</span>
+      </a>
+      <a routerLink="/partenaire-promotions" routerLinkActive="bg-gray-50 text-primary" class="flex items-center px-6 py-3 text-gray-600 hover:bg-gray-50 hover:text-primary">
+        <i class="ri-price-tag-3-line mr-3"></i>
+        <span>Promotions</span>
+      </a>
+      <a routerLink="/partenaire-evenements" routerLinkActive="bg-gray-50 text-primary" class="flex items-center px-6 py-3 text-gray-600 hover:bg-gray-50 hover:text-primary">
+        <i class="ri-calendar-line mr-3"></i>
+        <span>Événements</span>
+      </a>
+      <a routerLink="/profile-partenaire" routerLinkActive="bg-gray-50 text-primary" class="flex items-center px-6 py-3 text-gray-600 hover:bg-gray-50 hover:text-primary">
+        <i class="ri-user-line mr-3"></i>
+        <span>Mon profil</span>
+      </a>
+    </nav>
+  </aside>
+
+  <!-- Contenu principal -->
+  <div class="flex-1 flex flex-col">
+    <!-- En-tête -->
+    <header class="bg-white shadow-sm h-16">
+      <div class="h-full px-6 flex items-center justify-between">
+        <div class="flex items-center">
+          <h1 class="text-xl font-semibold text-gray-900">Promotions Partenaire</h1>
+        </div>
+        <div class="flex items-center space-x-4">
+          <div class="relative">
+            <button id="profileButton" class="flex items-center space-x-2 cursor-pointer" (click)="toggleProfile()">
+              <div class="w-8 h-8 rounded-full bg-gray-200 flex items-center justify-center">
+                <i class="ri-user-line text-gray-600"></i>
+              </div>
+              <span class="text-gray-700">{{ user?.nom || 'Partenaire' }}</span>
+              <i class="ri-arrow-down-s-line ml-1 text-gray-600"></i>
+            </button>
+            <div id="profileMenu" class="absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-lg py-2 z-50" [class.hidden]="!isProfileMenuOpen">
+              <a routerLink="/profile-partenaire" class="px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 flex items-center">
+                <i class="ri-user-line mr-2"></i>
+                Mon profil
+              </a>
+              <div class="border-t border-gray-100 my-1"></div>
+              <a (click)="logout()" class="px-4 py-2 text-sm text-red-600 hover:bg-gray-100 flex items-center cursor-pointer">
+                <i class="ri-logout-box-line mr-2"></i>
+                Déconnexion
+              </a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <!-- Main Section -->
+    <main class="flex-1 overflow-auto p-6">
+      <!-- Breadcrumb -->
+      <nav aria-label="Fil d'Ariane" class="flex items-center text-sm text-gray-500 mb-4">
+        <a routerLink="/partenaire" class="hover:text-primary transition-colors">Tableau de bord</a>
+        <i class="ri-arrow-right-s-line mx-1"></i>
+        <span class="text-gray-700" aria-current="page">Promotions</span>
+      </nav>
+  
+      <div class="flex justify-between items-center mb-6">
+        <h1 class="text-2xl font-bold text-gray-800">Gestion des Promotions</h1>
+      </div>
+  
+      <!-- Form Section -->
+      <section aria-labelledby="form-title" class="bg-white rounded-lg shadow-sm mb-8">
+        <div class="p-6 border-b flex justify-between items-center">
+          <h2 id="form-title" class="text-xl font-semibold text-gray-800">Ajouter une promotion</h2>
+          <button 
+            class="text-gray-500 hover:text-gray-700 transition-colors"
+            aria-label="Fermer le formulaire"
+          >
+            <i class="ri-close-line text-2xl"></i>
+          </button>
+        </div>
+        
+        <form [formGroup]="promotionForm" (ngSubmit)="onSubmitPromotionForm($event)" class="p-6">
+          <div class="space-y-8">
+            <!-- Informations de base -->
+            <div>
+              <h3 class="text-lg font-medium text-gray-800 mb-4">Informations de base</h3>
+              <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <!-- Nom de la promotion -->
+                <div>
+                  <label for="promotionName" class="block text-sm font-medium text-gray-700 mb-2">
+                    Nom de la promotion <span class="text-red-500">*</span>
+                  </label>
+                  <input
+                    id="promotionName"
+                    formControlName="promotionName"
+                    type="text"
+                    placeholder="Saisissez le nom de la promotion"
+                    class="w-full px-3 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-colors"
+                    [ngClass]="{'border-red-500': promotionForm.get('promotionName')?.touched && promotionForm.get('promotionName')?.invalid}"
+                  />
+                  <p *ngIf="promotionForm.get('promotionName')?.touched && promotionForm.get('promotionName')?.invalid" class="text-red-500 text-sm mt-1">
+                    Le nom de la promotion est requis.
+                  </p>
+                </div>
+    
+                <!-- Type d’établissement -->
+                <div>
+                  <label for="establishmentType" class="block text-sm font-medium text-gray-700 mb-2">
+                    Type d’établissement <span class="text-red-500">*</span>
+                  </label>
+                  <div class="relative">
+                    <select
+                      id="establishmentType"
+                      formControlName="establishmentType"
+                      class="w-full px-3 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent appearance-none pr-8"
+                      [ngClass]="{'border-red-500': promotionForm.get('establishmentType')?.touched && promotionForm.get('establishmentType')?.invalid}"
+                    >
+                      <option value="" disabled>Sélectionnez type établissement</option>
+                      <option *ngFor="let type of establishmentTypes" [value]="type.value">{{ type.label }}</option>
+                    </select>
+                    <i class="ri-arrow-down-s-line absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500 pointer-events-none"></i>
+                    <p *ngIf="promotionForm.get('establishmentType')?.touched && promotionForm.get('establishmentType')?.invalid" class="text-red-500 text-sm mt-1">
+                      Le type d’établissement est requis.
+                    </p>
+                  </div>
+                </div>
+    
+                <!-- Nom Établissement -->
+                <div>
+                  <label for="establishmentName" class="block text-sm font-medium text-gray-700 mb-2">
+                    Nom Établissement <span class="text-red-500">*</span>
+                  </label>
+                  <div class="relative">
+                    <select
+                      id="establishmentName"
+                      formControlName="establishmentName"
+                      class="w-full px-3 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent appearance-none pr-8"
+                      [ngClass]="{'border-red-500': promotionForm.get('establishmentName')?.touched && promotionForm.get('establishmentName')?.invalid}"
+                    >
+                      <option value="" disabled>Sélectionnez un établissement</option>
+                      <option *ngFor="let estab of establishments" [value]="estab.value">{{ estab.label }}</option>
+                    </select>
+                    <i class="ri-arrow-down-s-line absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500 pointer-events-none"></i>
+                    <p *ngIf="promotionForm.get('establishmentName')?.touched && promotionForm.get('establishmentName')?.invalid" class="text-red-500 text-sm mt-1">
+                      Le nom de l’établissement est requis.
+                    </p>
+                  </div>
+                </div>
+    
+                <!-- Type de promotion -->
+                <div>
+                  <label for="promotionType" class="block text-sm font-medium text-gray-700 mb-2">
+                    Type de promotion <span class="text-red-500">*</span>
+                  </label>
+                  <div class="relative">
+                    <select
+                      id="promotionType"
+                      formControlName="promotionType"
+                      class="w-full px-3 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent appearance-none pr-8"
+                      [ngClass]="{'border-red-500': promotionForm.get('promotionType')?.touched && promotionForm.get('promotionType')?.invalid}"
+                    >
+                      <option value="" disabled>Sélectionnez un type</option>
+                      <option *ngFor="let type of promotionTypes" [value]="type.value">{{ type.label }}</option>
+                    </select>
+                    <i class="ri-arrow-down-s-line absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500 pointer-events-none"></i>
+                    <p *ngIf="promotionForm.get('promotionType')?.touched && promotionForm.get('promotionType')?.invalid" class="text-red-500 text-sm mt-1">
+                      Le type de promotion est requis.
+                    </p>
+                  </div>
+                </div>
+    
+                <!-- Valeur de la promotion -->
+                <div>
+                  <label for="promotionValue" class="block text-sm font-medium text-gray-700 mb-2">
+                    Valeur de la promotion <span class="text-red-500">*</span>
+                  </label>
+                  <input
+                    id="promotionValue"
+                    formControlName="promotionValue"
+                    type="text"
+                    placeholder="Ex: 20% ou 10€"
+                    class="w-full px-3 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-colors"
+                    [ngClass]="{'border-red-500': promotionForm.get('promotionValue')?.touched && promotionForm.get('promotionValue')?.invalid}"
+                  />
+                  <p *ngIf="promotionForm.get('promotionValue')?.touched && promotionForm.get('promotionValue')?.invalid" class="text-red-500 text-sm mt-1">
+                    La valeur de la promotion est requise.
+                  </p>
+                </div>
+    
+                <!-- Code promo -->
+                <div>
+                  <label for="promoCode" class="block text-sm font-medium text-gray-700 mb-2">
+                    Code promo
+                  </label>
+                  <input
+                    id="promoCode"
+                    formControlName="promoCode"
+                    type="text"
+                    placeholder="Ex: ETE2025"
+                    class="w-full px-3 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-colors"
+                  />
+                </div>
+              </div>
+            </div>
+    
+            <!-- Dates -->
+            <div>
+              <h3 class="text-lg font-medium text-gray-800 mb-4">Dates</h3>
+              <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <!-- Date de début -->
+                <div>
+                  <label for="startDate" class="block text-sm font-medium text-gray-700 mb-2">
+                    Date de début <span class="text-red-500">*</span>
+                  </label>
+                  <div class="relative">
+                    <input
+                      id="startDate"
+                      formControlName="startDate"
+                      type="date"
+                      placeholder="jj/mm/aaaa"
+                      class="w-full px-3 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
+                      [ngClass]="{'border-red-500': promotionForm.get('startDate')?.touched && promotionForm.get('startDate')?.invalid}"
+                    />
+                    <i class="ri-calendar-line absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500 pointer-events-none"></i>
+                    <p *ngIf="promotionForm.get('startDate')?.touched && promotionForm.get('startDate')?.invalid" class="text-red-500 text-sm mt-1">
+                      La date de début est requise.
+                    </p>
+                  </div>
+                </div>
+    
+                <!-- Date de fin -->
+                <div>
+                  <label for="endDate" class="block text-sm font-medium text-gray-700 mb-2">
+                    Date de fin <span class="text-red-500">*</span>
+                  </label>
+                  <div class="relative">
+                    <input
+                      id="endDate"
+                      formControlName="endDate"
+                      type="date"
+                      placeholder="jj/mm/aaaa"
+                      class="w-full px-3 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
+                      [ngClass]="{'border-red-500': promotionForm.get('endDate')?.touched && promotionForm.get('endDate')?.invalid}"
+                    />
+                    <i class="ri-calendar-line absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500 pointer-events-none"></i>
+                    <p *ngIf="promotionForm.get('endDate')?.touched && promotionForm.get('endDate')?.invalid" class="text-red-500 text-sm mt-1">
+                      La date de fin est requise.
+                    </p>
+                  </div>
+                </div>
+    
+                <!-- Limite d’utilisation -->
+                <div>
+                  <label for="usageLimit" class="block text-sm font-medium text-gray-700 mb-2">
+                    Limite d’utilisation
+                  </label>
+                  <input
+                    id="usageLimit"
+                    formControlName="usageLimit"
+                    type="number"
+                    min="0"
+                    class="w-full px-3 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-colors"
+                  />
+                </div>
+    
+                <!-- Statut -->
+                <div>
+                  <label for="status" class="block text-sm font-medium text-gray-700 mb-2">
+                    Statut <span class="text-red-500">*</span>
+                  </label>
+                  <div class="relative">
+                    <select
+                      id="status"
+                      formControlName="status"
+                      class="w-full px-3 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent appearance-none pr-8"
+                      [ngClass]="{'border-red-500': promotionForm.get('status')?.touched && promotionForm.get('status')?.invalid}"
+                    >
+                      <option value="" disabled>Sélectionnez un statut</option>
+                      <option *ngFor="let status of statuses" [value]="status.value">{{ status.label }}</option>
+                    </select>
+                    <i class="ri-arrow-down-s-line absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500 pointer-events-none"></i>
+                    <p *ngIf="promotionForm.get('status')?.touched && promotionForm.get('status')?.invalid" class="text-red-500 text-sm mt-1">
+                      Le statut est requis.
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+    
+          <!-- Form Buttons -->
+          <div class="flex justify-end space-x-3 mt-6 pt-6 border-t">
+            <button
+              type="button"
+              class="px-4 py-2 border border-gray-300 rounded-button text-gray-700 hover:bg-gray-50 transition-colors"
+            >
+              Annuler
+            </button>
+            <button
+              type="submit"
+              class="bg-primary hover:bg-primary/90 text-white px-4 py-2 rounded-button transition fok-colors"
+            >
+              Enregistrer
+            </button>
+          </div>
+        </form>
+      </section>
+
+      <!-- Dialog Box (Modal) for Successful Submission -->
+      <div *ngIf="showDialog" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+        <div class="bg-white rounded-lg w-full max-w-md p-6">
+          <!-- Modal Header -->
+          <div class="flex justify-between items-center mb-4">
+            <h3 class="text-lg font-semibold text-gray-800">Demande Soumise</h3>
+            <button 
+              (click)="closeDialog()"
+              class="text-gray-500 hover:text-gray-700 transition-colors"
+              aria-label="Fermer la boîte de dialogue"
+            >
+              <i class="ri-close-line text-2xl"></i>
+            </button>
+          </div>
+          <!-- Modal Body -->
+          <div class="flex items-start">
+            <i class="ri-information-line text-yellow-400 text-2xl mr-3"></i>
+            <p class="text-sm text-gray-700">
+              Votre demande de promotion a été soumise et est en attente de la confirmation de l'admin. Vous serez notifié une fois la confirmation effectuée.
+            </p>
+          </div>
+          <!-- Modal Footer -->
+          <div class="mt-6 flex justify-end">
+            <button 
+              (click)="closeDialog()"
+              class="bg-primary hover:bg-primary/90 text-white px-4 py-2 rounded-button transition-colors"
+            >
+              OK
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Validation Error Dialog -->
+      <div *ngIf="showValidationDialog" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+        <div class="bg-white rounded-lg w-full max-w-sm p-6">
+          <div class="flex items-center mb-4">
+            <i class="ri-error-warning-line text-red-500 text-2xl mr-3"></i>
+            <h3 class="text-lg font-semibold text-gray-800">Erreur</h3>
+          </div>
+          <p class="text-sm text-gray-600 mb-6">Veuillez remplir tous les champs obligatoires.</p>
+          <div class="flex justify-end">
+            <button 
+              (click)="closeValidationDialog()"
+              class="bg-primary hover:bg-primary/90 text-white px-4 py-2 rounded-button transition-colors"
+            >
+              OK
+            </button>
+          </div>
+        </div>
+      </div>
+    </main>
+  </div>
+</div>

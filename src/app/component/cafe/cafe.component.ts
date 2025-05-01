@@ -5,12 +5,30 @@ import { NavbarComponent } from '../navbar/navbar.component';
 import { FooterComponent } from '../footer/footer.component';
 import { Router } from '@angular/router';
 import { EtablissementService } from '../../services/etablissement.service';
+import { Etablissement } from '../../models/etablissement.model';
 
 interface FilterServices {
   Piscine: boolean;
   Spa: boolean;
   Restaurant: boolean;
   Wifi: boolean;
+}
+
+
+interface CafeDisplay {
+  id: string;
+  nom: string;
+  type: string;
+  image: string;
+  rating: number;
+  reviews: number;
+  description: string;
+  price: number;
+  services: string[];
+  address: string;
+  hours: string;
+  phone: string;
+  siteWeb: string;
 }
 
 @Component({
@@ -39,56 +57,56 @@ export class CafeComponent implements OnInit {
   itemsPerPage: number = 10;
   currentItems: number = this.itemsPerPage;
 
-  hotels: any[] = [];
-  filteredHotels: any[] = [];
+  Cafe: CafeDisplay[] = [];
+  filteredCafe: CafeDisplay[] = [];
 
   constructor(private router: Router, private etablissementService: EtablissementService) {}
 
   ngOnInit() {
-    this.fetchHotels();
+    this.fetchCafe();
   }
 
-  fetchHotels() {
+  fetchCafe() {
     this.isLoading = true;
     this.errorMessage = null;
-    this.etablissementService.getCafes().subscribe({
-      next: (hotels) => {
+    this.etablissementService.getCafe().subscribe({
+      next: (cafe: Etablissement[]) => {
         // Map API response to match the component's expected structure
-        this.hotels = hotels.map(hotel => {
-          let imageUrl = 'https://r-xx.bstatic.com/xdata/images/hotel/608x352/281564416.webp?k=d34be48dc235d2aba463351d30aa399a184946441e78177d1ed6e66c427e5e81&o='; // Fallback placeholder
+        this.Cafe = cafe.map((cafe: Etablissement) => {
+          let imageUrl = 'https://r-xx.bstatic.com/xdata/images/cafe/608x352/281564416.webp?k=d34be48dc235d2aba463351d30aa399a184946441e78177d1ed6e66c427e5e81&o=';
       
-          if (hotel.photos?.length) {
-            const photo = hotel.photos[0];
+          if (cafe.photos?.length) {
+            const photo = cafe.photos[0];
             if (typeof photo === 'string') {
               imageUrl = `http://localhost:5000/${photo.replace(/\\/g, '/')}`;
             } else if (photo instanceof File) {
               imageUrl = URL.createObjectURL(photo);
             }
-            console.log("imageUrl",imageUrl);
+            console.log("imageUrl", imageUrl);
           }
       
           return {
-            id: hotel.id,
-            nom: hotel.nom,
-            type: hotel.type,
+            id: cafe.id ?? '', 
+            nom: cafe.nom,
+            type: cafe.type,
             image: imageUrl,
             rating: 4,
             reviews: 100,
-            description: hotel.description || 'Aucune description disponible',
+            description: cafe.description || 'Aucune description disponible',
             price: 200,
-            services: hotel.services?.map((s: string) => this.normalizeService(s)) || [],
-            address: hotel.adresse,
-            hours: hotel.horaires?.is24_7 ? '24/7' : 'Horaires non spécifiés',
-            phone: hotel.telephone,
-            siteWeb:hotel.siteWeb
+            services: cafe.services?.map((s: string) => this.normalizeService(s)) || [],
+            address: cafe.adresse,
+            hours: cafe.horaires?.is24_7 ? '24/7' : 'Horaires non spécifiés',
+            phone: cafe.telephone,
+            siteWeb: cafe.siteWeb
           };
         });
-        this.filteredHotels = this.hotels; // Directly show all hotels
+        this.filteredCafe = this.Cafe; // Directly show all cafes
         this.isLoading = false;
       },
-      error: (error) => {
-        console.error('Error fetching hotels:', error);
-        this.errorMessage = 'Impossible de charger les hôtels. Veuillez réessayer plus tard.';
+      error: (error: any) => {
+        console.error('Error fetching cafes:', error);
+        this.errorMessage = 'Impossible de charger les cafés. Veuillez réessayer plus tard.';
         this.isLoading = false;
       }
     });
@@ -109,8 +127,8 @@ export class CafeComponent implements OnInit {
     }
   }
 
-  filterHotels() {
-    let filtered = this.hotels.filter(item => {
+  filterCafe() {
+    let filtered = this.Cafe.filter(item => {
       const matchesSearch = item.nom.toLowerCase().includes(this.searchQuery.toLowerCase()) ||
                            item.description.toLowerCase().includes(this.searchQuery.toLowerCase());
       const matchesPrice = (!this.filterPriceMin || item.price >= this.filterPriceMin) &&
@@ -126,30 +144,30 @@ export class CafeComponent implements OnInit {
       return matchesSearch && matchesPrice && matchesStars && matchesServices;
     });
 
-    this.filteredHotels = filtered.slice(0, this.currentItems);
+    this.filteredCafe = filtered.slice(0, this.currentItems);
   }
 
   onSortChange(event: Event) {
     const target = event.target as HTMLSelectElement;
     if (target) {
       this.sortOption = target.value;
-      this.sortHotels(target.value);
+      this.sortCafes(target.value);
     }
   }
 
-  sortHotels(sortType: string) {
+  sortCafes(sortType: string) {
     switch (sortType) {
       case 'priceAsc':
-        this.filteredHotels.sort((a, b) => a.price - b.price);
+        this.filteredCafe.sort((a, b) => a.price - b.price);
         break;
       case 'priceDesc':
-        this.filteredHotels.sort((a, b) => b.price - b.price);
+        this.filteredCafe.sort((a, b) => b.price - b.price);
         break;
       case 'rating':
-        this.filteredHotels.sort((a, b) => b.rating - a.rating);
+        this.filteredCafe.sort((a, b) => b.rating - a.rating);
         break;
       default:
-        this.filterHotels();
+        this.filterCafe();
     }
   }
 
@@ -157,13 +175,9 @@ export class CafeComponent implements OnInit {
     return Array(Math.floor(rating)).fill(0);
   }
 
-  openBookingModal(hotel: any) {
-    this.router.navigate(['/hotel', hotel.id]);
-  }
-
   loadMore() {
     this.currentItems += this.itemsPerPage;
-    this.filterHotels();
+    this.filterCafe();
   }
 
   toggleFilters() {
@@ -171,7 +185,7 @@ export class CafeComponent implements OnInit {
   }
 
   canLoadMore(): boolean {
-    let filtered = this.hotels.filter(item => {
+    let filtered = this.Cafe.filter(item => {
       const matchesSearch = item.nom.toLowerCase().includes(this.searchQuery.toLowerCase()) ||
                            item.description.toLowerCase().includes(this.searchQuery.toLowerCase());
       const matchesPrice = (!this.filterPriceMin || item.price >= this.filterPriceMin) &&
@@ -190,10 +204,18 @@ export class CafeComponent implements OnInit {
     return this.currentItems < filtered.length;
   }
 
-  goToWebsite(url:any) {
+  goToWebsite(url: string) {
     if (url) {
       window.open(url, '_blank'); // Opens in a new tab
     }
+  }
 
+  goToDetails(cafe: CafeDisplay): void {
+    console.log("cafe:", cafe);
+    if (!cafe.id) {
+      console.error('Cafe ID is undefined!');
+      return;
+    }
+    this.router.navigate(['/etablissements', cafe.id]);
   }
 }

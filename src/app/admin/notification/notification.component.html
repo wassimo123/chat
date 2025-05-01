@@ -1,108 +1,93 @@
 <div class="flex h-screen bg-gray-50 min-h-screen">
-  <!-- Sidebar: Menu de navigation latéral -->
+  <!-- Sidebar -->
   <aside class="w-64 bg-white shadow-sm">
     <div class="h-16 flex items-center px-6">
       <div class="text-2xl font-['Pacifico'] text-primary">Sfax</div>
     </div>
     <nav class="mt-4">
-      <!-- Lien vers le tableau de bord -->
-      <a routerLink="/dashboard" routerLinkActive="bg-gray-50 text-primary" class="flex items-center px-6 py-3 text-gray-600 hover:bg-gray-50 hover:text-primary">
-        <i class="ri-dashboard-line mr-3"></i>
-        <span>Tableau de bord</span>
+      <a routerLink="/dashboard" class="flex items-center px-6 py-3 text-gray-600 hover:bg-gray-50 hover:text-primary">
+        <i class="ri-dashboard-line mr-3"></i> <span>Tableau de bord</span>
       </a>
-      <!-- Lien vers la gestion des utilisateurs -->
-      <a routerLink="/users" routerLinkActive="bg-gray-50 text-primary" class="flex items-center px-6 py-3 text-gray-600 hover:bg-gray-50 hover:text-primary">
-        <i class="ri-user-line mr-3"></i>
-        <span>Utilisateurs</span>
+      <a routerLink="/users" class="flex items-center px-6 py-3 text-gray-600 hover:bg-gray-50 hover:text-primary">
+        <i class="ri-user-line mr-3"></i> <span>Utilisateurs</span>
       </a>
-      <a
-      routerLink="/etablissements"
-      routerLinkActive="bg-gray-50 text-primary"
-      class="flex items-center px-6 py-3 text-gray-600 hover:bg-gray-50 hover:text-primary"
-    >
-      <i class="ri-building-line mr-3"></i>
-      <span>Établissements</span>
-    </a>
-    <a routerLink="/promo" routerLinkActive="bg-gray-50 text-primary" class="flex items-center px-6 py-3 text-gray-600 hover:bg-gray-50 hover:text-primary">
-      <i class="ri-price-tag-3-line mr-3"></i>
-      <span>Promotions</span>
-    </a>
-    <a routerLink="/event" routerLinkActive="bg-gray-50 text-primary" class="flex items-center px-6 py-3 text-gray-600 hover:bg-gray-50 hover:text-primary">
-      <i class="ri-calendar-line mr-3"></i>
-      <span>Événements</span>
-    </a>
-      <!-- Lien vers les notifications (page actuelle) -->
-      <a routerLink="/notifications" routerLinkActive="bg-gray-50 text-primary" class="flex items-center px-6 py-3 text-gray-600 hover:bg-gray-50 hover:text-primary">
-        <i class="ri-notification-line mr-3"></i>
-        <span>Notifications</span>
+      <a routerLink="/etablissements" routerLinkActive="bg-gray-50 text-primary" class="flex items-center px-6 py-3 text-gray-600 hover:bg-gray-50 hover:text-primary">
+        <i class="ri-building-line mr-3"></i>
+        <span>Établissements</span>
+      </a>
+      <a routerLink="/promo" routerLinkActive="bg-gray-50 text-primary" class="flex items-center px-6 py-3 text-gray-600 hover:bg-gray-50 hover:text-primary">
+        <i class="ri-price-tag-3-line mr-3"></i>
+        <span>Promotions</span>
+      </a>
+      <a routerLink="/event" routerLinkActive="bg-gray-50 text-primary" class="flex items-center px-6 py-3 text-gray-600 hover:bg-gray-50 hover:text-primary">
+        <i class="ri-calendar-line mr-3"></i>
+        <span>Événements</span>
+      </a>
+      <a routerLink="/notifications" class="flex items-center px-6 py-3 text-gray-600 hover:bg-gray-50 hover:text-primary">
+        <i class="ri-notification-line mr-3"></i> <span>Notifications</span>
       </a>
     </nav>
   </aside>
 
   <!-- Contenu principal -->
-  <div class="flex-1 flex flex-col">
-    <!-- En-tête avec barre de recherche et menu de profil -->
-    <header class="bg-white shadow-sm h-16">
-      <div class="h-full px-6 flex items-center justify-between">
-        <div class="flex items-center">
-          <div class="relative">
-            <input type="text" placeholder="Rechercher..." class="w-64 pl-10 pr-4 py-2 border border-gray-300 rounded-button focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent" [(ngModel)]="searchQuery" (input)="onSearch()">
-            <div class="absolute left-3 top-2.5 text-gray-400">
-              <i class="ri-search-line"></i>
-            </div>
-          </div>
-        </div>
-        <div class="flex items-center space-x-4">
-          <!-- Bouton de notification avec badge -->
-          <button routerLink="/notifications" class="w-8 h-8 flex items-center justify-center text-gray-600 hover:text-primary relative">
-            <i class="ri-notification-3-line"></i>
-            <span class="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">
-              {{ notifications.length }}
-            </span>
-          </button>
-          <!-- Menu de profil -->
-          <div class="relative">
-            <button id="profileButton" class="flex items-center space-x-2 cursor-pointer" (click)="toggleProfile()">
-              <div class="w-8 h-8 rounded-full bg-gray-200 flex items-center justify-center">
-                <i class="ri-user-line text-gray-600"></i>
+  <div *ngIf="isAuthenticated; else notAuthenticated"  class="flex-1 flex flex-col">
+        <!-- Header -->
+        <header class="bg-white shadow-sm h-16">
+          <div class="h-full px-6 flex items-center justify-between">
+            <div class="flex items-center">
+              <div class="relative">
+                <input type="text" placeholder="Rechercher..." class="w-64 pl-10 pr-4 py-2 border border-gray-300 rounded-button focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent" [(ngModel)]="searchQuery" (input)="onSearch()">
+                <div class="absolute left-3 top-2.5 text-gray-400">
+                  <i class="ri-search-line"></i>
+                </div>
               </div>
-              <span class="text-gray-700">Admin</span>
-              <i class="ri-arrow-down-s-line ml-1 text-gray-600"></i>
-            </button>
-            <div id="profileMenu" class="absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-lg py-2 z-50" [class.hidden]="!isProfileMenuOpen">
-              <a routerLink="/profile" class="px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 flex items-center">
-                <i class="ri-user-line mr-2"></i>
-                Mon profil
-              </a>
-              <div class="border-t border-gray-100 my-1"></div>
-              <a routerLink="/connexion" class="px-4 py-2 text-sm text-red-600 hover:bg-gray-100 flex items-center">
-                <i class="ri-logout-box-line mr-2"></i>
-                Déconnexion
-              </a>
+            </div>
+            <div class="flex items-center space-x-4">
+              <button routerLink="/notifications" class="w-8 h-8 flex items-center justify-center text-gray-600 hover:text-primary relative">
+                <i class="ri-notification-3-line"></i>
+                <span class="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">
+                  {{ notifications.length }}
+                </span>
+              </button>
+              <div class="relative">
+                <button id="profileButton" class="flex items-center space-x-2 cursor-pointer" (click)="toggleProfile()">
+                  <div class="w-8 h-8 rounded-full bg-gray-200 flex items-center justify-center">
+                    <i class="ri-user-line text-gray-600"></i>
+                  </div>
+                  <span class="text-gray-700">Admin</span>
+                  <i class="ri-arrow-down-s-line ml-1 text-gray-600"></i>
+                </button>
+                <div id="profileMenu" class="absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-lg py-2 z-50" [class.hidden]="!isProfileMenuOpen">
+                  <a routerLink="/profile" class="px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 flex items-center">
+                    <i class="ri-user-line mr-2"></i> Mon profil
+                  </a>
+                  <div class="border-t border-gray-100 my-1"></div>
+                  <a (click)="logout()" class="px-4 py-2 text-sm text-red-600 hover:bg-gray-100 flex items-center cursor-pointer">
+                    <i class="ri-logout-box-line mr-2"></i> Déconnexion
+                  </a>
+                </div>
+              </div>
             </div>
           </div>
-        </div>
-      </div>
-    </header>
+        </header>
+ 
 
-    <!-- Contenu principal -->
     <main class="flex-1 overflow-auto p-6">
       <div class="px-4 py-6 sm:px-0">
-        <!-- Titre avec badge de notifications non lues -->
         <div class="flex items-center mb-6">
           <h1 class="text-2xl font-semibold text-gray-900">Notifications</h1>
           <span class="ml-3 px-3 py-1 bg-primary text-white text-sm rounded-full">{{ notifications.length }} non lues</span>
         </div>
 
-        <!-- Liste des notifications -->
         <div class="bg-white rounded-lg shadow">
           <div class="p-6 space-y-4">
             <div class="flex items-start space-x-4 border-b pb-4" *ngFor="let notif of notifications">
-              <div class="w-10 h-10 flex items-center justify-center rounded-full" [ngClass]="{
-                'bg-blue-100': notif.type === 'info',
-                'bg-green-100': notif.type === 'success',
-                'bg-red-100': notif.type === 'error'
-              }">
+              <div class="w-10 h-10 flex items-center justify-center rounded-full"
+                   [ngClass]="{
+                      'bg-blue-100': notif.type === 'info',
+                      'bg-green-100': notif.type === 'success',
+                      'bg-red-100': notif.type === 'error'
+                   }">
                 <i [ngClass]="notif.icon" class="text-lg" [ngStyle]="{
                   'color': notif.type === 'info' ? '#3B82F6' :
                            notif.type === 'success' ? '#16A34A' :
@@ -113,10 +98,18 @@
                 <p class="text-sm text-gray-900">{{ notif.message }}</p>
                 <p class="text-xs text-gray-500">{{ notif.time }}</p>
               </div>
-              <button class="text-gray-400 hover:text-gray-600" (click)="dismissNotification(notif.id)">
-                <i class="ri-close-line"></i>
-              </button>
+              <div class="flex space-x-2">
+                <!-- Bouton accepter -->
+                <button class="w-10 h-10 rounded-full bg-green-500 hover:bg-green-600 text-white flex items-center justify-center" (click)="markAsRead1(notif.id)">
+                  <i class="ri-check-line"></i>
+                </button>
+                <!-- Bouton annuler -->
+                <button class="w-10 h-10 rounded-full bg-red-500 hover:bg-red-600 text-white flex items-center justify-center" (click)="markAsRead2(notif.id)">
+                  <i class="ri-close-line"></i>
+                </button>
+              </div>
             </div>
+
             <div *ngIf="notifications.length === 0" class="text-center py-10 text-gray-500 text-sm">
               Aucune notification pour le moment.
             </div>
@@ -125,5 +118,12 @@
       </div>
     </main>
   </div>
-
- 
+</div>
+       <!-- Si l'utilisateur n'est pas authentifié -->
+       <ng-template #notAuthenticated>
+        <div class="flex h-screen items-center justify-center bg-gray-50">
+          <div class="text-center">
+            <p class="text-lg font-semibold text-gray-700">Redirection en cours...</p>
+          </div>
+        </div>
+      </ng-template>

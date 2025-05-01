@@ -1,6 +1,6 @@
 <div class="flex h-screen bg-gray-50 min-h-screen">
   <!-- Sidebar -->
-  <aside class="w-64 bg-white shadow-sm">
+  <aside *ngIf="isAuthenticated" class="w-64 bg-white shadow-sm">
     <div class="h-16 flex items-center px-6">
       <div class="text-2xl font-['Pacifico'] text-primary">Sfax</div>
     </div>
@@ -33,7 +33,7 @@
   </aside>
 
   <!-- Main content -->
-  <div class="flex-1 flex flex-col">
+  <div *ngIf="isAuthenticated; else notAuthenticated" class="flex-1 flex flex-col">
     <!-- Header -->
     <header class="bg-white shadow-sm h-16">
       <div class="h-full px-6 flex items-center justify-between">
@@ -48,7 +48,9 @@
         <div class="flex items-center space-x-4">
           <button routerLink="/notifications" class="w-8 h-8 flex items-center justify-center text-gray-600 hover:text-primary relative">
             <i class="ri-notification-3-line"></i>
-            <span class="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">{{ notificationCount }}</span>
+            <span class="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">
+              {{ notifications.length }}
+            </span>
           </button>
           <div class="relative">
             <button id="profileButton" class="flex items-center space-x-2 cursor-pointer" (click)="toggleProfile()">
@@ -63,7 +65,7 @@
                 <i class="ri-user-line mr-2"></i> Mon profil
               </a>
               <div class="border-t border-gray-100 my-1"></div>
-              <a routerLink="/connexion" class="px-4 py-2 text-sm text-red-600 hover:bg-gray-100 flex items-center">
+              <a (click)="logout()" class="px-4 py-2 text-sm text-red-600 hover:bg-gray-100 flex items-center cursor-pointer">
                 <i class="ri-logout-box-line mr-2"></i> Déconnexion
               </a>
             </div>
@@ -238,9 +240,7 @@
                     <a class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 cursor-pointer" (click)="selectType('')">Tous</a>
                     <a class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 cursor-pointer" (click)="selectType('Restaurant')">Restaurants</a>
                     <a class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 cursor-pointer" (click)="selectType('Hôtel')">Hôtels</a>
-                    <a class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 cursor-pointer" (click)="selectType('Commerce')">Commerces</a>
                     <a class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 cursor-pointer" (click)="selectType('Café')">Café</a>
-                    <a class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 cursor-pointer" (click)="selectType('Autre')">Autres</a>
                   </div>
                 </div>
               </div>
@@ -257,7 +257,6 @@
                     <a class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 cursor-pointer" (click)="selectStatus('Actif')">Actif</a>
                     <a class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 cursor-pointer" (click)="selectStatus('En attente')">En attente</a>
                     <a class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 cursor-pointer" (click)="selectStatus('Inactif')">Inactif</a>
-                    
                   </div>
                 </div>
               </div>
@@ -277,7 +276,7 @@
                     <a class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 cursor-pointer" (click)="selectLocation('Sakiet Ezzit')">Route Sakiet Ezzit</a>
                     <a class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 cursor-pointer" (click)="selectLocation('Gremda')">Route Gremda</a>
                     <a class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 cursor-pointer" (click)="selectLocation('Lafran')">Route Lafran</a>
-                    <a class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 cursor-pointer" (click)="selectLocation(' Manzel chaker')">Route Manzel chaker</a>
+                    <a class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 cursor-pointer" (click)="selectLocation('Manzel chaker')">Route Manzel chaker</a>
                     <a class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 cursor-pointer" (click)="selectLocation('Thyna')">Route Thyna</a>
                     <a class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 cursor-pointer" (click)="selectLocation('El Ain')">Route El Ain</a>
                   </div>
@@ -381,7 +380,7 @@
                   </td>
                   <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                     <div class="flex items-center justify-end space-x-2">
-                      <button class="p-1 text-gray-500 hover:text-gray-500 rounded-full hover:bg-gray-100" (click)="viewEtablissement(etablissement)">
+                      <button class="p-1 text-gray-500 hover:text-gray-500 rounded-full hover:bg-gray-100" (click)="viewEtablissement1(etablissement)">
                         <div class="w-5 h-5 flex items-center justify-center">
                           <i class="ri-eye-line"></i>
                         </div>
@@ -427,6 +426,15 @@
     </main>
   </div>
 
+  <!-- Si l'utilisateur n'est pas authentifié -->
+  <ng-template #notAuthenticated>
+    <div class="flex h-screen items-center justify-center bg-gray-50">
+      <div class="text-center">
+        <p class="text-lg font-semibold text-gray-700">Redirection en cours...</p>
+      </div>
+    </div>
+  </ng-template>
+
   <!-- Modal for adding/editing -->
   <div class="fixed inset-0 bg-gray-900 bg-opacity-50 flex items-center justify-center z-50 overflow-y-auto" [class.hidden]="!isModalOpen">
     <div class="bg-white rounded-lg shadow-xl w-full max-w-4xl m-4">
@@ -447,9 +455,7 @@
                   <option value="" disabled>Sélectionnez un type</option>
                   <option value="Restaurant">Restaurant</option>
                   <option value="Hôtel">Hôtel</option>
-                  <option value="Commerce">Commerce</option>
                   <option value="Café">Café</option>
-                  <option value="Autre">Autre</option>
                 </select>
               </div>
               <div>
@@ -459,7 +465,6 @@
                   <option value="Actif">Actif</option>
                   <option value="En attente">En attente</option>
                   <option value="Inactif">Inactif</option>
-                
                 </select>
               </div>
               <div>
@@ -663,16 +668,13 @@
           <!-- Photos -->
           <div class="bg-white rounded-lg shadow-sm p-6 mb-6">
             <h2 class="text-lg font-medium text-gray-900 mb-4">Photos</h2>
-            
             <!-- File input for selecting multiple images -->
             <div class="mb-4">
               <input type="file" multiple (change)="onPhotoSelected($event)">
             </div>
-          
             <!-- Display selected photos -->
             <div *ngFor="let photo of currentEtablissement.photos; let i = index" class="relative inline-block mr-4">
               <img [src]="resolvePhotoUrl(photo)" width="100" height="100" class="rounded-lg" />
-              
               <!-- Delete button for each photo -->
               <button 
                 type="button" 
@@ -682,7 +684,6 @@
               </button>
             </div>
           </div>
-          
 
           <!-- Actions -->
           <div class="bg-white border-t border-gray-200 p-6 sticky bottom-0 left-0 right-0 shadow-md">
@@ -714,4 +715,5 @@
       </div>
     </div>
   </div>
+  <app-map-modal *ngIf="showMapPopup" [fullAddress]="selectedAddressForMap || ''"    (click)="showMapPopup = false"></app-map-modal>
 </div>

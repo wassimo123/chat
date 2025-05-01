@@ -29,7 +29,12 @@ export class EvenementService {
         events.map(event => ({
           ...event,
           id: event._id,
-          date: event.date ? new Date(event.date).toISOString().split('T')[0] : '' // Ensure date is in YYYY-MM-DD format
+          dateDebut: event.dateDebut ? new Date(event.dateDebut).toISOString().split('T')[0] : '',
+          dateFin: event.dateFin ? new Date(event.dateFin).toISOString().split('T')[0] : '',
+          prix: {
+            estGratuit: event.prix?.estGratuit || false,
+            montant: event.prix?.montant || 0
+          }
         }))
       ),
       catchError(this.handleError)
@@ -41,7 +46,12 @@ export class EvenementService {
       map(response => ({
         ...response,
         id: response._id,
-        date: response.date ? new Date(response.date).toISOString().split('T')[0] : ''
+        dateDebut: response.dateDebut ? new Date(response.dateDebut).toISOString().split('T')[0] : '',
+        dateFin: response.dateFin ? new Date(response.dateFin).toISOString().split('T')[0] : '',
+        prix: {
+          estGratuit: response.prix?.estGratuit || false,
+          montant: response.prix?.montant || 0
+        }
       })),
       catchError(this.handleError)
     );
@@ -52,7 +62,12 @@ export class EvenementService {
       map(response => ({
         ...response,
         id: response._id,
-        date: response.date ? new Date(response.date).toISOString().split('T')[0] : ''
+        dateDebut: response.dateDebut ? new Date(response.dateDebut).toISOString().split('T')[0] : '',
+        dateFin: response.dateFin ? new Date(response.dateFin).toISOString().split('T')[0] : '',
+        prix: {
+          estGratuit: response.prix?.estGratuit || false,
+          montant: response.prix?.montant || 0
+        }
       })),
       catchError(this.handleError)
     );
@@ -60,23 +75,28 @@ export class EvenementService {
 
   archiveEvenement(id: string): Observable<Evenement> {
     return this.http.patch<any>(`${this.apiUrl}/${id}/archive`, {}).pipe(
-      map(response => {
-        
-        return {
-          ...response,
-          id: response._id,
-          date: response.date ? new Date(response.date).toISOString().split('T')[0] : ''
-        };
-      }),
-      catchError((error: HttpErrorResponse) => {
-       
-        return this.handleError(error);
-      })
+      map(response => ({
+        ...response,
+        id: response._id,
+        dateDebut: response.dateDebut ? new Date(response.dateDebut).toISOString().split('T')[0] : '',
+        dateFin: response.dateFin ? new Date(response.dateFin).toISOString().split('T')[0] : '',
+        prix: {
+          estGratuit: response.prix?.estGratuit || false,
+          montant: response.prix?.montant || 0
+        }
+      })),
+      catchError(this.handleError)
     );
   }
 
   getEtablissementsByType(type: string): Observable<{ _id: string; nom: string }[]> {
     return this.http.get<{ _id: string; nom: string }[]>(`${this.typeEtabUrl}/type/${type}`).pipe(
+      catchError(this.handleError)
+    );
+  }
+
+  getEtablissementById(id: string): Observable<{ _id: string; nom: string }> {
+    return this.http.get<{ _id: string; nom: string }>(`${this.typeEtabUrl}/id/${id}`).pipe(
       catchError(this.handleError)
     );
   }

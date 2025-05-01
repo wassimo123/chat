@@ -303,7 +303,7 @@
 }
 
 .bg-opacity-50 {
-  background-opacity: 0.5;
+  background-color: rgba(0, 0, 0, 0.5);
 }
 
 .items-center {
@@ -384,4 +384,15 @@
 
 .mr-4 {
   margin-right: 1rem;
+}
+#map {
+  height: 100%;
+  width: 100%;
+}
+
+.h-\[70vh\] {
+  height: 70vh;
+}
+.cursor-pointer {
+  cursor: pointer;
 }

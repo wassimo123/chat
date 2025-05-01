@@ -7,7 +7,7 @@ export interface Promotion {
   _id?: string;
   id?: string;
   name: string;
-  establishmentId: number;
+  establishmentId: string; // Changed to string to match backend
   discount: string;
   startDate: string;
   endDate: string;
@@ -37,7 +37,6 @@ export class PromotionService {
 
   constructor(private http: HttpClient) { }
 
-  // Gestion des erreurs HTTP
   private handleError(error: HttpErrorResponse): Observable<never> {
     let errorMessage = 'Une erreur est survenue lors de la requête.';
     if (error.error && error.error.message) {
@@ -48,26 +47,22 @@ export class PromotionService {
     return throwError(() => new Error(errorMessage));
   }
 
-  // Obtenir toutes les promotions
   getPromotions(): Observable<Promotion[]> {
     return this.http.get<Promotion[]>(this.apiUrl).pipe(
       catchError(this.handleError)
     );
   }
 
-  // Obtenir une promotion par ID
   getPromotion(id: string): Observable<Promotion> {
     return this.http.get<Promotion>(`${this.apiUrl}/${id}`).pipe(
       catchError(this.handleError)
     );
   }
 
-  // Ajouter une nouvelle promotion
   addPromotion(promotion: Promotion, photos: File[]): Observable<Promotion> {
     const formData = new FormData();
-    console.log('promo: ',promotion);
     formData.append('name', promotion.name);
-    formData.append('establishmentId', promotion.establishmentId.toString());
+    formData.append('establishmentId', promotion.establishmentId);
     formData.append('discount', promotion.discount);
     formData.append('startDate', promotion.startDate);
     formData.append('endDate', promotion.endDate);
@@ -78,7 +73,6 @@ export class PromotionService {
     formData.append('description', promotion.description || '');
     formData.append('conditions', JSON.stringify(promotion.conditions));
 
-    // Ajouter les photos
     for (let photo of photos) {
       formData.append('photos', photo);
     }
@@ -88,11 +82,10 @@ export class PromotionService {
     );
   }
 
-  // Mettre à jour une promotion
   updatePromotion(id: string, promotion: Promotion, photos: File[]): Observable<Promotion> {
     const formData = new FormData();
     formData.append('name', promotion.name);
-    formData.append('establishmentId', promotion.establishmentId.toString());
+    formData.append('establishmentId', promotion.establishmentId);
     formData.append('discount', promotion.discount);
     formData.append('startDate', promotion.startDate);
     formData.append('endDate', promotion.endDate);
@@ -104,7 +97,6 @@ export class PromotionService {
     formData.append('conditions', JSON.stringify(promotion.conditions));
     formData.append('existingPhotos', JSON.stringify(promotion.photos || []));
 
-    // Ajouter les nouvelles photos
     for (let photo of photos) {
       formData.append('photos', photo);
     }
@@ -114,16 +106,15 @@ export class PromotionService {
     );
   }
 
-  // Archiver une promotion (changer le statut à "expired")
   archivePromotion(id: string): Observable<any> {
     return this.http.patch(`${this.apiUrl}/${id}/archive`, {}).pipe(
       catchError(this.handleError)
     );
   }
 
-
   getEtablissementsByType(type: string): Observable<any[]> {
-    return this.http.get<any[]>(`${this.typeEtabUrl}/type/${type}`);
+    return this.http.get<any[]>(`${this.typeEtabUrl}/type/${type}`).pipe(
+      catchError(this.handleError)
+    );
   }
-  
 }

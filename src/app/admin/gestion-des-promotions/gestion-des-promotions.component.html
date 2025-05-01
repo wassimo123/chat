@@ -5,7 +5,9 @@
       <div class="text-2xl font-['Pacifico'] text-primary">Sfax</div>
     </div>
     <nav class="mt-4">
-      <a routerLink="/dashboard" routerLinkActive="bg-gray-50 text-primary" class="flex items-center px-6 py-3 text-gray-600 hover:bg-gray-50 hover:text-primary">
+      <a routerLink="/dashboard" router
+
+LinkActive="bg-gray-50 text-primary" class="flex items-center px-6 py-3 text-gray-600 hover:bg-gray-50 hover:text-primary">
         <i class="ri-dashboard-line mr-3"></i>
         <span>Tableau de bord</span>
       </a>
@@ -33,7 +35,7 @@
   </aside>
 
   <!-- Main content -->
-  <div class="flex-1 flex flex-col">
+  <div *ngIf="isAuthenticated; else notAuthenticated" class="flex-1 flex flex-col">
     <!-- Header -->
     <header class="bg-white shadow-sm h-16">
       <div class="h-full px-6 flex items-center justify-between">
@@ -48,7 +50,9 @@
         <div class="flex items-center space-x-4">
           <button routerLink="/notifications" class="w-8 h-8 flex items-center justify-center text-gray-600 hover:text-primary relative">
             <i class="ri-notification-3-line"></i>
-            <span class="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">{{ notificationCount }}</span>
+            <span class="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">
+              {{ notifications.length }}
+            </span>
           </button>
           <div class="relative">
             <button id="profileButton" class="flex items-center space-x-2 cursor-pointer" (click)="toggleProfile()">
@@ -63,7 +67,7 @@
                 <i class="ri-user-line mr-2"></i> Mon profil
               </a>
               <div class="border-t border-gray-100 my-1"></div>
-              <a routerLink="/connexion" class="px-4 py-2 text-sm text-red-600 hover:bg-gray-100 flex items-center">
+              <a (click)="logout()" class="px-4 py-2 text-sm text-red-600 hover:bg-gray-100 flex items-center cursor-pointer">
                 <i class="ri-logout-box-line mr-2"></i> Déconnexion
               </a>
             </div>
@@ -92,7 +96,7 @@
       <div class="flex flex-col md:flex-row md:items-center justify-between mb-6">
         <div>
           <div class="flex items-center text-sm text-gray-500 mb-2">
-            <a routerLink="/dashboard" class="hover:text-primary">Tableau de bord</a>
+            <a routerLink="/promo" class="hover:text-primary">Tableau de bord</a>
             <div class="w-4 h-4 flex items-center justify-center mx-1">
               <i class="ri-arrow-right-s-line"></i>
             </div>
@@ -180,7 +184,7 @@
             </div>
             <div class="relative">
               <button class="flex items-center justify-between w-full md:w-40 px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-200 rounded-lg hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-primary whitespace-nowrap" (click)="toggleEstablishmentFilter()">
-                <span>{{ selectedEstablishment || 'Établissement' }}</span>
+                <span>{{ selectedEstablishment ? getEstablishmentName(selectedEstablishment) : 'Établissement' }}</span>
                 <div class="w-4 h-4 flex items-center justify-center ml-2">
                   <i class="ri-arrow-down-s-line"></i>
                 </div>
@@ -188,7 +192,7 @@
               <div class="absolute mt-1 right-0 md:right-auto bg-white rounded-lg shadow-lg z-10" [class.hidden]="!showEstablishmentFilter">
                 <div class="py-1">
                   <a class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 cursor-pointer" (click)="selectEstablishment('')">Tous</a>
-                  <a *ngFor="let establishment of establishments" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 cursor-pointer" (click)="selectEstablishment(establishment.id.toString())">{{ establishment.name }}</a>
+                  <a *ngFor="let establishment of etablissementsType" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 cursor-pointer" (click)="selectEstablishment(establishment._id)">{{ establishment.nom }}</a>
                 </div>
               </div>
             </div>
@@ -348,6 +352,15 @@
     </main>
   </div>
 
+  <!-- Si l'utilisateur n'est pas authentifié -->
+  <ng-template #notAuthenticated>
+    <div class="flex h-screen items-center justify-center bg-gray-50">
+      <div class="text-center">
+        <p class="text-lg font-semibold text-gray-700">Redirection en cours...</p>
+      </div>
+    </div>
+  </ng-template>
+
   <!-- Add/Edit Promotion Modal -->
   <div class="fixed inset-0 bg-gray-900 bg-opacity-50 flex items-center justify-center z-50 overflow-y-auto" [class.hidden]="!isModalOpen">
     <div class="bg-white rounded-lg shadow-xl w-full max-w-4xl m-4">
@@ -363,35 +376,19 @@
                 <input id="promo-name" type="text" name="promo-name" [(ngModel)]="currentPromotion.name" class="mt-1 block w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-primary" placeholder="Saisissez le nom de la promotion" required>
               </div>
               <div>
-                <label for="establishment-type" class="block text-sm font-medium text-gray-700 mb-1">
-                  Type d'Établissement <span class="text-red-500">*</span>
-                </label>
-                <select id="establishment-type"
-                name="type"  
-                [(ngModel)]="selectedType"
-                (change)="onTypeChange()"
-                class="mt-1 block w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-primary"
-                required>
-          <option value="" disabled selected>Sélectionnez type établissement</option>
-          <option *ngFor="let type of availableTypes" [value]="type">{{ type }}</option>
-        </select>
+                <label for="establishment-type" class="block text-sm font-medium text-gray-700 mb-1">Type d'Établissement <span class="text-red-500">*</span></label>
+                <select id="establishment-type" name="type" [(ngModel)]="selectedType" (change)="onTypeChange()" class="mt-1 block w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-primary" required>
+                  <option value="" disabled selected>Sélectionnez type établissement</option>
+                  <option *ngFor="let type of availableTypes" [value]="type">{{ type }}</option>
+                </select>
               </div>
-              
-              <!-- Dropdown to select the establishment based on selected type -->
               <div>
-                <label for="promo-establishment" class="block text-sm font-medium text-gray-700 mb-1">
-                  Nom Établissement <span class="text-red-500">*</span>
-                </label>
-                <select id="nom-establishment"
-        name="etablissementID"  
-        [(ngModel)]="currentPromotion.establishmentId"
-        class="mt-1 block w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-primary"
-        required>
-  <option value="" disabled>Sélectionnez un établissement</option>
-  <option *ngFor="let etab of etablissementsType" [value]="etab._id">{{ etab.nom }}</option>
-</select>
+                <label for="promo-establishment" class="block text-sm font-medium text-gray-700 mb-1">Nom Établissement <span class="text-red-500">*</span></label>
+                <select id="promo-establishment" name="etablissementID" [(ngModel)]="currentPromotion.establishmentId" class="mt-1 block w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-primary" required>
+                  <option value="" disabled>Sélectionnez un établissement</option>
+                  <option *ngFor="let etab of etablissementsType" [value]="etab._id">{{ etab.nom }}</option>
+                </select>
               </div>
-
               <div>
                 <label for="promo-type" class="block text-sm font-medium text-gray-700 mb-1">Type de promotion <span class="text-red-500">*</span></label>
                 <select id="promo-type" name="promo-type" [(ngModel)]="currentPromotion.type" class="mt-1 block w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-primary" required>

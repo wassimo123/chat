@@ -1,13 +1,13 @@
 export interface Evenement {
   id: string;
   nom: string;
-  date: string;
+  dateDebut: string;
+  dateFin: string;
   heureDebut: string;
   heureFin: string;
   lieu: string;
   ville: string;
   capacite: number;
-  participants: number;
   categorie: string;
   organisateur: string;
   description: string;
@@ -16,12 +16,16 @@ export interface Evenement {
   typeEtablissement: '' | 'Restaurant' | 'Hôtel' | 'Café' | 'Sfax';
   establishmentId: string;
   selected?: boolean;
-  photos?: string[]; // Added photos
+  photo: string;
+  prix: {
+    estGratuit: boolean;
+    montant: number;
+  };
 }
 
 export interface Stats {
   total: number;
   upcoming: number;
-  participants: number;
-  participationRate: number;
+  inProgress: number;   
+  completed: number;  
 }

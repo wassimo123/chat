@@ -1,71 +1,125 @@
-// src/app/inscription/inscription.component.ts
 import { Component } from '@angular/core';
-import { Router } from '@angular/router';
 import { UserService } from '../../services/user.service';
+import { NotificationService } from '../../services/notification.service';
+import { Router } from '@angular/router';
+import Swal from 'sweetalert2';
 
 @Component({
   selector: 'app-inscription',
   templateUrl: './inscription.component.html',
-  styleUrls: ['./inscription.component.css'],
+  styleUrls: ['./inscription.component.css']
 })
 export class InscriptionComponent {
   user = {
+    matriculeFiscale: '',
     nom: '',
     prenom: '',
     email: '',
     password: '',
     confirmPassword: '',
-    phone: '',
-    address: '',
-    matriculefiscale: '',
-    terms: false,
-    dateCreation: this.formatDate(new Date()),
+    telephone: '',
+    adresse: '',
+    dateCreation: '',
+    terms: false
   };
 
-  constructor(private router: Router, private userService: UserService) {}
+  showPassword: boolean = false; // Propriété pour gérer la visibilité du mot de passe
+  showConfirmPassword: boolean = false; // Propriété pour gérer la visibilité de la confirmation du mot de passe
+
+  constructor(
+    private userService: UserService,
+    private notificationService: NotificationService,
+    private router: Router
+  ) {}
+
+  // Méthode pour basculer la visibilité du mot de passe
+  togglePasswordVisibility() {
+    this.showPassword = !this.showPassword;
+  }
+
+  // Méthode pour basculer la visibilité de la confirmation du mot de passe
+  toggleConfirmPasswordVisibility() {
+    this.showConfirmPassword = !this.showConfirmPassword;
+  }
 
   onSubmit() {
+    // Validation simple
+    if (!this.user.matriculeFiscale || !this.user.nom || !this.user.prenom || !this.user.email ||
+        !this.user.password || !this.user.confirmPassword || !this.user.telephone ||
+        !this.user.adresse || !this.user.dateCreation) {
+      Swal.fire({
+        title: 'Erreur',
+        text: 'Veuillez remplir tous les champs obligatoires.',
+        icon: 'error',
+        timer: 2000,
+        showConfirmButton: false
+      });
+      return;
+    }
+
     if (!this.user.terms) {
-      alert("Vous devez accepter les conditions d'utilisation.");
+      Swal.fire({
+        title: 'Erreur',
+        text: 'Vous devez accepter les conditions d\'utilisation.',
+        icon: 'error',
+        timer: 2000,
+        showConfirmButton: false
+      });
       return;
     }
 
     if (this.user.password !== this.user.confirmPassword) {
-      alert('Les mots de passe ne correspondent pas.');
+      Swal.fire({
+        title: 'Erreur',
+        text: 'Les mots de passe ne correspondent pas.',
+        icon: 'error',
+        timer: 2000,
+        showConfirmButton: false
+      });
       return;
     }
 
-    this.userService.register({
-      matriculeFiscale: this.user.matriculefiscale,
-      nom: this.user.nom,
-      prenom: this.user.prenom,
-      email: this.user.email,
-      password: this.user.password,
-      confirmPassword: this.user.confirmPassword,
-      telephone: this.user.phone,
-      adresse: this.user.address,
-      dateCreation: this.user.dateCreation,
-      terms: this.user.terms,
-    }).subscribe(
-      (response) => {
-        console.log('Inscription réussie:', response);
+    // Envoi de la requête d'inscription
+    this.userService.register(this.user).subscribe({
+      next: (response) => {
+        // Stocker le token dans localStorage (peut être utilisé pour des actions futures)
         localStorage.setItem('token', response.token);
-        localStorage.setItem('user', JSON.stringify(response.user));
-        alert('Inscription réussie ! Vous allez être redirigé vers la page de connexion.');
-        this.router.navigate(['/connexion']);
+
+        // Générer une notification pour l'administrateur
+        const notification = {
+          id: Date.now(),
+          type: 'info' as const,
+          icon: 'ri-user-add-line',
+          message: `Un nouveau partenaire (${this.user.nom} ${this.user.prenom}) a demandé la création d'un compte.`,
+          time: new Date().toLocaleTimeString(),
+          read: false,
+          email: this.user.email
+        };
+        this.notificationService.addNotification(notification);
+
+        Swal.fire({
+          title: 'Succès',
+          text: 'Inscription réussie ! En attente de validation par l\'administrateur.',
+          icon: 'success',
+          timer: 2000,
+          showConfirmButton: false
+        }).then(() => {
+          this.router.navigate(['/connexion']);
+        });
       },
-      (error) => {
-        console.error("Erreur lors de l'inscription:", error);
-        alert(error.error.message || "Erreur lors de l'inscription.");
+      error: (err) => {
+        Swal.fire({
+          title: 'Erreur',
+          text: err.error.message || 'Erreur lors de l\'inscription.',
+          icon: 'error',
+          timer: 2000,
+          showConfirmButton: false
+        });
       }
-    );
+    });
   }
 
   goToLogin() {
     this.router.navigate(['/connexion']);
-  }
-
-  private formatDate(date: Date): string {
-    return date.toISOString().split('T')[0];
   }
 }

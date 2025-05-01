@@ -1,4 +1,7 @@
-import { Component, OnInit, HostListener, ViewChild, ElementRef } from '@angular/core';
+import { Component, OnInit, HostListener } from '@angular/core';
+import { Router } from '@angular/router';
+import { UserService } from '../../services/user.service';
+import { NotificationService } from 'src/app/services/notification.service';
 
 @Component({
   selector: 'app-profile',
@@ -6,11 +9,14 @@ import { Component, OnInit, HostListener, ViewChild, ElementRef } from '@angular
   styleUrls: ['./profile.component.css']
 })
 export class ProfileComponent implements OnInit {
-  // Contrôle l'affichage du menu de profil
+  isAuthenticated: boolean = false;
   isProfileMenuOpen: boolean = false;
+  notifications: any[] = [];
 
-  // Contrôle l'affichage du modal pour changer le mot de passe
-  isPasswordModalOpen: boolean = false;
+  showCurrentPassword: boolean = false;
+  showOldPassword: boolean = false;
+  showNewPassword: boolean = false;
+  showConfirmPassword: boolean = false;
   currentPassword: string = '';
   newPassword: string = '';
   confirmPassword: string = '';
@@ -18,45 +24,124 @@ export class ProfileComponent implements OnInit {
   passwordMatchMessage: string = '';
   passwordMatchClass: string = '';
 
-  // Contrôle l'affichage du modal de message (succès/erreur)
   showMessageModal: boolean = false;
   messageModalType: 'error' | 'success' = 'error';
   messageModalTitle: string = '';
   messageModalMessage: string = '';
 
-  // Données du profil
-  profileImage: string = 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQxOX4mkcW8pH9FbpI9rTBkokiMxSY2GJ3eyw&s';
   profile = {
-    firstName: 'Affes',
-    lastName: 'Wassim',
-    email: 'wassimaffes947@gmail.com',
+    matriculeFiscale: '',
+    firstName: '',
+    lastName: '',
+    email: '',
+    password: '',
+    telephone: '',
+    adresse: '',
     language: 'fr',
     timezone: 'Tunisie'
   };
   originalProfile: any = null;
 
-  // Toast pour les modifications du profil
   toastMessage: string | null = null;
   toastType: 'success' | 'info' = 'success';
 
-  // Nombre de notifications non lues (mocké pour l'instant)
-  notificationCount: number = 3;
-
-  @ViewChild('photoInput') photoInput!: ElementRef<HTMLInputElement>;
-
-  constructor() {}
+  constructor(
+    private userService: UserService,
+    private notificationService: NotificationService,
+    private router: Router
+  ) {}
 
   ngOnInit() {
-    // Sauvegarde des données initiales pour la réinitialisation
-    this.originalProfile = { ...this.profile };
+    const token = localStorage.getItem('token');
+    const userData = localStorage.getItem('user');
+    if (!token || !userData) {
+      this.isAuthenticated = false;
+      this.router.navigate(['/connexion'], { queryParams: { error: 'unauthorized' } });
+      return;
+    }
+
+    const user = JSON.parse(userData);
+    if (!user || !user.email) {
+      this.isAuthenticated = false;
+      localStorage.removeItem('user');
+      localStorage.removeItem('token');
+      this.router.navigate(['/connexion'], { queryParams: { error: 'unauthorized' } });
+      return;
+    }
+
+    this.isAuthenticated = true;
+
+    this.profile.email = user.email || '';
+    this.profile.firstName = user.prenom || '';
+    this.profile.lastName = user.nom || '';
+    this.profile.matriculeFiscale = user.matriculeFiscale || '';
+    this.profile.telephone = user.telephone || '';
+    this.profile.adresse = user.adresse || '';
+    this.profile.password = user.password || '';
+
+    this.userService.getUserByEmail(this.profile.email).subscribe(
+      (response) => {
+        console.log('Réponse de getUserByEmail:', response);
+        this.profile.firstName = response.prenom || '';
+        this.profile.lastName = response.nom || '';
+        this.profile.email = response.email || '';
+        this.profile.matriculeFiscale = response.matriculeFiscale || '';
+        this.profile.password = response.password || '';
+        this.profile.telephone = response.telephone || '';
+        this.profile.adresse = response.adresse || '';
+        this.originalProfile = { ...this.profile };
+      },
+      (error) => {
+        console.error('Erreur lors de la récupération des données du profil:', error);
+        this.showMessageModal = true;
+        this.messageModalType = 'error';
+        this.messageModalTitle = 'Erreur';
+        this.messageModalMessage = 'Impossible de charger les données du profil. Veuillez vous reconnecter.';
+        setTimeout(() => {
+          localStorage.removeItem('user');
+          localStorage.removeItem('token');
+          this.router.navigate(['/connexion']);
+        }, 2000);
+      }
+    );
+
+    this.notificationService.notifications$.subscribe(notifications => {
+      console.log('Notifications reçues:', notifications);
+      
+      let unreadNotifications = notifications.filter(notif => !notif.read);
+
+      const updatedNotifications: any[] = [];
+      let checkPromises = unreadNotifications.map(notif => {
+        if (!notif.email) {
+          return Promise.resolve(null);
+        }
+        return this.userService.checkUserExists(notif.email).toPromise().then(
+          (response) => {
+            if (response && response.exists) {
+              return notif;
+            } else {
+              console.log(`Utilisateur avec email ${notif.email} n'existe plus, suppression de la notification.`);
+              return null;
+            }
+          },
+          error => {
+            console.error(`Erreur lors de la vérification de l'utilisateur ${notif.email}:`, error);
+            return null;
+          }
+        );
+      });
+
+      Promise.all(checkPromises).then(results => {
+        const validNotifications = results.filter(notif => notif !== null);
+        this.notifications = validNotifications;
+      });
+    });
   }
 
-  // Ouvre/ferme le menu de profil
   toggleProfileMenu() {
     this.isProfileMenuOpen = !this.isProfileMenuOpen;
   }
 
-  // Ferme le menu de profil si clic en dehors
   @HostListener('document:click', ['$event'])
   onDocumentClick(event: Event) {
     const target = event.target as HTMLElement;
@@ -65,38 +150,140 @@ export class ProfileComponent implements OnInit {
     }
   }
 
-  // Ouvre l'input de fichier pour changer la photo de profil
-  triggerFileInput() {
-    this.photoInput.nativeElement.click();
+  toggleCurrentPasswordVisibility() {
+    this.showCurrentPassword = !this.showCurrentPassword;
   }
 
-  // Met à jour la photo de profil
-  updateProfileImage(event: Event) {
-    const input = event.target as HTMLInputElement;
-    const file = input.files?.[0];
-    if (file) {
-      const reader = new FileReader();
-      reader.onload = (e) => {
-        this.profileImage = e.target?.result as string;
-        this.showToast('Photo de profil mise à jour avec succès', 'success');
-      };
-      reader.readAsDataURL(file);
-    }
+  toggleOldPasswordVisibility() {
+    this.showOldPassword = !this.showOldPassword;
   }
 
-  // Réinitialise le formulaire
+  toggleNewPasswordVisibility() {
+    this.showNewPassword = !this.showNewPassword;
+  }
+
+  toggleConfirmPasswordVisibility() {
+    this.showConfirmPassword = !this.showConfirmPassword;
+  }
+
   resetForm() {
     this.profile = { ...this.originalProfile };
+    this.currentPassword = '';
+    this.newPassword = '';
+    this.confirmPassword = '';
+    this.passwordStrengthClass = '';
+    this.passwordMatchMessage = '';
+    this.passwordMatchClass = '';
+    this.showOldPassword = false;
+    this.showNewPassword = false;
+    this.showConfirmPassword = false;
     this.showToast('Les modifications ont été annulées', 'info');
   }
 
-  // Soumet le formulaire de profil
   handleProfileSubmit() {
-    this.originalProfile = { ...this.profile };
-    this.showToast('Profil mis à jour avec succès', 'success');
+    if (!this.profile.telephone || !this.profile.adresse) {
+      this.showMessageModal = true;
+      this.messageModalType = 'error';
+      this.messageModalTitle = 'Erreur';
+      this.messageModalMessage = 'Veuillez remplir tous les champs obligatoires (téléphone et adresse).';
+      return;
+    }
+
+    if (
+      this.profile.firstName !== this.originalProfile.firstName ||
+      this.profile.lastName !== this.originalProfile.lastName ||
+      this.profile.email !== this.originalProfile.email
+    ) {
+      this.showMessageModal = true;
+      this.messageModalType = 'error';
+      this.messageModalTitle = 'Erreur';
+      this.messageModalMessage = 'Le nom, prénom et email ne peuvent pas être modifiés.';
+      return;
+    }
+
+    let passwordChanged = false;
+    if (this.currentPassword || this.newPassword || this.confirmPassword) {
+      if (!this.validatePassword(this.newPassword)) {
+        this.showMessageModal = true;
+        this.messageModalType = 'error';
+        this.messageModalTitle = 'Erreur de validation';
+        this.messageModalMessage = 'Le nouveau mot de passe ne respecte pas les critères de sécurité requis.';
+        return;
+      }
+
+      if (this.newPassword !== this.confirmPassword) {
+        this.showMessageModal = true;
+        this.messageModalType = 'error';
+        this.messageModalTitle = 'Erreur de validation';
+        this.messageModalMessage = 'Les nouveaux mots de passe ne correspondent pas.';
+        return;
+      }
+
+      const passwordData = {
+        currentPassword: this.currentPassword,
+        newPassword: this.newPassword,
+        confirmPassword: this.confirmPassword
+      };
+
+      this.userService.changePassword(passwordData).subscribe(
+        (response) => {
+          this.profile.password = this.newPassword;
+          passwordChanged = true;
+          this.finalizeSubmit(passwordChanged);
+        },
+        (error) => {
+          console.error('Erreur lors du changement de mot de passe:', error);
+          this.showMessageModal = true;
+          this.messageModalType = 'error';
+          this.messageModalTitle = 'Erreur';
+          this.messageModalMessage = error.error?.message || 'Erreur lors du changement de mot de passe.';
+        }
+      );
+    } else {
+      this.finalizeSubmit(passwordChanged);
+    }
   }
 
-  // Affiche un toast
+  finalizeSubmit(passwordChanged: boolean) {
+    const updatedUser = {
+      matriculeFiscale: this.profile.matriculeFiscale,
+      prenom: this.profile.firstName,
+      nom: this.profile.lastName,
+      email: this.profile.email,
+      telephone: this.profile.telephone,
+      adresse: this.profile.adresse,
+      ...(passwordChanged && { password: this.profile.password, confirmPassword: this.profile.password })
+    };
+
+    this.userService.updateUser(this.profile.matriculeFiscale, updatedUser).subscribe(
+      (response) => {
+        this.originalProfile = { ...this.profile };
+        const userData = JSON.parse(localStorage.getItem('user') || '{}');
+        userData.prenom = this.profile.firstName;
+        userData.nom = this.profile.lastName;
+        userData.email = this.profile.email;
+        userData.telephone = this.profile.telephone;
+        userData.adresse = this.profile.adresse;
+        userData.password = this.profile.password;
+        localStorage.setItem('user', JSON.stringify(userData));
+        this.currentPassword = '';
+        this.newPassword = '';
+        this.confirmPassword = '';
+        this.showOldPassword = false;
+        this.showNewPassword = false;
+        this.showConfirmPassword = false;
+        this.showToast('Profil mis à jour avec succès', 'success');
+      },
+      (error) => {
+        console.error('Erreur lors de la mise à jour du profil:', error);
+        this.showMessageModal = true;
+        this.messageModalType = 'error';
+        this.messageModalTitle = 'Erreur';
+        this.messageModalMessage = error.error?.message || 'Erreur lors de la mise à jour du profil.';
+      }
+    );
+  }
+
   showToast(message: string, type: 'success' | 'info') {
     this.toastMessage = message;
     this.toastType = type;
@@ -105,24 +292,6 @@ export class ProfileComponent implements OnInit {
     }, 3000);
   }
 
-  // Affiche le modal pour changer le mot de passe
-  showPasswordModal() {
-    this.isPasswordModalOpen = true;
-    this.isProfileMenuOpen = false;
-  }
-
-  // Ferme le modal pour changer le mot de passe
-  closePasswordModal() {
-    this.isPasswordModalOpen = false;
-    this.currentPassword = '';
-    this.newPassword = '';
-    this.confirmPassword = '';
-    this.passwordStrengthClass = '';
-    this.passwordMatchMessage = '';
-    this.passwordMatchClass = '';
-  }
-
-  // Vérifie la force du mot de passe
   checkPasswordStrength() {
     const password = this.newPassword;
     const hasLower = /[a-z]/.test(password);
@@ -142,7 +311,6 @@ export class ProfileComponent implements OnInit {
     }
   }
 
-  // Vérifie si les mots de passe correspondent
   checkPasswordMatch() {
     if (this.confirmPassword) {
       if (this.newPassword === this.confirmPassword) {
@@ -158,7 +326,6 @@ export class ProfileComponent implements OnInit {
     }
   }
 
-  // Valide le mot de passe selon les critères
   validatePassword(password: string): boolean {
     const hasLower = /[a-z]/.test(password);
     const hasUpper = /[A-Z]/.test(password);
@@ -168,34 +335,13 @@ export class ProfileComponent implements OnInit {
     return hasLower && hasUpper && hasNumber && hasSpecial && length;
   }
 
-  // Soumet le formulaire de changement de mot de passe
-  handlePasswordSubmit() {
-    if (!this.validatePassword(this.newPassword)) {
-      this.showMessageModal = true;
-      this.messageModalType = 'error';
-      this.messageModalTitle = 'Erreur de validation';
-      this.messageModalMessage = 'Le nouveau mot de passe ne respecte pas les critères de sécurité requis.';
-      return;
-    }
-
-    if (this.newPassword !== this.confirmPassword) {
-      this.showMessageModal = true;
-      this.messageModalType = 'error';
-      this.messageModalTitle = 'Erreur de validation';
-      this.messageModalMessage = 'Les nouveaux mots de passe ne correspondent pas.';
-      return;
-    }
-
-    // Ici, vous feriez normalement un appel API pour changer le mot de passe
-    this.showMessageModal = true;
-    this.messageModalType = 'success';
-    this.messageModalTitle = 'Succès';
-    this.messageModalMessage = 'Votre mot de passe a été modifié avec succès.';
-    this.closePasswordModal();
-  }
-
-  // Ferme le modal de message
   closeMessageModal() {
     this.showMessageModal = false;
+  }
+
+  logout() {
+    localStorage.removeItem('token');
+    localStorage.removeItem('user');
+    this.router.navigate(['/connexion']);
   }
 }

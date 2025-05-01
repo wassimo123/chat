@@ -1,4 +1,3 @@
-// src/app/services/user.service.ts
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Observable } from 'rxjs';
@@ -13,7 +12,7 @@ export class UserService {
 
   private getHeaders(): HttpHeaders {
     const token = localStorage.getItem('token');
-    console.log('Token envoyé dans la requête /accept-terms :', token);
+    console.log('Token envoyé dans la requête :', token);
     return new HttpHeaders({
       Authorization: `Bearer ${token}`,
     });
@@ -50,13 +49,44 @@ export class UserService {
     return this.http.patch<any>(`${this.apiUrl}/users/matricule/${matricule}`, {});
   }
 
-  // Nouvelle méthode pour demander un lien de réinitialisation
   forgotPassword(email: string): Observable<any> {
     return this.http.post(`${this.apiUrl}/forgot-password`, { email });
   }
 
-  // Nouvelle méthode pour réinitialiser le mot de passe
   resetPassword(token: string, newPassword: string, confirmPassword: string): Observable<any> {
     return this.http.post(`${this.apiUrl}/reset-password`, { token, newPassword, confirmPassword });
   }
+
+  checkUserExists(email: string): Observable<{ exists: boolean, status?: string }> {
+    return this.http.get<{ exists: boolean, status?: string }>(`${this.apiUrl}/users/check-email/${email}`, { headers: this.getHeaders() });
+  }
+
+  updateUserStatus(email: string, status: string): Observable<any> {
+    return this.http.patch(`${this.apiUrl}/users/status/${email}`, { status }, { headers: this.getHeaders() });
+  }
+
+// Nouvelle méthode pour supprimer un utilisateur
+deleteUser(email: string): Observable<any> {
+  return this.http.delete(`${this.apiUrl}/users/${email}`, { headers: this.getHeaders() });
+}
+
+  // Nouvelle méthode pour récupérer les activités récentes
+  getRecentActivities(): Observable<any[]> {
+    return this.http.get<any[]>(`${this.apiUrl}/activities`, { headers: this.getHeaders() });
+  }
+    // Nouvelle méthode pour supprimer une activité
+    deleteActivity(activityId: string): Observable<any> {
+      return this.http.delete(`${this.apiUrl}/activities/${activityId}`, { headers: this.getHeaders() });
+    }
+      // Nouvelle méthode pour récupérer les informations de l'utilisateur par email
+  getUserByEmail(email: string): Observable<any> {
+    return this.http.get(`${this.apiUrl}/users/email/${email}`, { headers: this.getHeaders() });
+  }
+
+  changePassword(passwordData: { currentPassword: string; newPassword: string; confirmPassword: string }): Observable<any> {
+    return this.http.post(`${this.apiUrl}/change-password`, passwordData, { headers: this.getHeaders() });
+  }
+
+
+
 }

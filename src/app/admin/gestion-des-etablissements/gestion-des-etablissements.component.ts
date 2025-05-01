@@ -3,8 +3,10 @@ import { Chart } from "chart.js";
 import { registerables } from "chart.js";
 import { EtablissementService } from "../../services/etablissement.service";
 import { Etablissement, Stats, Notification, Horaires, JourHoraire, ReseauxSociaux } from "../../models/etablissement.model";
-
+import { UserService } from '../../services/user.service';
+import { NotificationService } from 'src/app/services/notification.service';
 Chart.register(...registerables);
+import { Router } from '@angular/router'; // Ajout de Router
 
 @Component({
   selector: "app-gestion-des-etablissements",
@@ -32,6 +34,7 @@ export class GestionDesEtablissementsComponent implements OnInit, AfterViewInit 
   filteredEtablissements: Etablissement[] = [];
   paginatedEtablissements: Etablissement[] = [];
   stats: Stats = { total: 0, restaurants: 0, hotels: 0, commerces: 0 };
+  notifications: any[] = [];
 
   tableSearchQuery = "";
   selectedType = "";
@@ -64,15 +67,83 @@ export class GestionDesEtablissementsComponent implements OnInit, AfterViewInit 
   messageModalType: "success" | "error" = "success";
   messageModalTitle = "";
   messageModalMessage = "";
-
-  constructor(private etablissementService: EtablissementService) {}
+  selectedAddressForMap: string | null = null;
+  showMapPopup: boolean = false;
+  
+  isAuthenticated: boolean = false; // Ajout de la propriété isAuthenticated
+  constructor(private etablissementService: EtablissementService,private userService: UserService,private notificationService: NotificationService,
+    private router: Router) {}
 
   ngOnInit(): void {
-    this.loadEtablissements();
-  }
+     // Vérification de l'authentification
+     const token = localStorage.getItem('token');
+     const userData = localStorage.getItem('user');
+     if (!token || !userData) {
+       this.isAuthenticated = false;
+       this.router.navigate(['/connexion'], { queryParams: { error: 'unauthorized' } });
+       return;
+     }
+ 
+     const user = JSON.parse(userData);
+     if (!user || !user.email) {
+       this.isAuthenticated = false;
+       localStorage.removeItem('user');
+       localStorage.removeItem('token');
+       this.router.navigate(['/connexion'], { queryParams: { error: 'unauthorized' } });
+       return;
+     }
+ 
+     this.isAuthenticated = true;
 
+    this.loadEtablissements();
+    this.notificationService.notifications$.subscribe(notifications => {
+      console.log('Notifications reçues:', notifications);
+      
+      // Filtrer les notifications non lues
+      let unreadNotifications = notifications.filter(notif => !notif.read);
+
+      // Vérifier l'existence de chaque utilisateur associé à une notification
+      const updatedNotifications: any[] = [];
+      let checkPromises = unreadNotifications.map(notif => {
+        if (!notif.email) {
+          // Si la notification n'a pas d'email, on la supprime directement
+          return Promise.resolve(null);
+        }
+        return this.userService.checkUserExists(notif.email).toPromise().then(
+          (response) => {
+            // Vérifier si la réponse est définie et si l'utilisateur existe
+            if (response && response.exists) {
+              return notif; // Garder la notification si l'utilisateur existe
+            } else {
+              console.log(`Utilisateur avec email ${notif.email} n'existe plus, suppression de la notification.`);
+              return null; // Ne pas garder la notification si l'utilisateur n'existe plus
+            }
+          },
+          error => {
+            console.error(`Erreur lors de la vérification de l'utilisateur ${notif.email}:`, error);
+            return null; // En cas d'erreur, supprimer la notification pour éviter des problèmes
+          }
+        );
+      });
+
+      // Résoudre toutes les promesses et mettre à jour les notifications
+      Promise.all(checkPromises).then(results => {
+        const validNotifications = results.filter(notif => notif !== null);
+        this.notifications = validNotifications;
+        
+        // Mettre à jour les notifications dans le service pour persister les changements
+        // Commenté temporairement car updateNotifications n'existe pas encore
+        // if (validNotifications.length !== unreadNotifications.length) {
+        //   this.notificationService.updateNotifications(validNotifications);
+        // }
+      });
+    });
+  }
+//ghnjk
   ngAfterViewInit(): void {
-    this.initCharts();
+    if (this.isAuthenticated) {
+      this.initCharts();
+    }
   }
 
   loadEtablissements(): void {
@@ -469,8 +540,14 @@ export class GestionDesEtablissementsComponent implements OnInit, AfterViewInit 
     }
   }
 
-  viewEtablissement(etablissement: Etablissement): void {
+  viewEtablissement1(etablissement: Etablissement): void {
     console.log("Voir établissement:", etablissement);
+  }
+
+  
+  viewEtablissement(etablissement: Etablissement): void {
+    this.selectedAddressForMap = `${etablissement.adresse}, ${etablissement.ville ?? ''}, ${etablissement.codePostal ?? ''}, ${etablissement.pays ?? ''}`;
+    this.showMapPopup = true;
   }
 
   toggleProfile(): void {
@@ -482,7 +559,16 @@ export class GestionDesEtablissementsComponent implements OnInit, AfterViewInit 
     this.currentPage = 1;
     this.filterEtablissements();
   }
-
+  // onSearch(): void {
+  //   this.router.navigate(["/etablissements"], { queryParams: { search: this.searchQuery } });
+  // }
+  logout(): void {
+    localStorage.removeItem('token');
+    localStorage.removeItem('user');
+    this.isAuthenticated = false;
+    this.router.navigate(['/connexion']);
+  }
+  
   toggleService(service: string, event: Event): void {
     const checked = (event.target as HTMLInputElement).checked;
     if (checked) {

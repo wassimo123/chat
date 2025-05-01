@@ -15,14 +15,19 @@
       </div>
       <div class="mb-4">
         <label class="block text-sm font-medium text-gray-700">Mot de passe</label>
-        <input
-          type="password"
-          [(ngModel)]="password"
-          name="password"
-          class="mt-1 block w-full border border-gray-300 rounded-button px-3 py-2 focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
-          placeholder="Entrez votre mot de passe"
-          required
-        />
+        <div class="relative">
+          <input
+            [type]="showPassword ? 'text' : 'password'"
+            [(ngModel)]="password"
+            name="password"
+            class="mt-1 block w-full border border-gray-300 rounded-button px-3 py-2 focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
+            placeholder="Entrez votre mot de passe"
+            required
+          />
+          <button type="button" (click)="togglePasswordVisibility()" class="absolute inset-y-0 right-0 flex items-center pr-3">
+            <i [class]="showPassword ? 'ri-eye-off-line' : 'ri-eye-line'" class="text-gray-500"></i>
+          </button>
+        </div>
       </div>
       <div class="flex items-center justify-between mb-4">
         <label class="flex items-center">

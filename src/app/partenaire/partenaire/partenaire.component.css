@@ -1,0 +1,29 @@
+/* Welcome Animation */
+.welcome-animation {
+    animation: welcomeFadeIn 2s ease-in-out forwards;
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+    letter-spacing: 0.05em;
+  }
+  
+  @keyframes welcomeFadeIn {
+    0% {
+      opacity: 0;
+      transform: scale(0.95) translateY(20px);
+      letter-spacing: 0.05em;
+    }
+    50% {
+      opacity: 0.5;
+      transform: scale(1.02) translateY(-5px);
+      letter-spacing: 0.1em;
+    }
+    100% {
+      opacity: 1;
+      transform: scale(1) translateY(0);
+      letter-spacing: 0.05em;
+    }
+  }
+  
+  /* Font Pacifico */
+  .font-pacifico {
+    font-family: 'Pacifico', cursive;
+  }

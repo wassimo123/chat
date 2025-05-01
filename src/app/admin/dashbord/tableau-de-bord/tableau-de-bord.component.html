@@ -1,37 +1,30 @@
 <div class="flex h-screen bg-gray-50 min-h-screen">
   <!-- Sidebar: Menu de navigation latéral -->
-  <aside class="w-64 bg-white shadow-sm">
+  <aside *ngIf="isAuthenticated" class="w-64 bg-white shadow-sm">
     <div class="h-16 flex items-center px-6">
       <div class="text-2xl font-['Pacifico'] text-primary">Sfax</div>
     </div>
     <nav class="mt-4">
-      <!-- Lien vers le tableau de bord (page actuelle) -->
       <a routerLink="/dashboard" routerLinkActive="bg-gray-50 text-primary" class="flex items-center px-6 py-3 text-gray-600 hover:bg-gray-50 hover:text-primary">
         <i class="ri-dashboard-line mr-3"></i>
         <span>Tableau de bord</span>
       </a>
-      <!-- Lien vers la gestion des utilisateurs -->
       <a routerLink="/users" routerLinkActive="bg-gray-50 text-primary" class="flex items-center px-6 py-3 text-gray-600 hover:bg-gray-50 hover:text-primary">
         <i class="ri-user-line mr-3"></i>
         <span>Utilisateurs</span>
       </a>
-      <a
-      routerLink="/etablissements"
-      routerLinkActive="bg-gray-50 text-primary"
-      class="flex items-center px-6 py-3 text-gray-600 hover:bg-gray-50 hover:text-primary"
-    >
-      <i class="ri-building-line mr-3"></i>
-      <span>Établissements</span>
-    </a>
-    <a routerLink="/promo" routerLinkActive="bg-gray-50 text-primary" class="flex items-center px-6 py-3 text-gray-600 hover:bg-gray-50 hover:text-primary">
-      <i class="ri-price-tag-3-line mr-3"></i>
-      <span>Promotions</span>
-    </a>
-    <a routerLink="/event" routerLinkActive="bg-gray-50 text-primary" class="flex items-center px-6 py-3 text-gray-600 hover:bg-gray-50 hover:text-primary">
-      <i class="ri-calendar-line mr-3"></i>
-      <span>Événements</span>
-    </a>
-      <!-- Lien vers les notifications -->
+      <a routerLink="/etablissements" routerLinkActive="bg-gray-50 text-primary" class="flex items-center px-6 py-3 text-gray-600 hover:bg-gray-50 hover:text-primary">
+        <i class="ri-building-line mr-3"></i>
+        <span>Établissements</span>
+      </a>
+      <a routerLink="/promo" routerLinkActive="bg-gray-50 text-primary" class="flex items-center px-6 py-3 text-gray-600 hover:bg-gray-50 hover:text-primary">
+        <i class="ri-price-tag-3-line mr-3"></i>
+        <span>Promotions</span>
+      </a>
+      <a routerLink="/event" routerLinkActive="bg-gray-50 text-primary" class="flex items-center px-6 py-3 text-gray-600 hover:bg-gray-50 hover:text-primary">
+        <i class="ri-calendar-line mr-3"></i>
+        <span>Événements</span>
+      </a>
       <a routerLink="/notifications" routerLinkActive="bg-gray-50 text-primary" class="flex items-center px-6 py-3 text-gray-600 hover:bg-gray-50 hover:text-primary">
         <i class="ri-notification-line mr-3"></i>
         <span>Notifications</span>
@@ -40,7 +33,7 @@
   </aside>
 
   <!-- Contenu principal -->
-  <div class="flex-1 flex flex-col">
+  <div *ngIf="isAuthenticated; else notAuthenticated" class="flex-1 flex flex-col">
     <!-- En-tête avec barre de recherche et menu de profil -->
     <header class="bg-white shadow-sm h-16">
       <div class="h-full px-6 flex items-center justify-between">
@@ -53,14 +46,12 @@
           </div>
         </div>
         <div class="flex items-center space-x-4">
-          <!-- Bouton pour naviguer vers la page des notifications -->
           <button routerLink="/notifications" class="w-8 h-8 flex items-center justify-center text-gray-600 hover:text-primary relative">
             <i class="ri-notification-3-line"></i>
             <span class="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">
-              {{ notificationCount }}
+              {{ notifications.length }}
             </span>
           </button>
-          <!-- Menu de profil -->
           <div class="relative">
             <button id="profileButton" class="flex items-center space-x-2 cursor-pointer" (click)="toggleProfile()">
               <div class="w-8 h-8 rounded-full bg-gray-200 flex items-center justify-center">
@@ -75,7 +66,7 @@
                 Mon profil
               </a>
               <div class="border-t border-gray-100 my-1"></div>
-              <a routerLink="/connexion" class="px-4 py-2 text-sm text-red-600 hover:bg-gray-100 flex items-center">
+              <a (click)="logout()" class="px-4 py-2 text-sm text-red-600 hover:bg-gray-100 flex items-center cursor-pointer">
                 <i class="ri-logout-box-line mr-2"></i>
                 Déconnexion
               </a>
@@ -88,7 +79,6 @@
     <!-- Contenu principal du tableau de bord -->
     <main class="flex-1 overflow-auto p-6">
       <div class="px-4 py-6 sm:px-0">
-        <!-- Titre de la page -->
         <div class="flex justify-between items-center mb-6">
           <h1 class="text-2xl font-semibold text-gray-900">Tableau de bord</h1>
         </div>
@@ -163,12 +153,10 @@
 
         <!-- Graphiques -->
         <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          <!-- Graphique: Activité des utilisateurs -->
           <div class="bg-white rounded-lg shadow p-6">
             <h3 class="text-lg font-semibold text-gray-900 mb-4">Activité des utilisateurs</h3>
             <div id="userActivityChart" style="width: 100%; height: 300px;" #userActivityChart></div>
           </div>
-          <!-- Graphique: Distribution des rôles -->
           <div class="bg-white rounded-lg shadow p-6">
             <h3 class="text-lg font-semibold text-gray-900 mb-4">Distribution des rôles</h3>
             <div id="userRolesChart" style="width: 100%; height: 300px;" #userRolesChart></div>
@@ -178,24 +166,34 @@
         <!-- Dernières activités -->
         <div class="mt-8 bg-white rounded-lg shadow">
           <div class="p-6">
-            <h3 class="text-lg font-semibold text-gray-900 mb-4">Dernières activités</h3>
+            <div class="flex justify-between items-center mb-4">
+              <h3 class="text-lg font-semibold text-gray-900">Dernières activités</h3>
+            </div>
             <div class="space-y-4">
-              <div class="flex items-center" *ngFor="let activity of recentActivities">
-                <div class="w-8 h-8 rounded-full flex items-center justify-center" [ngClass]="{
-                  'bg-blue-100': activity.type === 'new',
-                  'bg-green-100': activity.type === 'activated',
-                  'bg-yellow-100': activity.type === 'updated'
-                }">
-                  <i [ngClass]="activity.icon" [ngStyle]="{
-                    'color': activity.type === 'new' ? '#4F46E5' :
-                             activity.type === 'activated' ? '#16A34A' :
-                             activity.type === 'updated' ? '#D97706' : ''
-                  }"></i>
+              <div class="flex items-center justify-between" *ngFor="let activity of recentActivities">
+                <div class="flex items-center">
+                  <div class="w-8 h-8 rounded-full flex items-center justify-center" [ngClass]="{
+                    'bg-blue-100': activity.type === 'new',
+                    'bg-green-100': activity.type === 'activated',
+                    'bg-yellow-100': activity.type === 'updated'
+                  }">
+                    <i [ngClass]="activity.icon" [ngStyle]="{
+                      'color': activity.type === 'new' ? '#4F46E5' :
+                               activity.type === 'activated' ? '#16A34A' :
+                               activity.type === 'updated' ? '#D97706' : ''
+                    }"></i>
+                  </div>
+                  <div class="ml-4">
+                    <p class="text-sm text-gray-900">{{ activity.message }}</p>
+                    <p class="text-xs text-gray-500">{{ activity.time }}</p>
+                  </div>
                 </div>
-                <div class="ml-4">
-                  <p class="text-sm text-gray-900">{{ activity.message }}</p>
-                  <p class="text-xs text-gray-500">{{ activity.time }}</p>
-                </div>
+                <button (click)="deleteActivity(activity)" class="text-red-600 hover:text-red-800">
+                  <i class="ri-close-line text-lg"></i>
+                </button>
+              </div>
+              <div *ngIf="recentActivities.length === 0" class="text-sm text-gray-500">
+                Aucune activité récente.
               </div>
             </div>
           </div>
@@ -204,4 +202,12 @@
     </main>
   </div>
 
- 
+  <!-- Si l'utilisateur n'est pas authentifié -->
+  <ng-template #notAuthenticated>
+    <div class="flex h-screen items-center justify-center bg-gray-50">
+      <div class="text-center">
+        <p class="text-lg font-semibold text-gray-700">Redirection en cours...</p>
+      </div>
+    </div>
+  </ng-template>
+</div>

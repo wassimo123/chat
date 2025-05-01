@@ -3,25 +3,18 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { NavbarComponent } from '../navbar/navbar.component';
 import { FooterComponent } from '../footer/footer.component';
-
-interface Event {
-  id: number;
-  title: string;
-  category: string;
-  location: string;
-  image: string;
-  description: string;
-  price: string;
-  date: string;
-  startDate: Date;
-  status: string;
-  isNew: boolean;
-  favorited: boolean;
-}
+import { EvenementService } from '../../services/evenement.service';
+import { Evenement } from '../../models/evenement.model';
+import { forkJoin, Observable } from 'rxjs';
+import { HttpClient } from '@angular/common/http';
 
 interface FilterOption {
   name: string;
   selected: boolean;
+}
+
+interface EvenementWithName extends Evenement {
+  establishmentName?: string;
 }
 
 @Component({
@@ -32,280 +25,328 @@ interface FilterOption {
   styleUrls: ['./event.component.css'],
 })
 export class EventComponent implements OnInit {
-  events: Event[] = [
-    {
-      id: 1,
-      title: 'Festival International de Sfax',
-      category: 'Festival',
-      location: 'Théâtre Municipal de Sfax',
-      image:
-        'https://readdy.ai/api/search-image?query=cultural%20festival%20with%20traditional%20music%20performance%2C%20colorful%20stage%2C%20crowd%20enjoying%2C%20professional%20lighting%2C%20evening%20atmosphere%2C%20high%20quality%20photography&width=400&height=250&seq=1&orientation=landscape',
-      description:
-        'Une célébration de la musique et de la culture avec des artistes internationaux.',
-      price: '45 DT',
-      date: '20-25 Avril 2025',
-      startDate: new Date('2025-04-20'),
-      status: 'Places limitées',
-      isNew: true,
-      favorited: false,
-    },
-    {
-      id: 2,
-      title: 'Exposition d’Art Contemporain',
-      category: 'Exposition',
-      location: 'Galerie Municipale',
-      image:
-        'https://readdy.ai/api/search-image?query=art%20exhibition%20in%20modern%20gallery%20space%2C%20contemporary%20paintings%20and%20sculptures%2C%20people%20viewing%20artwork%2C%20elegant%20lighting%2C%20professional%20photography&width=400&height=250&seq=2&orientation=landscape',
-      description:
-        'Découvrez les œuvres de 15 artistes contemporains tunisiens.',
-      price: 'Gratuit',
-      date: '18 Avril - 2 Mai 2025',
-      startDate: new Date('2025-04-18'),
-      status: 'Entrée libre',
-      isNew: false,
-      favorited: false,
-    },
-    {
-      id: 3,
-      title: 'Concert Symphonique',
-      category: 'Concert',
-      location: 'Palais des Congrès',
-      image:
-        'https://readdy.ai/api/search-image?query=concert%20hall%20with%20orchestra%20performing%2C%20classical%20music%2C%20elegant%20interior%2C%20dramatic%20lighting%2C%20audience%20in%20formal%20attire%2C%20professional%20photography&width=400&height=250&seq=3&orientation=landscape',
-      description:
-        'L’Orchestre Symphonique de Sfax présente les œuvres de Mozart.',
-      price: '60 DT',
-      date: '22 Avril 2025',
-      startDate: new Date('2025-04-22'),
-      status: 'Dernières places',
-      isNew: false,
-      favorited: false,
-    },
-    {
-      id: 4,
-      title: 'Les Misérables',
-      category: 'Théâtre',
-      location: 'Théâtre Municipal',
-      image:
-        'https://readdy.ai/api/search-image?query=theater%20performance%2C%20dramatic%20stage%20lighting%2C%20actors%20performing%2C%20elegant%20theater%20interior%2C%20audience%20watching%2C%20professional%20photography&width=400&height=250&seq=4&orientation=landscape',
-      description:
-        'Une adaptation moderne du chef-d’œuvre de Victor Hugo.',
-      price: '35 DT',
-      date: '24-26 Avril 2025',
-      startDate: new Date('2025-04-24'),
-      status: 'Prévente',
-      isNew: false,
-      favorited: false,
-    },
-    {
-      id: 5,
-      title: 'Festival Gastronomique',
-      category: 'Gastronomie',
-      location: 'Place de la République',
-      image:
-        'https://readdy.ai/api/search-image?query=food%20festival%2C%20gourmet%20dishes%2C%20chef%20demonstrations%2C%20people%20tasting%20food%2C%20outdoor%20setting%2C%20professional%20photography&width=400&height=250&seq=5&orientation=landscape',
-      description:
-        'Découvrez les saveurs de la cuisine méditerranéenne.',
-      price: '25 DT',
-      date: '27-28 Avril 2025',
-      startDate: new Date('2025-04-27'),
-      status: 'Pass journée',
-      isNew: false,
-      favorited: false,
-    },
-    {
-      id: 6,
-      title: 'Sfax Tech Conference',
-      category: 'Conférence',
-      location: 'Centre des Congrès',
-      image:
-        'https://readdy.ai/api/search-image?query=conference%20room%2C%20business%20presentation%2C%20professional%20speakers%2C%20audience%20listening%2C%20modern%20venue%2C%20professional%20photography&width=400&height=250&seq=6&orientation=landscape',
-      description:
-        'L’avenir de la technologie et de l’innovation en Tunisie.',
-      price: '80 DT',
-      date: '30 Avril 2025',
-      startDate: new Date('2025-04-30'),
-      status: 'Early Bird',
-      isNew: false,
-      favorited: false,
-    },
-  ];
-
-  filteredEvents: Event[] = [];
+  events: EvenementWithName[] = [];
+  filteredEvents: EvenementWithName[] = [];
+  paginatedEvents: EvenementWithName[] = [];
   categories: FilterOption[] = [
+    { name: 'Gastronomie', selected: false },
+    { name: 'Musique', selected: false },
+    { name: 'Littérature', selected: false },
+    { name: 'Cinéma', selected: false },
+    { name: 'Art', selected: false },
+    { name: 'Sport', selected: false },
     { name: 'Festivals', selected: false },
-    { name: 'Concerts', selected: false },
-    { name: 'Expositions', selected: false },
-    { name: 'Spectacles', selected: false },
     { name: 'Conférences', selected: false },
-  ];
-  dateOptions: FilterOption[] = [
-    { name: 'Aujourd’hui', selected: false },
-    { name: 'Cette semaine', selected: false },
-    { name: 'Ce week-end', selected: false },
-    { name: 'Ce mois', selected: false },
+    { name: 'Autre', selected: false },
   ];
   locations: FilterOption[] = [
-    { name: 'Centre-ville', selected: false },
-    { name: 'Médina', selected: false },
-    { name: 'Zone touristique', selected: false },
-    { name: 'Plage', selected: false },
+    { name: 'Route Centre Ville', selected: false },
+    { name: 'Route Bab Bhar', selected: false },
+    { name: 'Route Gremda', selected: false },
+    { name: 'Route Lafran', selected: false },
+    { name: 'Route Manzel Chaker', selected: false },
+    { name: 'Route Sidi Mansour', selected: false },
+    { name: 'Route Sakiet Ezzit', selected: false },
+    { name: 'Route El Ain', selected: false },
+    { name: 'Route Thyna', selected: false },
   ];
   searchQuery: string = '';
-  priceRange: number = 100;
-  accessiblePMR: boolean = false;
-  freeParking: boolean = false;
-  sortOption: string = 'dateAsc';
-  selectedEvent: Event | null = null;
+  priceMin: number = 0;
+  priceMax: number = 200;
+  dateFrom: string = '';
+  dateTo: string = '';
+  sortOption: string = '';
+  selectedEvent: EvenementWithName | null = null;
   showReserveModal: boolean = false;
   showNotifyModal: boolean = false;
-  reservation = { name: '', email: '', phone: '', date: '', persons: 1, payment: 'card' };
   notificationEmail: string = '';
+  newsletterEmail: string = '';
+  newsletterMessage: string = '';
+  newsletterSuccess: boolean = false;
+  notificationMessage: string = '';
+  notificationSuccess: boolean = false;
+
+  currentPage: number = 1;
+  itemsPerPage: number = 9;
+  totalPages: number = 1;
+
+  private establishmentNames: Map<string, string> = new Map();
+
+  constructor(
+    private evenementService: EvenementService,
+    private http: HttpClient
+  ) {}
 
   ngOnInit() {
-    this.filteredEvents = [...this.events];
+    this.loadEvents();
+  }
+
+  loadEvents(): void {
+    this.evenementService.getEvenements().subscribe({
+      next: (events: Evenement[]) => {
+        console.log('Événements chargés :', events);
+        this.events = events.map((e: Evenement) => ({
+          ...e,
+          photo: e.photo
+            ? (e.photo.startsWith('data:') || e.photo.startsWith('http'))
+              ? e.photo
+              : `http://localhost:5000${e.photo}`
+            : 'https://via.placeholder.com/400x250',
+        })) as EvenementWithName[];
+
+        const establishmentIds = [...new Set(this.events.map(e => e.establishmentId).filter(id => id))];
+        console.log('IDs des établissements à récupérer :', establishmentIds);
+
+        const requests: Observable<{ _id: string; nom: string }>[] = establishmentIds.map(id =>
+          this.evenementService.getEtablissementById(id)
+        );
+
+        if (requests.length > 0) {
+          forkJoin(requests).subscribe({
+            next: (etablissements) => {
+              console.log('Établissements récupérés :', etablissements);
+              etablissements.forEach(etab => {
+                this.establishmentNames.set(etab._id, etab.nom);
+              });
+
+              this.events = this.events.map(event => ({
+                ...event,
+                establishmentName: this.establishmentNames.get(event.establishmentId) || 'Inconnu',
+              }));
+
+              // Filter out events with status "Terminé" or "En cours"
+              this.filteredEvents = this.events.filter(e => e.statut === 'À venir');
+              this.sortEvents();
+              this.updatePagination();
+            },
+            error: (err) => {
+              console.error('Erreur lors du chargement des noms des établissements:', err);
+              this.events = this.events.map(event => ({
+                ...event,
+                establishmentName: 'Inconnu',
+              }));
+              // Filter out events with status "Terminé" or "En cours"
+              this.filteredEvents = this.events.filter(e => e.statut === 'À venir');
+              this.sortEvents();
+              this.updatePagination();
+            }
+          });
+        } else {
+          console.log('Aucun establishmentId à récupérer');
+          this.events = this.events.map(event => ({
+            ...event,
+            establishmentName: 'Inconnu',
+          }));
+          // Filter out events with status "Terminé" or "En cours"
+          this.filteredEvents = this.events.filter(e => e.statut === 'À venir');
+          this.sortEvents();
+          this.updatePagination();
+        }
+      },
+      error: (err: any) => {
+        console.error('Erreur lors du chargement des événements:', err);
+      }
+    });
+  }
+
+  refreshEvents(): void {
+    this.sortOption = '';
+    this.establishmentNames.clear();
+    this.loadEvents();
   }
 
   filterEvents() {
     this.filteredEvents = this.events.filter((event) => {
+      // Only include events with status "À venir"
+      if (event.statut !== 'À venir') {
+        return false;
+      }
+
       const matchesSearch = this.searchQuery
-        ? event.title.toLowerCase().includes(this.searchQuery.toLowerCase()) ||
-          event.description.toLowerCase().includes(this.searchQuery.toLowerCase())
+        ? event.nom.toLowerCase().includes(this.searchQuery.toLowerCase()) ||
+          event.description?.toLowerCase().includes(this.searchQuery.toLowerCase()) ||
+          (event.typeEtablissement?.toLowerCase() || '').includes(this.searchQuery.toLowerCase())
         : true;
 
       const matchesCategory = this.categories.some((c) => c.selected)
-        ? this.categories.some((c) => c.selected && c.name === event.category)
+        ? this.categories.some((c) => c.selected && c.name === event.categorie)
         : true;
 
-      const matchesPrice = this.priceRange
-        ? event.price === 'Gratuit' ||
-          parseFloat(event.price) <= this.priceRange
-        : true;
+      const matchesPrice =
+        event.prix.estGratuit ||
+        (event.prix.montant >= (this.priceMin || 0) &&
+         event.prix.montant <= (this.priceMax || Infinity));
 
-      const today = new Date();
-      const matchesDate = this.dateOptions.some((d) => d.selected)
-        ? this.dateOptions.some((d) => {
-            if (!d.selected) return false;
-            if (d.name === 'Aujourd’hui') {
-              return (
-                event.startDate.toDateString() === today.toDateString()
-              );
-            } else if (d.name === 'Cette semaine') {
-              const weekEnd = new Date(today);
-              weekEnd.setDate(today.getDate() + 7);
-              return (
-                event.startDate >= today && event.startDate <= weekEnd
-              );
-            } else if (d.name === 'Ce week-end') {
-              const weekendStart = new Date(today);
-              weekendStart.setDate(
-                today.getDate() + (6 - today.getDay())
-              );
-              const weekendEnd = new Date(weekendStart);
-              weekendEnd.setDate(weekendStart.getDate() + 1);
-              return (
-                event.startDate >= weekendStart &&
-                event.startDate <= weekendEnd
-              );
-            } else if (d.name === 'Ce mois') {
-              const monthEnd = new Date(today);
-              monthEnd.setMonth(today.getMonth() + 1);
-              return (
-                event.startDate >= today && event.startDate <= monthEnd
-              );
+      const matchesDate = this.dateFrom || this.dateTo
+        ? (() => {
+            const eventDate = new Date(event.dateDebut);
+            const fromDate = this.dateFrom ? new Date(this.dateFrom) : null;
+            const toDate = this.dateTo ? new Date(this.dateTo) : null;
+            if (fromDate && toDate) {
+              return eventDate >= fromDate && eventDate <= toDate;
+            } else if (fromDate) {
+              return eventDate >= fromDate;
+            } else if (toDate) {
+              return eventDate <= toDate;
             }
-            return false;
-          })
+            return true;
+          })()
         : true;
 
       const matchesLocation = this.locations.some((l) => l.selected)
         ? this.locations.some((l) =>
             l.selected &&
-            event.location.toLowerCase().includes(l.name.toLowerCase())
+            event.lieu.toLowerCase().includes(l.name.toLowerCase())
           )
         : true;
 
-      const matchesAccessibility = this.accessiblePMR
-        ? event.status.includes('Accessible') // Assuming events have accessibility info
-        : true;
-
-      const matchesParking = this.freeParking
-        ? event.status.includes('Parking') // Assuming events have parking info
-        : true;
-
-      return (
-        matchesSearch &&
-        matchesCategory &&
-        matchesPrice &&
-        matchesDate &&
-        matchesLocation &&
-        matchesAccessibility &&
-        matchesParking
-      );
+      return matchesSearch && matchesCategory && matchesPrice && matchesDate && matchesLocation;
     });
 
     this.sortEvents();
+    this.currentPage = 1;
+    this.updatePagination();
   }
 
   sortEvents() {
     this.filteredEvents.sort((a, b) => {
       switch (this.sortOption) {
+        case 'recent':
+        case '':
+          return b.id.localeCompare(a.id);
         case 'dateAsc':
-          return a.startDate.getTime() - b.startDate.getTime();
+          return new Date(a.dateDebut).getTime() - new Date(b.dateDebut).getTime();
         case 'dateDesc':
-          return b.startDate.getTime() - a.startDate.getTime();
+          return new Date(b.dateDebut).getTime() - new Date(a.dateDebut).getTime();
         case 'priceAsc':
-          const aPrice =
-            a.price === 'Gratuit' ? 0 : parseFloat(a.price);
-          const bPrice =
-            b.price === 'Gratuit' ? 0 : parseFloat(b.price);
+          const aPrice = a.prix.estGratuit ? 0 : a.prix.montant;
+          const bPrice = b.prix.estGratuit ? 0 : b.prix.montant;
           return aPrice - bPrice;
         case 'priceDesc':
-          const aPriceDesc =
-            a.price === 'Gratuit' ? 0 : parseFloat(a.price);
-          const bPriceDesc =
-            b.price === 'Gratuit' ? 0 : parseFloat(b.price);
+          const aPriceDesc = a.prix.estGratuit ? 0 : a.prix.montant;
+          const bPriceDesc = b.prix.estGratuit ? 0 : b.prix.montant;
           return bPriceDesc - aPriceDesc;
         default:
           return 0;
       }
     });
+    this.updatePagination();
   }
 
-  getCategoryClass(category: string): string {
-    const classes: { [key: string]: string } = {
-      Festival: 'bg-red-500',
-      Exposition: 'bg-blue-500',
-      Concert: 'bg-purple-500',
-      Théâtre: 'bg-green-500',
-      Gastronomie: 'bg-orange-500',
-      Conférence: 'bg-indigo-500',
-    };
-    return classes[category] || 'bg-gray-500';
+  updatePagination(): void {
+    this.totalPages = Math.ceil(this.filteredEvents.length / this.itemsPerPage);
+    const start = (this.currentPage - 1) * this.itemsPerPage;
+    const end = start + this.itemsPerPage;
+    this.paginatedEvents = this.filteredEvents.slice(start, end);
   }
 
-  getStatusClass(status: string): string {
-    const classes: { [key: string]: string } = {
-      'Places limitées': 'bg-yellow-100 text-yellow-800',
-      'Entrée libre': 'bg-green-100 text-green-800',
-      'Dernières places': 'bg-red-100 text-red-800',
-      Prévente: 'bg-blue-100 text-blue-800',
-      'Pass journée': 'bg-purple-100 text-purple-800',
-      'Early Bird': 'bg-gray-100 text-gray-800',
-    };
-    return classes[status] || 'bg-gray-100 text-gray-800';
+  previousPage(): void {
+    if (this.currentPage > 1) {
+      this.currentPage--;
+      this.updatePagination();
+    }
   }
 
-  toggleFavorite(event: Event) {
-    event.favorited = !event.favorited;
+  nextPage(): void {
+    if (this.currentPage < this.totalPages) {
+      this.currentPage++;
+      this.updatePagination();
+    }
   }
 
-  openEventModal(event: Event) {
+  goToPage(page: number): void {
+    this.currentPage = page;
+    this.updatePagination();
+  }
+
+  getPages(): number[] {
+    const pages: number[] = [];
+    for (let i = 1; i <= this.totalPages; i++) {
+      pages.push(i);
+    }
+    return pages;
+  }
+
+  getCategoryClass(categorie: string): string {
+    switch (categorie) {
+      case 'Gastronomie': return 'bg-green-100';
+      case 'Musique': return 'bg-blue-100';
+      case 'Littérature': return 'bg-yellow-100';
+      case 'Cinéma': return 'bg-red-100';
+      case 'Art': return 'bg-purple-100';
+      case 'Sport': return 'bg-green-200';
+      case 'Festivals': return 'bg-pink-100';
+      case 'Conférences': return 'bg-blue-200';
+      case 'Autre': return 'bg-gray-100';
+      default: return 'bg-gray-100';
+    }
+  }
+
+  getTypeEtablissementClass(type: string | undefined): string {
+    switch (type) {
+      case 'Restaurant': return 'bg-blue-100 text-blue-800';
+      case 'Hôtel': return 'bg-purple-100 text-purple-800';
+      case 'Commerce': return 'bg-orange-100 text-orange-800';
+      case 'Café': return 'bg-brown-100 text-brown-800';
+      case 'Autre': return 'bg-gray-100 text-gray-800';
+      default: return 'bg-gray-100 text-gray-800';
+    }
+  }
+
+  getCategoryIconClass(categorie: string): string {
+    switch (categorie) {
+      case 'Gastronomie': return 'text-green-500';
+      case 'Musique': return 'text-blue-500';
+      case 'Littérature': return 'text-yellow-500';
+      case 'Cinéma': return 'text-red-500';
+      case 'Art': return 'text-purple-500';
+      case 'Sport': return 'text-green-600';
+      case 'Festivals': return 'text-pink-500';
+      case 'Conférences': return 'text-blue-600';
+      case 'Autre': return 'text-gray-500';
+      default: return 'text-gray-500';
+    }
+  }
+
+  getCategoryIcon(categorie: string): string {
+    switch (categorie) {
+      case 'Gastronomie': return 'ri-restaurant-line';
+      case 'Musique': return 'ri-music-line';
+      case 'Littérature': return 'ri-book-open-line';
+      case 'Cinéma': return 'ri-movie-line';
+      case 'Art': return 'ri-paint-brush-line';
+      case 'Sport': return 'ri-run-line';
+      case 'Festivals': return 'ri-star-line';
+      case 'Conférences': return 'ri-mic-line';
+      case 'Autre': return 'ri-calendar-line';
+      default: return 'ri-calendar-line';
+    }
+  }
+
+  getStatusClass(statut: string): string {
+    switch (statut) {
+      case 'À venir': return 'bg-green-100 text-green-800';
+      case 'En cours': return 'bg-indigo-100 text-indigo-800';
+      case 'Terminé': return 'bg-gray-100 text-gray-800';
+      default: return 'bg-gray-100 text-gray-800';
+    }
+  }
+
+  getFormattedPrice(event: Evenement): string {
+    return event.prix.estGratuit ? 'Gratuit' : `${event.prix.montant} DT`;
+  }
+
+  handleImageError(event: Event, evenement: EvenementWithName): void {
+    (event.target as HTMLImageElement).src = 'https://via.placeholder.com/400x250';
+    evenement.photo = 'https://via.placeholder.com/400x250';
+  }
+
+  openEventModal(event: EvenementWithName) {
     this.selectedEvent = event;
     this.showReserveModal = true;
   }
 
-  openNotifyModal(event: Event) {
+  openNotifyModal(event: EvenementWithName) {
     this.selectedEvent = event;
     this.showNotifyModal = true;
   }
@@ -314,29 +355,51 @@ export class EventComponent implements OnInit {
     this.showReserveModal = false;
     this.showNotifyModal = false;
     this.selectedEvent = null;
-    this.reservation = {
-      name: '',
-      email: '',
-      phone: '',
-      date: '',
-      persons: 1,
-      payment: 'card',
-    };
     this.notificationEmail = '';
-  }
-
-  submitReservation() {
-    console.log('Réservation soumise :', this.reservation);
-    this.closeModal();
+    this.notificationMessage = '';
   }
 
   submitNotification() {
-    console.log(
-      'Notification demandée pour :',
-      this.selectedEvent,
-      'Email :',
-      this.notificationEmail
-    );
-    this.closeModal();
+    if (this.notificationEmail && this.selectedEvent) {
+      this.http.post(`http://localhost:5000/api/evenements/${this.selectedEvent.id}/notify`, { email: this.notificationEmail })
+        .subscribe({
+          next: (response: any) => {
+            this.notificationMessage = 'Votre demande de notification a été enregistrée avec succès !';
+            this.notificationSuccess = true;
+            setTimeout(() => {
+              this.closeModal();
+            }, 2000);
+          },
+          error: (err) => {
+            this.notificationMessage = 'Erreur lors de l\'enregistrement de la notification. Veuillez réessayer.';
+            this.notificationSuccess = false;
+            console.error('Erreur lors de l\'enregistrement de la notification:', err);
+          }
+        });
+    }
+  }
+
+  subscribeNewsletter() {
+    if (this.newsletterEmail) {
+      this.http.post('http://localhost:5000/api/newsletter/subscribe', { email: this.newsletterEmail })
+        .subscribe({
+          next: (response: any) => {
+            this.newsletterMessage = response.message || 'Merci pour votre inscription !';
+            this.newsletterSuccess = true;
+            setTimeout(() => {
+              this.newsletterMessage = '';
+              this.newsletterEmail = '';
+            }, 3000);
+          },
+          error: (err) => {
+            this.newsletterMessage = err.error.message || 'Erreur lors de l\'inscription. Veuillez réessayer.';
+            this.newsletterSuccess = false;
+            console.error('Erreur lors de l\'inscription à la newsletter:', err);
+          }
+        });
+    } else {
+      this.newsletterMessage = 'Veuillez entrer un email valide.';
+      this.newsletterSuccess = false;
+    }
   }
 }

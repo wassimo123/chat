@@ -71,12 +71,32 @@ export class EtablissementService {
     //return this.http.get<any[]>(`${this.apiUrl}/type/Hôtel`);
 
   }
-  getCafes(): Observable<Etablissement[]> {
-    return this.http.get<any[]>(`${this.apiUrl}/type/Café`);
+  // getCafes(): Observable<Etablissement[]> {
+  //   return this.http.get<any[]>(`${this.apiUrl}/type/Café`);
+  // }
+
+  getCafe(): Observable<Etablissement[]> {
+    return this.http.get<EtablissementRaw[]>(`${this.apiUrl}/type/Café`, { headers: this.getHeaders() }).pipe(
+      map(rawEtablissements => rawEtablissements.map(raw => this.mapToEtablissement(raw))),
+      catchError(this.handleError)
+    );
   }
-  getRestaurants(): Observable<Etablissement[]> {
-    return this.http.get<any[]>(`${this.apiUrl}/type/Restaurant`);
+
+
+  // getRestaurants(): Observable<Etablissement[]> {
+  //   return this.http.get<any[]>(`${this.apiUrl}/type/Restaurant`);
+  // }
+  getRestaurant(): Observable<Etablissement[]> {
+    return this.http.get<EtablissementRaw[]>(`${this.apiUrl}/type/Restaurant`, { headers: this.getHeaders() }).pipe(
+      map(rawEtablissements => rawEtablissements.map(raw => this.mapToEtablissement(raw))),
+      catchError(this.handleError)
+    );
+  
+
   }
+
+
+
   // Récupérer tous les établissements
   getEtablissements(): Observable<Etablissement[]> {
     return this.http.get<EtablissementRaw[]>(this.apiUrl, { headers: this.getHeaders() }).pipe(
@@ -165,6 +185,8 @@ export class EtablissementService {
       });
     }
   
+    // formData.append('partenaireId', '664f6bc9c4f95f28d0c5e782'); // <-- Remplace par un ObjectId réel
+
     console.log('Sending form data to backend');
   
     // Send the POST request with FormData

@@ -6,134 +6,37 @@
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
 }
 
-input[type="text"],
-input[type="email"],
-input[type="tel"],
-input[type="date"],
-input[type="number"],
-select {
-  transition: all 0.2s ease-in-out;
-  border-color: #e5e7eb;
-}
-
-input[type="text"]:focus,
-input[type="email"]:focus,
-input[type="tel"]:focus,
-input[type="date"]:focus,
-input[type="number"]:focus,
-select:focus {
-  border-color: #3b82f6;
-  box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.1);
-}
-
-button {
-  transition: all 0.2s ease-in-out;
-}
-
-button:active {
-  transform: scale(0.98);
-}
-
-.event-card {
-  transition: transform 0.2s ease-in-out;
-}
-
-.event-card:hover {
-  transform: translateY(-5px);
-  box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1),
-    0 10px 10px -5px rgba(0, 0, 0, 0.04);
-}
-
-.fixed.inset-0 {
-  animation: fadeIn 0.3s ease-out;
-}
-
-@keyframes fadeIn {
-  from {
-    opacity: 0;
-  }
-  to {
-    opacity: 1;
-  }
-}
-
-.fixed.inset-0 > div {
-  animation: slideIn 0.3s ease-out;
-}
-
-@keyframes slideIn {
-  from {
-    transform: translateY(-20px);
-    opacity: 0;
-  }
-  to {
-    transform: translateY(0);
-    opacity: 1;
-  }
-}
-
-.custom-checkbox {
-  appearance: none;
-  width: 1.25rem;
-  height: 1.25rem;
+.checkbox-custom {
+  position: relative;
+  width: 18px;
+  height: 18px;
   border: 2px solid #d1d5db;
   border-radius: 4px;
-  background-color: white;
   cursor: pointer;
-  position: relative;
 }
 
-.custom-checkbox:checked {
-  background-color: #3b82f6;
-  border-color: #3b82f6;
+.checkbox-custom.checked {
+  background-color: #6366f1;
+  border-color: #6366f1;
 }
 
-.custom-checkbox:checked::after {
-  content: '';
+.checkbox-custom.checked::after {
+  content: "";
   position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  width: 0.5rem;
-  height: 0.5rem;
-  background-color: white;
-  border-radius: 1px;
-}
-
-.custom-range {
-  -webkit-appearance: none;
-  appearance: none;
-  width: 100%;
-  height: 6px;
-  background: #e5e7eb;
-  border-radius: 5px;
-  outline: none;
-}
-
-.custom-range::-webkit-slider-thumb {
-  -webkit-appearance: none;
-  appearance: none;
-  width: 18px;
-  height: 18px;
-  background: #3b82f6;
-  border-radius: 50%;
-  cursor: pointer;
-}
-
-.custom-range::-moz-range-thumb {
-  width: 18px;
-  height: 18px;
-  background: #3b82f6;
-  border-radius: 50%;
-  cursor: pointer;
-  border: none;
+  left: 5px;
+  top: 2px;
+  width: 6px;
+  height: 10px;
+  border: solid white;
+  border-width: 0 2px 2px 0;
+  transform: rotate(45deg);
 }
 
 .custom-switch {
   position: relative;
   display: inline-block;
-  width: 3rem;
-  height: 1.5rem;
+  width: 44px;
+  height: 24px;
 }
 
 .custom-switch input {
@@ -150,32 +53,152 @@ button:active {
   right: 0;
   bottom: 0;
   background-color: #e5e7eb;
-  transition: 0.4s;
+  transition: .4s;
   border-radius: 34px;
 }
 
 .switch-slider:before {
   position: absolute;
-  content: '';
-  height: 1.1rem;
-  width: 1.1rem;
-  left: 0.2rem;
-  bottom: 0.2rem;
+  content: "";
+  height: 18px;
+  width: 18px;
+  left: 3px;
+  bottom: 3px;
   background-color: white;
-  transition: 0.4s;
+  transition: .4s;
   border-radius: 50%;
 }
 
 input:checked + .switch-slider {
-  background-color: #3b82f6;
+  background-color: #6366f1;
 }
 
 input:checked + .switch-slider:before {
-  transform: translateX(1.5rem);
+  transform: translateX(20px);
 }
 
-.rounded-button {
-  border-radius: 8px;
+.tab-button {
+  transition: all 0.2s ease;
+}
+
+.tab-button.active {
+  background-color: #6366f1;
+  color: white;
+}
+
+/* Couleurs pour les catégories */
+.text-green-500 { color: #34d399; }
+.text-red-500 { color: #f87171; }
+.text-yellow-500 { color: #fbbf24; }
+.text-blue-500 { color: #3b82f6; }
+.text-purple-500 { color: #a855f7; }
+.text-indigo-500 { color: #6366f1; }
+.text-pink-500 { color: #ec4899; }
+.text-blue-600 { color: #2563eb; }
+
+.bg-green-100 { background-color: #a7f3d0; } /* Assombri pour Gastronomie */
+.bg-blue-100 { background-color: #bfdbfe; } /* Assombri pour Musique */
+.bg-yellow-100 { background-color: #fde68a; } /* Assombri pour Littérature */
+.bg-red-100 { background-color: #fecaca; } /* Assombri pour Cinéma */
+.bg-purple-100 { background-color: #e9d5ff; } /* Assombri pour Art */
+.bg-indigo-100 { background-color: #c7d2fe; } /* Assombri pour Conférences */
+.bg-pink-100 { background-color: #f9a8d4; } /* Assombri pour Festivals */
+.bg-blue-200 { background-color: #93c5fd; } /* Assombri pour autre usage */
+.bg-gray-100 { background-color: #e5e7eb; } /* Assombri pour Autre */
+
+/* Couleurs pour les types d'établissement */
+.bg-orange-100 { background-color: #fed7aa; } /* Assombri pour Commerce */
+.bg-brown-100 { background-color: #d2b48c; } /* Assombri pour Café */
+.bg-blue-100 { background-color: #bfdbfe; } /* Déjà défini pour Restaurant */
+.bg-purple-100 { background-color: #e9d5ff; } /* Déjà défini pour Hôtel */
+.bg-gray-100 { background-color: #e5e7eb; } /* Déjà défini pour Autre */
+
+.text-green-800 { color: #065f46; }
+.text-blue-800 { color: #1e40af; }
+.text-yellow-800 { color: #92400e; }
+.text-red-800 { color: #991b1b; }
+.text-indigo-800 { color: #3730a3; }
+.text-orange-800 { color: #c2410c; }
+.text-brown-800 { color: #8d5524; }
+.text-gray-800 { color: #1f2937; } /* Couleur sombre pour le texte des badges */
+
+/* Styles pour les badges */
+.absolute.top-3.left-3,
+.absolute.top-3.right-3 {
+  color: #1f2937; /* Remplace text-white par une couleur sombre pour le texte */
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2); /* Ajoute une ombre pour détacher le badge de l'image */
+  animation: bounce 1s ease infinite; /* Animation de rebond déjà présente */
+}
+
+.modal {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
+}
+
+.modal .bg-white {
+  max-height: 90vh;
+  overflow-y: auto;
+}
+
+input, select, textarea {
+  transition: all 0.2s ease-in-out;
+}
+
+input:focus, select:focus, textarea:focus {
+  border-color: #6366f1;
+  box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
+}
+
+/* Styles pour la carte d'événement (inspiré de promotion-card) */
+.event-card {
+  background-color: #ffffff; /* bg-white */
+  border-radius: 16px; /* rounded-lg */
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -4px rgba(0, 0, 0, 0.1); /* shadow-lg */
+  overflow: hidden; /* overflow-hidden */
+  transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out; /* Animation de transition */
+}
+
+.event-card:hover {
+  transform: translateY(-5px); /* Déplacement vers le haut au survol (comme promotion-card) */
+  box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1),
+              0 10px 10px -5px rgba(0, 0, 0, 0.04); /* Ombre au survol (comme promotion-card) */
+}
+
+/* Styles demandés */
+.rounded-lg {
+  border-radius: 16px;
+}
+
+.overflow-hidden {
+  overflow: hidden;
+}
+
+.line-clamp-2 {
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.fixed.inset-0 {
+  animation: fadeIn 0.3s ease-out;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+.fixed.inset-0 > div {
+  animation: slideIn 0.3s ease-out;
+}
+
+@keyframes slideIn {
+  from { transform: translateY(-20px); opacity: 0; }
+  to { transform: translateY(0); opacity: 1; }
 }
 
 select {
@@ -183,4 +206,147 @@ select {
   background-position: right 0.5rem center;
   background-repeat: no-repeat;
   background-size: 1.5em 1.5em;
+}
+
+input[type="date"] {
+  appearance: none;
+  -webkit-appearance: none;
+  position: relative;
+}
+
+/* Masquer l'icône par défaut du navigateur pour input[type="date"] */
+input[type="date"]::-webkit-calendar-picker-indicator {
+  opacity: 0;
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  cursor: pointer;
+}
+
+/* Assurer que le champ est cliquable pour afficher le calendrier */
+input[type="date"] {
+  cursor: pointer;
+}
+
+/* Style pour l'icône personnalisée */
+.agenda-field .ri-calendar-line {
+  font-size: 1.1rem;
+  color: #9ca3af; /* text-gray-400 */
+  transition: color 0.3s ease-in-out;
+  pointer-events: none; /* L'icône ne doit pas interférer avec le clic */
+}
+
+.agenda-field:hover .ri-calendar-line {
+  color: #6366f1; /* text-primary au survol */
+}
+
+input[type="number"]::-webkit-inner-spin-button,
+input[type="number"]::-webkit-outer-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+input[type="number"] {
+  -moz-appearance: textfield;
+}
+
+/* Animation de rebond pour les badges */
+@keyframes bounce {
+  0%, 100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-5px); /* Monter de 5px pour un effet de rebond */
+  }
+}
+
+/* Appliquer l'animation aux badges (catégorie et type d'établissement) */
+.absolute.top-3.left-3,
+.absolute.top-3.right-3 {
+  animation: bounce 1s ease infinite;
+}
+
+/* Animation pour les boutons dans les modals */
+.modal-button {
+  transition: transform 0.2s ease-in-out, background-color 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+}
+
+.modal-button:hover {
+  transform: scale(1.05); /* Légère augmentation de taille au survol */
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15); /* Ombre légère pour un effet de "soulèvement" */
+}
+
+/* Animation pour le bouton "Plus d'infos" */
+.info-button {
+  transition: transform 0.2s ease-in-out, background-color 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+}
+
+.info-button:hover {
+  transform: scale(1.05); /* Légère augmentation de taille au survol */
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15); /* Ombre légère pour un effet de "soulèvement" */
+}
+
+/* Animation pour l'icône de notification */
+.notify-icon {
+  transition: transform 0.2s ease-in-out, background-color 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+}
+
+.notify-icon:hover {
+  transform: scale(1.1); /* Légère augmentation de taille au survol (un peu plus prononcée pour l'icône) */
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15); /* Ombre légère pour un effet de "soulèvement" */
+}
+
+/* Styles pour la section Agenda */
+.agenda-field {
+  position: relative;
+}
+
+.agenda-field label {
+  font-size: 0.85rem;
+  font-weight: 500;
+  color: #374151; /* text-gray-700 */
+}
+
+.agenda-field input[type="date"] {
+  background-color: #f9fafb; /* bg-gray-50 */
+  border: 1px solid #e5e7eb; /* border-gray-200 */
+  border-radius: 8px; /* rounded-lg */
+  padding: 0.65rem 2.5rem 0.65rem 0.75rem; /* Ajustement du padding pour l'icône */
+  font-size: 0.875rem; /* text-sm */
+  color: #1f2937; /* text-gray-800 */
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05); /* Légère ombre */
+  transition: all 0.3s ease-in-out;
+}
+
+.agenda-field input[type="date"]:hover {
+  background-color: #fff; /* Fond blanc au survol */
+  border-color: #a5b4fc; /* border-indigo-300 */
+  box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1); /* Ombre légère */
+}
+
+.agenda-field input[type="date"]:focus {
+  border-color: #6366f1; /* border-primary */
+  box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.2); /* focus:ring-primary */
+  background-color: #fff;
+}
+
+/* Placeholder stylisé */
+.agenda-field input[type="date"]::-webkit-input-placeholder {
+  color: #9ca3af; /* text-gray-400 */
+  font-style: italic;
+}
+
+.agenda-field input[type="date"]:-moz-placeholder {
+  color: #9ca3af; /* text-gray-400 */
+  font-style: italic;
+}
+
+.agenda-field input[type="date"]::-moz-placeholder {
+  color: #9ca3af; /* text-gray-400 */
+  font-style: italic;
+}
+
+.agenda-field input[type="date"]:-ms-input-placeholder {
+  color: #9ca3af; /* text-gray-400 */
+  font-style: italic;
 }

@@ -1,6 +1,7 @@
 import { Component, OnInit, HostListener } from '@angular/core';
 import { UserService } from '../../services/user.service';
-
+import { NotificationService } from 'src/app/services/notification.service';
+import { Router } from '@angular/router'; // Ajout de Router
 interface User {
   matriculeFiscale: string;
   nom: string;
@@ -12,6 +13,8 @@ interface User {
   adresse: string;
   dateCreation: string;
   isArchived?: boolean;
+  status?: 'pending' | 'active' | 'inactive';
+  role?: string;
 }
 
 @Component({
@@ -37,6 +40,7 @@ export class GestionDesUtilisateursComponent implements OnInit {
     adresse: '', 
     dateCreation: '' 
   };
+  notifications: any[] = [];
 
   isPasswordModalOpen: boolean = false;
   currentPassword: string = '';
@@ -46,29 +50,99 @@ export class GestionDesUtilisateursComponent implements OnInit {
   passwordMatchMessage: string = '';
   passwordMatchClass: string = '';
 
+  showPassword: boolean = false;
+  showConfirmPassword: boolean = false;
+
   showMessageModal: boolean = false;
   messageModalType: 'error' | 'success' = 'error';
   messageModalTitle: string = '';
   messageModalMessage: string = '';
 
   users: User[] = [];
-  filteredUsers = [...this.users];
-  notificationCount: number = 3;
+  filteredUsers: User[] = [];
+  paginatedUsers: User[] = [];
+
+  currentPage: number = 1;
+  itemsPerPage: number = 5;
+  totalItems: number = 0;
+  totalPages: number = 1;
 
   showArchiveConfirmation = false;
   userToArchive: string | null = null;
+  isAuthenticated: boolean = false; // Ajout de la propriété isAuthenticated
 
-  constructor(private userService: UserService) {}
+  constructor(private userService: UserService, private notificationService: NotificationService,private router: Router) {}
 
   ngOnInit(): void {
+
+ // Vérification de l'authentification
+ const token = localStorage.getItem('token');
+ const userData = localStorage.getItem('user');
+ if (!token || !userData) {
+   this.isAuthenticated = false;
+   this.router.navigate(['/connexion'], { queryParams: { error: 'unauthorized' } });
+   return;
+ }
+
+ const user = JSON.parse(userData);
+ if (!user || !user.email) {
+   this.isAuthenticated = false;
+   localStorage.removeItem('user');
+   localStorage.removeItem('token');
+   this.router.navigate(['/connexion'], { queryParams: { error: 'unauthorized' } });
+   return;
+ }
+
+ this.isAuthenticated = true;
+
+
     this.loadUsers();
+    
+    this.notificationService.notifications$.subscribe(notifications => {
+      console.log('Notifications reçues:', notifications);
+      
+      let unreadNotifications = notifications.filter(notif => !notif.read);
+
+      const updatedNotifications: any[] = [];
+      let checkPromises = unreadNotifications.map(notif => {
+        if (!notif.email) {
+          return Promise.resolve(null);
+        }
+        return this.userService.checkUserExists(notif.email).toPromise().then(
+          (response) => {
+            if (response && response.exists) {
+              return notif;
+            } else {
+              console.log(`Utilisateur avec email ${notif.email} n'existe plus, suppression de la notification.`);
+              return null;
+            }
+          },
+          error => {
+            console.error(`Erreur lors de la vérification de l'utilisateur ${notif.email}:`, error);
+            return null;
+          }
+        );
+      });
+
+      Promise.all(checkPromises).then(results => {
+        const validNotifications = results.filter(notif => notif !== null);
+        this.notifications = validNotifications;
+      });
+    });
   }
 
   loadUsers() {
     this.userService.getUsers().subscribe({
       next: (data) => {
         this.users = data;
-        this.filteredUsers = this.users.filter(user => !user.isArchived);
+        this.filteredUsers = this.users.filter(user => 
+          user.status === 'active' && 
+          !user.isArchived && 
+          user.role?.toLowerCase() !== 'admin'
+        );
+        this.totalItems = this.filteredUsers.length;
+        this.totalPages = Math.ceil(this.totalItems / this.itemsPerPage);
+        this.updatePaginatedUsers();
       },
       error: (error) => {
         console.error('Erreur lors du chargement des utilisateurs:', error);
@@ -117,15 +191,50 @@ export class GestionDesUtilisateursComponent implements OnInit {
       }
     });
   }
-  
 
-  onSearch() {
-    console.log('Recherche:', this.searchQuery);
+  onSearch(): void {
+    this.tableSearchQuery = this.searchQuery;
+    this.currentPage = 1;
+    this.filterUsers();
+  }
+
+  goToPage(page: number) {
+    if (page < 1 || page > this.totalPages) return;
+    this.currentPage = page;
+    this.updatePaginatedUsers();
+  }
+
+  previousPage() {
+    if (this.currentPage > 1) {
+      this.currentPage--;
+      this.updatePaginatedUsers();
+    }
+  }
+
+  nextPage() {
+    if (this.currentPage < this.totalPages) {
+      this.currentPage++;
+      this.updatePaginatedUsers();
+    }
+  }
+
+  getPages(): number[] {
+    const pages: number[] = [];
+    for (let i = 1; i <= this.totalPages; i++) {
+      pages.push(i);
+    }
+    return pages;
+  }
+
+  getEndIndex(): number {
+    return Math.min(this.currentPage * this.itemsPerPage, this.filteredUsers.length);
   }
 
   filterUsers() {
     this.filteredUsers = this.users.filter(user => {
-      if (user.isArchived) return false;
+      if (user.status !== 'active' || user.isArchived || user.role?.toLowerCase() === 'admin') {
+        return false;
+      }
       
       if (!this.tableSearchQuery) return true;
       
@@ -137,6 +246,16 @@ export class GestionDesUtilisateursComponent implements OnInit {
         user.email.toLowerCase().includes(searchStr)
       );
     });
+
+    this.totalItems = this.filteredUsers.length;
+    this.totalPages = Math.ceil(this.totalItems / this.itemsPerPage);
+    this.updatePaginatedUsers();
+  }
+
+  updatePaginatedUsers() {
+    const startIndex = (this.currentPage - 1) * this.itemsPerPage;
+    const endIndex = startIndex + this.itemsPerPage;
+    this.paginatedUsers = this.filteredUsers.slice(startIndex, endIndex);
   }
 
   openAddUserModal() {
@@ -150,8 +269,10 @@ export class GestionDesUtilisateursComponent implements OnInit {
       confirmPassword: '',
       telephone: '', 
       adresse: '', 
-      dateCreation: '' ,
+      dateCreation: '' 
     };
+    this.showPassword = false;
+    this.showConfirmPassword = false;
     this.isModalOpen = true;
   }
 
@@ -160,8 +281,8 @@ export class GestionDesUtilisateursComponent implements OnInit {
     this.currentUser = { ...user, password: undefined, confirmPassword: undefined };
     this.isModalOpen = true;
   }
+
   saveUser() {
-    // Vérification des champs obligatoires
     if (!this.currentUser.matriculeFiscale || 
         !this.currentUser.nom || 
         !this.currentUser.prenom || 
@@ -175,7 +296,6 @@ export class GestionDesUtilisateursComponent implements OnInit {
       return;
     }
 
-    // Pour un nouvel utilisateur, vérifier les mots de passe
     if (this.modalTitle === 'Ajouter un utilisateur') {
       if (!this.currentUser.password || !this.currentUser.confirmPassword) {
         this.showMessageModal = true;
@@ -194,13 +314,15 @@ export class GestionDesUtilisateursComponent implements OnInit {
       }
     }
 
-    // Ajouter la date de création si non définie
     if (!this.currentUser.dateCreation) {
       this.currentUser.dateCreation = new Date().toISOString().split('T')[0];
     }
 
     if (this.modalTitle === 'Ajouter un utilisateur') {
-      // Création d'un nouvel utilisateur
+      this.currentUser.status = 'active';
+    }
+
+    if (this.modalTitle === 'Ajouter un utilisateur') {
       this.userService.createUsers(this.currentUser).subscribe({
         next: (response) => {
           console.log('Utilisateur ajouté avec succès:', response);
@@ -221,7 +343,6 @@ export class GestionDesUtilisateursComponent implements OnInit {
         }
       });
     } else {
-      // Mise à jour d'un utilisateur existant
       this.userService.updateUser(this.currentUser.matriculeFiscale, this.currentUser).subscribe({
         next: (response) => {
           console.log('Utilisateur mis à jour avec succès:', response);
@@ -260,6 +381,8 @@ export class GestionDesUtilisateursComponent implements OnInit {
       adresse: '',
       dateCreation: ''
     };
+    this.showPassword = false;
+    this.showConfirmPassword = false;
     this.passwordMatchMessage = '';
     this.passwordMatchClass = '';
   }
@@ -289,6 +412,20 @@ export class GestionDesUtilisateursComponent implements OnInit {
     this.passwordStrengthClass = '';
     this.passwordMatchMessage = '';
     this.passwordMatchClass = '';
+  }
+
+  logout(): void {
+    localStorage.removeItem('token');
+    localStorage.removeItem('user');
+    this.isAuthenticated = false;
+    this.router.navigate(['/connexion']);
+  }
+  togglePasswordVisibility() {
+    this.showPassword = !this.showPassword;
+  }
+
+  toggleConfirmPasswordVisibility() {
+    this.showConfirmPassword = !this.showConfirmPassword;
   }
 
   checkPasswordStrength() {

@@ -1,3 +1,51 @@
+/* Ensure the root container doesn't allow horizontal overflow */
+html, body {
+  overflow-x: hidden;
+}
+
+/* Ensure the main content doesn't overflow */
+main {
+  overflow-x: hidden;
+}
+
+/* Ensure chart containers are responsive */
+.chart-container {
+  width: 100%;
+  max-width: 100%;
+}
+
+/* Ensure canvas elements inside charts don't overflow */
+canvas {
+  width: 100% !important;
+  max-width: 100% !important;
+}
+
+/* Ensure the table doesn't force a wider width */
+table {
+  width: 100%;
+  table-layout: auto;
+}
+
+/* Ensure table cells wrap content if necessary */
+td, th {
+  white-space: normal;
+  word-wrap: break-word;
+}
+
+/* Adjust padding and margins to prevent overflow */
+.px-4 {
+  padding-left: 1rem;
+  padding-right: 1rem;
+}
+
+/* Responsive grid for charts on smaller screens */
+@media (max-width: 1024px) {
+  .grid-cols-1.lg\:grid-cols-2 {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* Existing styles */
 .checkbox-custom {
   position: relative;
   width: 18px;

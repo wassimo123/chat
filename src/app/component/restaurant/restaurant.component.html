@@ -9,8 +9,7 @@
       <div class="flex gap-4">
         <!-- Bouton Trier par -->
         <div class="relative">
-          <select (change)="onSortChange($event)"
-                  [ngClass]="{'filter-active': sortOption !== 'default'}"
+          <select (change)="onSortChange($event)" [ngClass]="{'filter-active': sortOption !== 'default'}"
                   class="bg-white px-4 py-2 rounded-button border appearance-none pr-8 hover:border-primary">
             <option value="default">Trier par</option>
             <option value="priceAsc">Prix croissant</option>
@@ -28,14 +27,14 @@
           </button>
           <div *ngIf="showFilters" class="absolute right-0 mt-2 w-64 bg-white rounded-lg shadow-lg p-4 z-10">
             <div class="space-y-4">
-              <!-- Prix par nuit -->
+              <!-- Prix par repas -->
               <div>
-                <label class="block text-sm font-medium text-gray-700 mb-2">Prix par nuit</label>
+                <label class="block text-sm font-medium text-gray-700 mb-2">Prix par repas</label>
                 <div class="flex items-center space-x-2">
-                  <input type="number" placeholder="Min" [(ngModel)]="filterPriceMin" (ngModelChange)="filterHotels()"
+                  <input type="number" placeholder="Min" [(ngModel)]="filterPriceMin" (ngModelChange)="filterRestaurant()"
                          class="w-24 px-3 py-1 border rounded-button">
                   <span>-</span>
-                  <input type="number" placeholder="Max" [(ngModel)]="filterPriceMax" (ngModelChange)="filterHotels()"
+                  <input type="number" placeholder="Max" [(ngModel)]="filterPriceMax" (ngModelChange)="filterRestaurant()"
                          class="w-24 px-3 py-1 border rounded-button">
                 </div>
               </div>
@@ -44,15 +43,15 @@
                 <label class="block text-sm font-medium text-gray-700 mb-2">Étoiles</label>
                 <div class="flex items-center space-x-2">
                   <label class="flex items-center">
-                    <input type="checkbox" [(ngModel)]="filterStars[5]" (ngModelChange)="filterHotels()" class="form-checkbox text-primary">
+                    <input type="checkbox" [(ngModel)]="filterStars[5]" (ngModelChange)="filterRestaurant()" class="form-checkbox text-primary">
                     <span class="ml-2">5★</span>
                   </label>
                   <label class="flex items-center">
-                    <input type="checkbox" [(ngModel)]="filterStars[4]" (ngModelChange)="filterHotels()" class="form-checkbox text-primary">
+                    <input type="checkbox" [(ngModel)]="filterStars[4]" (ngModelChange)="filterRestaurant()" class="form-checkbox text-primary">
                     <span class="ml-2">4★</span>
                   </label>
                   <label class="flex items-center">
-                    <input type="checkbox" [(ngModel)]="filterStars[3]" (ngModelChange)="filterHotels()" class="form-checkbox text-primary">
+                    <input type="checkbox" [(ngModel)]="filterStars[3]" (ngModelChange)="filterRestaurant()" class="form-checkbox text-primary">
                     <span class="ml-2">3★</span>
                   </label>
                 </div>
@@ -62,19 +61,19 @@
                 <label class="block text-sm font-medium text-gray-700 mb-2">Services</label>
                 <div class="space-y-2">
                   <label class="flex items-center">
-                    <input type="checkbox" [(ngModel)]="filterServices.Piscine" (ngModelChange)="filterHotels()" class="form-checkbox text-primary">
+                    <input type="checkbox" [(ngModel)]="filterServices.Piscine" (ngModelChange)="filterRestaurant()" class="form-checkbox text-primary">
                     <span class="ml-2">Piscine</span>
                   </label>
                   <label class="flex items-center">
-                    <input type="checkbox" [(ngModel)]="filterServices.Spa" (ngModelChange)="filterHotels()" class="form-checkbox text-primary">
+                    <input type="checkbox" [(ngModel)]="filterServices.Spa" (ngModelChange)="filterRestaurant()" class="form-checkbox text-primary">
                     <span class="ml-2">Spa</span>
                   </label>
                   <label class="flex items-center">
-                    <input type="checkbox" [(ngModel)]="filterServices.Restaurant" (ngModelChange)="filterHotels()" class="form-checkbox text-primary">
+                    <input type="checkbox" [(ngModel)]="filterServices.Restaurant" (ngModelChange)="filterRestaurant()" class="form-checkbox text-primary">
                     <span class="ml-2">Restaurant</span>
                   </label>
                   <label class="flex items-center">
-                    <input type="checkbox" [(ngModel)]="filterServices.Wifi" (ngModelChange)="filterHotels()" class="form-checkbox text-primary">
+                    <input type="checkbox" [(ngModel)]="filterServices.Wifi" (ngModelChange)="filterRestaurant()" class="form-checkbox text-primary">
                     <span class="ml-2">Wifi gratuit</span>
                   </label>
                 </div>
@@ -86,31 +85,30 @@
       </div>
     </div>
 
-    <!-- Hotels Grid -->
+    <!-- Restaurant Grid -->
     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-      <div *ngFor="let hotel of filteredHotels"
+      <div *ngFor="let restaurant of filteredRestaurant"
            class="bg-white rounded-lg shadow-sm overflow-hidden hover:shadow-md transition-shadow">
-        <img [src]="hotel.image" [alt]="hotel.nom" class="w-full h-48 object-cover">
+        <img [src]="restaurant.image" [alt]="restaurant.nom" class="w-full h-48 object-cover">
         <div class="p-6">
           <div class="flex items-center gap-2 mb-2">
             <span class="text-xs font-medium px-2 py-1 rounded-full bg-green-100 text-green-800">
               Restaurant
             </span>
           </div>
-          <h3 class="text-xl font-semibold mb-2">{{hotel.nom}}</h3>
+          <h3 class="text-xl font-semibold mb-2">{{restaurant.nom}}</h3>
           <div class="flex items-center gap-1 mb-3">
-            <i class="ri-star-fill text-yellow-400" *ngFor="let star of getStars(hotel.rating)"></i>
-            <span class="text-sm text-gray-600 ml-1">({{hotel.reviews}} avis)</span>
+            <i class="ri-star-fill text-yellow-400" *ngFor="let star of getStars(restaurant.rating)"></i>
+            <span class="text-sm text-gray-600 ml-1">({{restaurant.reviews}} avis)</span>
           </div>
-          <p class="text-gray-600 mb-4">{{hotel.description}}</p>
+          <p class="text-gray-600 mb-4">{{restaurant.description}}</p>
           <div class="flex items-center justify-between">
-            <!--<span class="text-lg font-bold">{{hotel.price}} DT/nuit</span>-->
+            <!-- <span class="text-lg font-bold">{{restaurant.price}} DT par repas</span> -->
             <button 
-            class="bg-primary text-white px-4 py-2 rounded-button hover:bg-primary/90"
-            (click)="goToWebsite(hotel.siteWeb)">
-            Consulter
-          </button>
-          
+              class="bg-primary text-white px-4 py-2 rounded-button hover:bg-primary/90"
+              (click)="goToDetails(restaurant)">
+              Voir Details
+            </button>
           </div>
         </div>
       </div>

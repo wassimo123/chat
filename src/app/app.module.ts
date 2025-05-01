@@ -1,6 +1,6 @@
 import { NgModule } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
-import { FormsModule } from '@angular/forms';
+import { FormsModule , ReactiveFormsModule} from '@angular/forms';
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
 import { NgxEchartsModule } from 'ngx-echarts';
@@ -30,6 +30,12 @@ import { ResetPasswordComponent } from './reset-password/reset-password.componen
 import { GestionDesEtablissementsComponent } from './admin/gestion-des-etablissements/gestion-des-etablissements.component';
 import { GestionDesPromotionsComponent } from './admin/gestion-des-promotions/gestion-des-promotions.component';
 import { GestionDesEvenementsComponent } from './admin/gestion-des-evenements/gestion-des-evenements.component';
+import { PartenaireComponent } from './partenaire/partenaire/partenaire.component';
+import { MapModalComponent } from './components/map-modal/map-modal.component';
+import { ProfilePartenaireComponent } from './partenaire/profile-partenaire/profile-partenaire.component';
+import { PartenaireEtablissementsComponent } from './partenaire/partenaire-etablissements/partenaire-etablissements.component';
+import { PartenaireEvenementsComponent } from './partenaire/partenaire-evenements/partenaire-evenements.component';
+import { PartenairePromotionsComponent } from './partenaire/partenaire-promotions/partenaire-promotions.component';
 
 
 
@@ -53,7 +59,13 @@ import { GestionDesEvenementsComponent } from './admin/gestion-des-evenements/ge
     GestionDesEtablissementsComponent,
     GestionDesPromotionsComponent,
     GestionDesEvenementsComponent,
-   
+    PartenaireComponent,
+    MapModalComponent,
+   ProfilePartenaireComponent,
+   PartenaireEtablissementsComponent,
+   PartenaireEvenementsComponent,
+   PartenairePromotionsComponent
+  
     
 
    
@@ -80,6 +92,7 @@ import { GestionDesEvenementsComponent } from './admin/gestion-des-evenements/ge
     PromotionsComponent,
     RestaurantComponent,
     CafeComponent ,
+    ReactiveFormsModule,
     
 ],
   providers: [],

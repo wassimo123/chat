@@ -5,12 +5,29 @@ import { NavbarComponent } from '../navbar/navbar.component';
 import { FooterComponent } from '../footer/footer.component';
 import { Router } from '@angular/router';
 import { EtablissementService } from '../../services/etablissement.service';
+import { Etablissement } from '../../models/etablissement.model';
 
 interface FilterServices {
   Piscine: boolean;
   Spa: boolean;
   Restaurant: boolean;
   Wifi: boolean;
+}
+
+interface RestaurantDisplay {
+  id: string;
+  nom: string;
+  type: string;
+  image: string;
+  rating: number;
+  reviews: number;
+  description: string;
+  price: number;
+  services: string[];
+  address: string;
+  hours: string;
+  phone: string;
+  siteWeb: string;
 }
 
 @Component({
@@ -39,56 +56,56 @@ export class RestaurantComponent implements OnInit {
   itemsPerPage: number = 10;
   currentItems: number = this.itemsPerPage;
 
-  hotels: any[] = [];
-  filteredHotels: any[] = [];
+  Restaurant: RestaurantDisplay[] = [];
+  filteredRestaurant: RestaurantDisplay[] = [];
+restaurant: any;
 
   constructor(private router: Router, private etablissementService: EtablissementService) {}
 
   ngOnInit() {
-    this.fetchHotels();
+    this.fetchRestaurant();
   }
 
-  fetchHotels() {
+  fetchRestaurant() {
     this.isLoading = true;
     this.errorMessage = null;
-    this.etablissementService.getRestaurants().subscribe({
-      next: (hotels) => {
-        // Map API response to match the component's expected structure
-        this.hotels = hotels.map(hotel => {
-          let imageUrl = 'https://r-xx.bstatic.com/xdata/images/hotel/608x352/281564416.webp?k=d34be48dc235d2aba463351d30aa399a184946441e78177d1ed6e66c427e5e81&o='; // Fallback placeholder
+    this.etablissementService.getRestaurant().subscribe({
+      next: (restaurant: Etablissement[]) => {
+        this.Restaurant = restaurant.map((restaurant: Etablissement) => {
+          let imageUrl = 'https://r-xx.bstatic.com/xdata/images/restaurant/608x352/281564416.webp?k=d34be48dc235d2aba463351d30aa399a184946441e78177d1ed6e66c427e5e81&o=';
       
-          if (hotel.photos?.length) {
-            const photo = hotel.photos[0];
+          if (restaurant.photos?.length) {
+            const photo = restaurant.photos[0];
             if (typeof photo === 'string') {
               imageUrl = `http://localhost:5000/${photo.replace(/\\/g, '/')}`;
             } else if (photo instanceof File) {
               imageUrl = URL.createObjectURL(photo);
             }
-            console.log("imageUrl",imageUrl);
+            console.log("imageUrl", imageUrl);
           }
       
           return {
-            id: hotel.id,
-            nom: hotel.nom,
-            type: hotel.type,
+            id: restaurant.id ?? '',
+            nom: restaurant.nom,
+            type: restaurant.type,
             image: imageUrl,
             rating: 4,
             reviews: 100,
-            description: hotel.description || 'Aucune description disponible',
+            description: restaurant.description || 'Aucune description disponible',
             price: 200,
-            services: hotel.services?.map((s: string) => this.normalizeService(s)) || [],
-            address: hotel.adresse,
-            hours: hotel.horaires?.is24_7 ? '24/7' : 'Horaires non spécifiés',
-            phone: hotel.telephone,
-            siteWeb: hotel.siteWeb,
+            services: restaurant.services?.map((s: string) => this.normalizeService(s)) || [],
+            address: restaurant.adresse,
+            hours: restaurant.horaires?.is24_7 ? '24/7' : 'Horaires non spécifiés',
+            phone: restaurant.telephone,
+            siteWeb: restaurant.siteWeb
           };
         });
-        this.filteredHotels = this.hotels; // Directly show all hotels
+        this.filteredRestaurant = this.Restaurant;
         this.isLoading = false;
       },
-      error: (error) => {
-        console.error('Error fetching hotels:', error);
-        this.errorMessage = 'Impossible de charger les hôtels. Veuillez réessayer plus tard.';
+      error: (error: any) => {
+        console.error('Error fetching restaurants:', error);
+        this.errorMessage = 'Impossible de charger les restaurants. Veuillez réessayer plus tard.';
         this.isLoading = false;
       }
     });
@@ -109,12 +126,12 @@ export class RestaurantComponent implements OnInit {
     }
   }
 
-  filterHotels() {
-    let filtered = this.hotels.filter(item => {
+  filterRestaurant() {
+    let filtered = this.Restaurant.filter((item: RestaurantDisplay) => {
       const matchesSearch = item.nom.toLowerCase().includes(this.searchQuery.toLowerCase()) ||
                            item.description.toLowerCase().includes(this.searchQuery.toLowerCase());
-      const matchesPrice = (!this.filterPriceMin || item.price >= this.filterPriceMin) &&
-                           (!this.filterPriceMax || item.price <= this.filterPriceMax);
+      const matchesPrice = (!this.filterPriceMin || item.price >= (this.filterPriceMin ?? 0)) &&
+                           (!this.filterPriceMax || item.price <= (this.filterPriceMax ?? Infinity));
       const selectedStars = Object.keys(this.filterStars)
         .filter(star => this.filterStars[parseInt(star)])
         .map(star => parseInt(star));
@@ -126,30 +143,30 @@ export class RestaurantComponent implements OnInit {
       return matchesSearch && matchesPrice && matchesStars && matchesServices;
     });
 
-    this.filteredHotels = filtered.slice(0, this.currentItems);
+    this.filteredRestaurant = filtered.slice(0, this.currentItems);
   }
 
   onSortChange(event: Event) {
     const target = event.target as HTMLSelectElement;
     if (target) {
       this.sortOption = target.value;
-      this.sortHotels(target.value);
+      this.sortRestaurants(target.value);
     }
   }
 
-  sortHotels(sortType: string) {
+  sortRestaurants(sortType: string) {
     switch (sortType) {
       case 'priceAsc':
-        this.filteredHotels.sort((a, b) => a.price - b.price);
+        this.filteredRestaurant.sort((a: RestaurantDisplay, b: RestaurantDisplay) => a.price - b.price);
         break;
       case 'priceDesc':
-        this.filteredHotels.sort((a, b) => b.price - b.price);
+        this.filteredRestaurant.sort((a: RestaurantDisplay, b: RestaurantDisplay) => b.price - a.price);
         break;
       case 'rating':
-        this.filteredHotels.sort((a, b) => b.rating - a.rating);
+        this.filteredRestaurant.sort((a: RestaurantDisplay, b: RestaurantDisplay) => b.rating - a.rating);
         break;
       default:
-        this.filterHotels();
+        this.filterRestaurant();
     }
   }
 
@@ -157,19 +174,24 @@ export class RestaurantComponent implements OnInit {
     return Array(Math.floor(rating)).fill(0);
   }
 
-  openBookingModal(hotel: any) {
-    this.router.navigate(['/hotel', hotel.id]);
-  }
-  goToWebsite(url:any) {
+  goToWebsite(url: string) {
     if (url) {
-      window.open(url, '_blank'); // Opens in a new tab
+      window.open(url, '_blank');
     }
-
   }
-  
+
+  goToDetails(restaurant: RestaurantDisplay): void {
+    console.log("restaurant:", restaurant);
+    if (!restaurant.id) {
+      console.error('Restaurant ID is undefined!');
+      return;
+    }
+    this.router.navigate(['/etablissements', restaurant.id]);
+  }
+
   loadMore() {
     this.currentItems += this.itemsPerPage;
-    this.filterHotels();
+    this.filterRestaurant();
   }
 
   toggleFilters() {
@@ -177,11 +199,11 @@ export class RestaurantComponent implements OnInit {
   }
 
   canLoadMore(): boolean {
-    let filtered = this.hotels.filter(item => {
+    let filtered = this.Restaurant.filter((item: RestaurantDisplay) => {
       const matchesSearch = item.nom.toLowerCase().includes(this.searchQuery.toLowerCase()) ||
                            item.description.toLowerCase().includes(this.searchQuery.toLowerCase());
-      const matchesPrice = (!this.filterPriceMin || item.price >= this.filterPriceMin) &&
-                           (!this.filterPriceMax || item.price <= this.filterPriceMax);
+      const matchesPrice = (!this.filterPriceMin || item.price >= (this.filterPriceMin ?? 0)) &&
+                           (!this.filterPriceMax || item.price <= (this.filterPriceMax ?? Infinity));
       const selectedStars = Object.keys(this.filterStars)
         .filter(star => this.filterStars[parseInt(star)])
         .map(star => parseInt(star));

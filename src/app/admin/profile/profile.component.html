@@ -1,37 +1,30 @@
-<div class="flex h-screen bg-gray-50 min-h-screen">
+<div class="flex h-screen bg-gray-100 min-h-screen">
   <!-- Sidebar: Menu de navigation latéral -->
-  <aside class="w-64 bg-white shadow-sm">
+  <aside *ngIf="isAuthenticated" class="w-64 bg-white shadow-sm">
     <div class="h-16 flex items-center px-6">
       <div class="text-2xl font-['Pacifico'] text-primary">Sfax</div>
     </div>
     <nav class="mt-4">
-      <!-- Lien vers le tableau de bord -->
       <a routerLink="/dashboard" routerLinkActive="bg-gray-50 text-primary" class="flex items-center px-6 py-3 text-gray-600 hover:bg-gray-50 hover:text-primary">
         <i class="ri-dashboard-line mr-3"></i>
         <span>Tableau de bord</span>
       </a>
-      <!-- Lien vers la gestion des utilisateurs -->
       <a routerLink="/users" routerLinkActive="bg-gray-50 text-primary" class="flex items-center px-6 py-3 text-gray-600 hover:bg-gray-50 hover:text-primary">
         <i class="ri-user-line mr-3"></i>
         <span>Utilisateurs</span>
       </a>
-      <a
-      routerLink="/etablissements"
-      routerLinkActive="bg-gray-50 text-primary"
-      class="flex items-center px-6 py-3 text-gray-600 hover:bg-gray-50 hover:text-primary"
-    >
-      <i class="ri-building-line mr-3"></i>
-      <span>Établissements</span>
-    </a>
-    <a routerLink="/promo" routerLinkActive="bg-gray-50 text-primary" class="flex items-center px-6 py-3 text-gray-600 hover:bg-gray-50 hover:text-primary">
-      <i class="ri-price-tag-3-line mr-3"></i>
-      <span>Promotions</span>
-    </a>
-    <a routerLink="/event" routerLinkActive="bg-gray-50 text-primary" class="flex items-center px-6 py-3 text-gray-600 hover:bg-gray-50 hover:text-primary">
-      <i class="ri-calendar-line mr-3"></i>
-      <span>Événements</span>
-    </a>
-      <!-- Lien vers les notifications -->
+      <a routerLink="/etablissements" routerLinkActive="bg-gray-50 text-primary" class="flex items-center px-6 py-3 text-gray-600 hover:bg-gray-50 hover:text-primary">
+        <i class="ri-building-line mr-3"></i>
+        <span>Établissements</span>
+      </a>
+      <a routerLink="/promo" routerLinkActive="bg-gray-50 text-primary" class="flex items-center px-6 py-3 text-gray-600 hover:bg-gray-50 hover:text-primary">
+        <i class="ri-price-tag-3-line mr-3"></i>
+        <span>Promotions</span>
+      </a>
+      <a routerLink="/event" routerLinkActive="bg-gray-50 text-primary" class="flex items-center px-6 py-3 text-gray-600 hover:bg-gray-50 hover:text-primary">
+        <i class="ri-calendar-line mr-3"></i>
+        <span>Événements</span>
+      </a>
       <a routerLink="/notifications" routerLinkActive="bg-gray-50 text-primary" class="flex items-center px-6 py-3 text-gray-600 hover:bg-gray-50 hover:text-primary">
         <i class="ri-notification-line mr-3"></i>
         <span>Notifications</span>
@@ -40,7 +33,7 @@
   </aside>
 
   <!-- Contenu principal -->
-  <div class="flex-1 flex flex-col">
+  <div *ngIf="isAuthenticated; else notAuthenticated" class="flex-1 flex flex-col">
     <!-- En-tête -->
     <header class="bg-white shadow-sm h-16">
       <div class="h-full px-6 flex items-center justify-between">
@@ -51,14 +44,12 @@
           </a>
         </div>
         <div class="flex items-center space-x-4">
-          <!-- Bouton de notification avec badge -->
           <button routerLink="/notifications" class="w-8 h-8 flex items-center justify-center text-gray-600 hover:text-primary relative">
             <i class="ri-notification-3-line"></i>
             <span class="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">
-              {{ notificationCount }}
+              {{ notifications.length }}
             </span>
           </button>
-          <!-- Menu de profil -->
           <div class="relative">
             <button id="profileButton" class="flex items-center space-x-2 cursor-pointer" (click)="toggleProfileMenu()">
               <div class="w-8 h-8 rounded-full bg-gray-200 flex items-center justify-center">
@@ -72,9 +63,8 @@
                 <i class="ri-user-line mr-2"></i>
                 Mon profil
               </a>
-
               <div class="border-t border-gray-100 my-1"></div>
-              <a routerLink="/connexion" class="px-4 py-2 text-sm text-red-600 hover:bg-gray-100 flex items-center">
+              <a (click)="logout()" class="px-4 py-2 text-sm text-red-600 hover:bg-gray-100 flex items-center cursor-pointer">
                 <i class="ri-logout-box-line mr-2"></i>
                 Déconnexion
               </a>
@@ -85,54 +75,115 @@
     </header>
 
     <!-- Contenu principal -->
-    <main class="flex-1 overflow-auto p-6">
-      <div class="max-w-3xl mx-auto">
-        <div class="bg-white rounded-lg shadow-sm p-6">
-          <h1 class="text-2xl font-semibold text-gray-900 mb-8">Mon Profil</h1>
-          <div class="flex flex-col items-center mb-8">
-            <div class="relative">
-              <div class="w-32 h-32 rounded-full bg-gray-200 flex items-center justify-center overflow-hidden">
-                <img id="profileImage" [src]="profileImage" alt="Photo de profil" class="w-full h-full object-cover" />
-              </div>
-              <button (click)="triggerFileInput()" class="absolute bottom-0 right-0 w-8 h-8 bg-primary text-white rounded-full flex items-center justify-center shadow-sm hover:bg-primary-dark">
-                <i class="ri-camera-line"></i>
-              </button>
-              <input type="file" id="photoInput" class="hidden" accept="image/*" (change)="updateProfileImage($event)" #photoInput />
-            </div>
-          </div>
+    <main class="flex-1 overflow-auto p-8 bg-gray-100">
+      <div class="max-w-4xl mx-auto">
+        <div class="bg-white rounded-xl shadow-lg p-8">
+          <h1 class="text-3xl font-bold text-gray-800 mb-6 border-b pb-4">Mon Profil</h1>
           <form id="profileForm" class="space-y-6" (ngSubmit)="handleProfileSubmit()">
             <div class="grid grid-cols-2 gap-6">
+              <!-- Prénom -->
               <div>
                 <label class="block text-sm font-medium text-gray-700 mb-2">Prénom</label>
-                <input type="text" id="firstName" class="w-full px-4 py-2 border border-gray-300 rounded-button focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent" [(ngModel)]="profile.firstName" name="firstName" required />
+                <input type="text" id="firstName" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent bg-gray-100" [(ngModel)]="profile.firstName" name="firstName" readonly />
+                <p class="text-xs text-red-600 mt-1">Le prénom ne peut pas être modifié.</p>
               </div>
+              <!-- Nom -->
               <div>
                 <label class="block text-sm font-medium text-gray-700 mb-2">Nom</label>
-                <input type="text" id="lastName" class="w-full px-4 py-2 border border-gray-300 rounded-button focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent" [(ngModel)]="profile.lastName" name="lastName" required />
+                <input type="text" id="lastName" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent bg-gray-100" [(ngModel)]="profile.lastName" name="lastName" readonly />
+                <p class="text-xs text-red-600 mt-1">Le nom ne peut pas être modifié.</p>
               </div>
             </div>
+            <!-- Email -->
             <div>
               <label class="block text-sm font-medium text-gray-700 mb-2">Email</label>
-              <input type="email" id="email" class="w-full px-4 py-2 border border-gray-300 rounded-button focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent" [(ngModel)]="profile.email" name="email" required />
+              <input type="email" id="email" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent bg-gray-100" [(ngModel)]="profile.email" name="email" readonly />
+              <p class="text-xs text-red-600 mt-1">L'email ne peut pas être modifié.</p>
             </div>
-
-            <div class="col-span-2">
-              <label class="block text-sm font-medium text-gray-700 mb-2">Mot de passe</label>
-              <button type="button" (click)="showPasswordModal()"
-                class="w-full px-4 py-2 bg-primary text-white rounded-button hover:bg-primary-dark">
-                Changer le mot de passe
-              </button>
+            <!-- Téléphone -->
+            <div>
+              <label for="telephone" class="block text-sm font-medium text-gray-700 mb-2">Téléphone <span class="text-red-500">*</span></label>
+              <input type="text" id="telephone" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent" [(ngModel)]="profile.telephone" name="telephone" required />
             </div>
-            
+            <!-- Adresse -->
+            <div>
+              <label for="adresse" class="block text-sm font-medium text-gray-700 mb-2">Adresse <span class="text-red-500">*</span></label>
+              <input type="text" id="adresse" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent" [(ngModel)]="profile.adresse" name="adresse" required />
+            </div>
+            <!-- Mot de passe actuel -->
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-2">Mot de passe actuel</label>
+              <div class="relative">
+                <input [type]="showCurrentPassword ? 'text' : 'password'" id="currentPasswordDisplay" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent bg-gray-100" [(ngModel)]="profile.password" name="currentPasswordDisplay" readonly />
+                <button type="button" (click)="toggleCurrentPasswordVisibility()" class="absolute inset-y-0 right-0 flex items-center pr-3">
+                  <i [class]="showCurrentPassword ? 'ri-eye-off-line' : 'ri-eye-line'" class="text-gray-500"></i>
+                </button>
+              </div>
+            </div>
+            <!-- Section pour changer le mot de passe -->
+            <div class="border-t pt-6 mt-6">
+              <h2 class="text-lg font-semibold text-gray-800 mb-4">Changer le mot de passe</h2>
+              <div class="space-y-4">
+                <div>
+                  <label class="block text-sm font-medium text-gray-700 mb-2">Ancien mot de passe</label>
+                  <div class="relative">
+                    <input [type]="showOldPassword ? 'text' : 'password'" [(ngModel)]="currentPassword" name="currentPassword" required class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent" />
+                    <button type="button" (click)="toggleOldPasswordVisibility()" class="absolute inset-y-0 right-0 flex items-center pr-3">
+                      <i [class]="showOldPassword ? 'ri-eye-off-line' : 'ri-eye-line'" class="text-gray-500"></i>
+                    </button>
+                  </div>
+                </div>
+                <div>
+                  <label class="block text-sm font-medium text-gray-700 mb-2">Nouveau mot de passe</label>
+                  <div class="relative">
+                    <input [type]="showNewPassword ? 'text' : 'password'" [(ngModel)]="newPassword" name="newPassword" required class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent" (input)="checkPasswordStrength()" />
+                    <button type="button" (click)="toggleNewPasswordVisibility()" class="absolute inset-y-0 right-0 flex items-center pr-3">
+                      <i [class]="showNewPassword ? 'ri-eye-off-line' : 'ri-eye-line'" class="text-gray-500"></i>
+                    </button>
+                  </div>
+                  <div [ngClass]="passwordStrengthClass" class="password-strength mt-2"></div>
+                  <div class="mt-2 text-xs text-gray-500">
+                    Le mot de passe doit contenir au moins :
+                    <ul class="list-disc list-inside">
+                      <li>8 caractères</li>
+                      <li>Une lettre majuscule</li>
+                      <li>Une lettre minuscule</li>
+                      <li>Un chiffre</li>
+                      <li>Un caractère spécial</li>
+                    </ul>
+                  </div>
+                </div>
+                <div>
+                  <label class="block text-sm font-medium text-gray-700 mb-2">Confirmer le nouveau mot de passe</label>
+                  <div class="relative">
+                    <input [type]="showConfirmPassword ? 'text' : 'password'" [(ngModel)]="confirmPassword" name="confirmPassword" required class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent" (input)="checkPasswordMatch()" />
+                    <button type="button" (click)="toggleConfirmPasswordVisibility()" class="absolute inset-y-0 right-0 flex items-center pr-3">
+                      <i [class]="showConfirmPassword ? 'ri-eye-off-line' : 'ri-eye-line'" class="text-gray-500"></i>
+                    </button>
+                  </div>
+                  <div class="mt-1 text-xs" [ngClass]="passwordMatchClass">{{ passwordMatchMessage }}</div>
+                </div>
+              </div>
+            </div>
+            <!-- Boutons -->
             <div class="flex justify-end space-x-4 pt-6">
-              <button type="button" (click)="resetForm()" class="px-6 py-2 border border-gray-300 rounded-button text-gray-700 hover:bg-gray-50">Annuler</button>
-              <button type="submit" class="px-6 py-2 bg-primary text-white rounded-button hover:bg-primary-dark">Enregistrer</button>
+              <button type="button" (click)="resetForm()" class="px-6 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 transition-colors">Annuler</button>
+              <button type="submit" class="px-6 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors">Enregistrer</button>
             </div>
           </form>
         </div>
       </div>
     </main>
   </div>
+
+  <!-- Si l'utilisateur n'est pas authentifié -->
+  <ng-template #notAuthenticated>
+    <div class="flex h-screen items-center justify-center bg-gray-100">
+      <div class="text-center">
+        <p class="text-lg font-semibold text-gray-700">Redirection en cours...</p>
+      </div>
+    </div>
+  </ng-template>
 
   <!-- Toast Notification -->
   <div *ngIf="toastMessage" class="fixed bottom-4 right-4 px-6 py-3 rounded-lg shadow-lg z-50" [ngClass]="{'bg-green-500': toastType === 'success', 'bg-blue-500': toastType === 'info'}">
@@ -142,59 +193,16 @@
     </div>
   </div>
 
-  <!-- Modal pour changer le mot de passe -->
-  <div id="passwordModal" class="modal" [class.hidden]="!isPasswordModalOpen">
-    <div class="fixed inset-0 flex items-center justify-center">
-      <div class="bg-white rounded-lg shadow-xl w-full max-w-md">
-        <div class="p-6">
-          <h2 class="text-xl font-semibold text-gray-900 mb-6">Changer le mot de passe</h2>
-          <form (ngSubmit)="handlePasswordSubmit()">
-            <div class="space-y-4">
-              <div>
-                <label class="block text-sm font-medium text-gray-700">Mot de passe actuel</label>
-                <input type="password" [(ngModel)]="currentPassword" name="currentPassword" required class="mt-1 block w-full border border-gray-300 rounded-button px-3 py-2 focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent">
-              </div>
-              <div>
-                <label class="block text-sm font-medium text-gray-700">Nouveau mot de passe</label>
-                <input type="password" [(ngModel)]="newPassword" name="newPassword" required class="mt-1 block w-full border border-gray-300 rounded-button px-3 py-2 focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent" (input)="checkPasswordStrength()">
-                <div [ngClass]="passwordStrengthClass" class="password-strength"></div>
-                <div class="mt-2 text-xs text-gray-500">
-                  Le mot de passe doit contenir au moins :
-                  <ul class="list-disc list-inside">
-                    <li>8 caractères</li>
-                    <li>Une lettre majuscule</li>
-                    <li>Une lettre minuscule</li>
-                    <li>Un chiffre</li>
-                    <li>Un caractère spécial</li>
-                  </ul>
-                </div>
-              </div>
-              <div>
-                <label class="block text-sm font-medium text-gray-700">Confirmer le nouveau mot de passe</label>
-                <input type="password" [(ngModel)]="confirmPassword" name="confirmPassword" required class="mt-1 block w-full border border-gray-300 rounded-button px-3 py-2 focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent" (input)="checkPasswordMatch()">
-                <div class="mt-1 text-xs" [ngClass]="passwordMatchClass">{{ passwordMatchMessage }}</div>
-              </div>
-            </div>
-            <div class="mt-6 flex justify-end space-x-3">
-              <button type="button" class="px-4 py-2 border border-gray-300 rounded-button text-gray-700" (click)="closePasswordModal()">Annuler</button>
-              <button type="submit" class="px-4 py-2 bg-primary text-white rounded-button">Enregistrer</button>
-            </div>
-          </form>
-        </div>
-      </div>
-    </div>
-  </div>
-
   <!-- Modal pour les messages d'erreur ou de succès -->
-  <div *ngIf="showMessageModal" class="fixed inset-0 flex items-center justify-center z-50">
-    <div class="bg-white rounded-lg shadow-xl p-6 max-w-sm w-full mx-4">
+  <div *ngIf="showMessageModal" class="fixed inset-0 flex items-center justify-center z-50 bg-black bg-opacity-50">
+    <div class="bg-white rounded-xl shadow-xl p-6 max-w-sm w-full mx-4">
       <div class="flex items-center mb-4" [ngClass]="messageModalType === 'error' ? 'text-red-600' : 'text-green-600'">
         <i [ngClass]="messageModalType === 'error' ? 'ri-error-warning-line' : 'ri-checkbox-circle-line'" class="text-2xl mr-2"></i>
         <h3 class="text-lg font-semibold">{{ messageModalTitle }}</h3>
       </div>
       <p class="text-gray-700 mb-6">{{ messageModalMessage }}</p>
       <div class="flex justify-end">
-        <button (click)="closeMessageModal()" class="px-4 py-2 bg-primary text-white rounded-button">OK</button>
+        <button (click)="closeMessageModal()" class="px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors">OK</button>
       </div>
     </div>
   </div>

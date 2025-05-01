@@ -1,5 +1,33 @@
 import { Component, OnInit, AfterViewInit, ViewChild, ElementRef, HostListener } from '@angular/core';
+import { Router } from '@angular/router'; // Ajout de Router
 import * as echarts from 'echarts';
+import { UserService } from '../../../services/user.service';
+import { NotificationService } from 'src/app/services/notification.service';
+import Swal from 'sweetalert2';
+
+interface User {
+  matriculeFiscale: string;
+  nom: string;
+  prenom: string;
+  email: string;
+  password?: string;
+  confirmPassword?: string;
+  telephone: string;
+  adresse: string;
+  dateCreation: string;
+  isArchived?: boolean;
+  status?: 'pending' | 'active' | 'inactive';
+  role?: string;
+}
+
+interface Activity {
+  _id: string;
+  type: string;
+  email: string;
+  time: string;
+  message?: string;
+  icon?: string;
+}
 
 @Component({
   selector: 'app-tableau-de-bord',
@@ -10,67 +38,194 @@ export class TableauDeBordComponent implements OnInit, AfterViewInit {
   @ViewChild('userActivityChart') userActivityChartElement!: ElementRef;
   @ViewChild('userRolesChart') userRolesChartElement!: ElementRef;
 
-  // Propriétés pour la barre de recherche
   searchQuery: string = '';
-  userSearchQuery: string = '';
-  statusFilter: string = '';
-  roleFilter: string = '';
-
-  // Contrôle l'affichage du menu de profil
+  notifications: any[] = [];
   isProfileMenuOpen: boolean = false;
+  isAuthenticated: boolean = false; // Ajout de la propriété isAuthenticated
 
-  // Statistiques pour les cartes
   stats = {
-    totalUsers: 124,
-    activeUsers: 80,
-    pendingUsers: 25,
-    inactiveUsers: 15
+    totalUsers: 0,
+    activeUsers: 0,
+    pendingUsers: 0,
+    inactiveUsers: 0
   };
 
-  // Dernières activités
-  recentActivities = [
-    { type: 'new', icon: 'ri-user-add-line', message: 'Nouveau utilisateur inscrit:  Wassim Affes', time: 'Il y a 2 heures' },
-    { type: 'activated', icon: 'ri-check-line', message: 'Compte activé: Racem Ben Jdidia', time: 'Il y a 3 heures' },
-    { type: 'updated', icon: 'ri-edit-line', message: 'Profil mis à jour: Mohamed Kallel', time: 'Il y a 5 heures' }
-  ];
+  userActivityData: number[] = [];
+  userRolesData: { value: number, name: string, itemStyle: { color: string } }[] = [];
 
+  recentActivities: Activity[] = [];
 
-  // Modal pour changer le mot de passe
-  isPasswordModalOpen: boolean = false;
-  currentPassword: string = '';
-  newPassword: string = '';
-  confirmPassword: string = '';
-  passwordStrengthClass: string = '';
-  passwordMatchMessage: string = '';
-  passwordMatchClass: string = '';
+  users: User[] = [];
 
-  // Modal pour ajouter/modifier un utilisateur
-  isUserModalOpen: boolean = false;
-  modalTitle: string = 'Ajouter un utilisateur';
-  selectedUser: any = { nom: '', prenom: '', email: '', role: '' };
-
-  // Modal pour les messages
-  showMessageModal: boolean = false;
-  messageModalType: 'error' | 'success' = 'error';
-  messageModalTitle: string = '';
-  messageModalMessage: string = '';
-  notificationCount: number = 3;
-  constructor() {}
+  constructor(
+    private userService: UserService,
+    private notificationService: NotificationService,
+    private router: Router // Ajout de Router dans le constructeur
+  ) {}
 
   ngOnInit() {
-    
-  }
+    // Vérification de l'authentification
+    const token = localStorage.getItem('token');
+    const userData = localStorage.getItem('user');
+    if (!token || !userData) {
+      this.isAuthenticated = false;
+      this.router.navigate(['/connexion'], { queryParams: { error: 'unauthorized' } });
+      return;
+    }
 
-  ngAfterViewInit() {
-    this.initCharts();
-    window.addEventListener('resize', () => {
-      this.resizeCharts();
+    const user = JSON.parse(userData);
+    if (!user || !user.email) {
+      this.isAuthenticated = false;
+      localStorage.removeItem('user');
+      localStorage.removeItem('token');
+      this.router.navigate(['/connexion'], { queryParams: { error: 'unauthorized' } });
+      return;
+    }
+
+    this.isAuthenticated = true;
+
+    // Chargement des données si l'utilisateur est authentifié
+    this.loadUsers();
+    this.loadRecentActivities();
+
+    this.notificationService.notifications$.subscribe(notifications => {
+      console.log('Notifications reçues:', notifications);
+      let unreadNotifications = notifications.filter((notif: any) => !notif.read);
+
+      const updatedNotifications: any[] = [];
+      let checkPromises = unreadNotifications.map((notif: any) => {
+        if (!notif.email) {
+          return Promise.resolve(null);
+        }
+        return this.userService.checkUserExists(notif.email).toPromise().then(
+          (response) => {
+            if (response && response.exists) {
+              return notif;
+            } else {
+              console.log(`Utilisateur avec email ${notif.email} n'existe plus, suppression de la notification.`);
+              return null;
+            }
+          },
+          error => {
+            console.error(`Erreur lors de la vérification de l'utilisateur ${notif.email}:`, error);
+            return null;
+          }
+        );
+      });
+
+      Promise.all(checkPromises).then(results => {
+        const validNotifications = results.filter(notif => notif !== null);
+        this.notifications = validNotifications;
+      });
     });
   }
 
-  // Initialisation des graphiques
+  ngAfterViewInit() {
+    if (this.isAuthenticated) {
+      this.initCharts();
+      window.addEventListener('resize', () => {
+        this.resizeCharts();
+      });
+    }
+  }
+
+  loadUsers() {
+    this.userService.getUsers().subscribe({
+      next: (users) => {
+        this.users = users;
+        this.calculateStats();
+        this.prepareChartData();
+      },
+      error: (error) => {
+        console.error('Erreur lors du chargement des utilisateurs:', error);
+      }
+    });
+  }
+
+  loadRecentActivities() {
+    this.userService.getRecentActivities().subscribe({
+      next: (activities) => {
+        this.recentActivities = activities.map(activity => {
+          const date = new Date(activity.time);
+          const timeAgo = this.getTimeAgo(date);
+          let message = '';
+          let icon = '';
+
+          switch (activity.type) {
+            case 'new':
+              message = `Nouvel utilisateur inscrit: ${activity.email}`;
+              icon = 'ri-user-add-line';
+              break;
+            case 'activated':
+              message = `Compte activé: ${activity.email}`;
+              icon = 'ri-check-line';
+              break;
+            case 'updated':
+              message = `Profil mis à jour: ${activity.email}`;
+              icon = 'ri-edit-line';
+              break;
+            default:
+              message = `Activité: ${activity.email}`;
+              icon = 'ri-information-line';
+          }
+
+          return { ...activity, message, icon, time: timeAgo };
+        });
+      },
+      error: (error) => {
+        console.error('Erreur lors du chargement des activités récentes:', error);
+        this.recentActivities = [];
+      }
+    });
+  }
+
+  calculateStats() {
+    this.stats.totalUsers = this.users.length;
+    this.stats.activeUsers = this.users.filter(user => user.status === 'active' && !user.isArchived).length;
+    this.stats.pendingUsers = this.users.filter(user => user.status === 'pending').length;
+    this.stats.inactiveUsers = this.users.filter(user => user.status === 'inactive').length;
+  }
+
+  prepareChartData() {
+    const today = new Date();
+    const last7Days = Array.from({ length: 7 }, (_, i) => {
+      const date = new Date(today);
+      date.setDate(today.getDate() - i);
+      return date.toISOString().split('T')[0];
+    }).reverse();
+
+    this.userActivityData = last7Days.map(date => {
+      return this.users.filter(user => {
+        const userDate = new Date(user.dateCreation).toISOString().split('T')[0];
+        return userDate === date;
+      }).length;
+    });
+
+    const roleCounts: { [key: string]: number } = {};
+    this.users.forEach(user => {
+      const role = user.role || 'Utilisateur';
+      roleCounts[role] = (roleCounts[role] || 0) + 1;
+    });
+
+    const roleColors: { [key: string]: string } = {
+      Utilisateur: 'rgba(87, 181, 231, 1)',
+      Modérateur: 'rgba(141, 211, 199, 1)',
+      Administrateur: 'rgba(251, 191, 114, 1)',
+      Invité: 'rgba(252, 141, 98, 1)',
+      Admin: 'rgba(87, 181, 231, 1)',
+      Partenaire: 'rgba(141, 211, 199, 1)'
+    };
+
+    this.userRolesData = Object.keys(roleCounts).map(role => ({
+      value: roleCounts[role],
+      name: role,
+      itemStyle: { color: roleColors[role] || 'rgba(87, 181, 231, 1)' }
+    }));
+
+    this.initCharts();
+  }
+
   initCharts() {
-    // Graphique: Activité des utilisateurs
     const userActivityChart = echarts.init(this.userActivityChartElement.nativeElement);
     const userActivityOption = {
       animation: false,
@@ -100,7 +255,7 @@ export class TableauDeBordComponent implements OnInit, AfterViewInit {
       },
       series: [
         {
-          data: [150, 230, 224, 218, 135, 147, 260],
+          data: this.userActivityData.length ? this.userActivityData : [0, 0, 0, 0, 0, 0, 0],
           type: 'line',
           smooth: true,
           symbol: 'none',
@@ -123,7 +278,6 @@ export class TableauDeBordComponent implements OnInit, AfterViewInit {
     };
     userActivityChart.setOption(userActivityOption);
 
-    // Graphique: Distribution des rôles
     const userRolesChart = echarts.init(this.userRolesChartElement.nativeElement);
     const userRolesOption = {
       animation: false,
@@ -153,11 +307,11 @@ export class TableauDeBordComponent implements OnInit, AfterViewInit {
             label: { show: true, fontSize: '20', fontWeight: 'bold' }
           },
           labelLine: { show: false },
-          data: [
-            { value: 735, name: 'Utilisateurs', itemStyle: { color: 'rgba(87, 181, 231, 1)' } },
-            { value: 580, name: 'Modérateurs', itemStyle: { color: 'rgba(141, 211, 199, 1)' } },
-            { value: 484, name: 'Administrateurs', itemStyle: { color: 'rgba(251, 191, 114, 1)' } },
-            { value: 300, name: 'Invités', itemStyle: { color: 'rgba(252, 141, 98, 1)' } }
+          data: this.userRolesData.length ? this.userRolesData : [
+            { value: 0, name: 'Utilisateurs', itemStyle: { color: 'rgba(87, 181, 231, 1)' } },
+            { value: 0, name: 'Modérateurs', itemStyle: { color: 'rgba(141, 211, 199, 1)' } },
+            { value: 0, name: 'Administrateurs', itemStyle: { color: 'rgba(251, 191, 114, 1)' } },
+            { value: 0, name: 'Invités', itemStyle: { color: 'rgba(252, 141, 98, 1)' } }
           ]
         }
       ]
@@ -165,7 +319,6 @@ export class TableauDeBordComponent implements OnInit, AfterViewInit {
     userRolesChart.setOption(userRolesOption);
   }
 
-  // Redimensionner les graphiques lors du changement de taille de la fenêtre
   resizeCharts() {
     const userActivityChart = echarts.getInstanceByDom(this.userActivityChartElement.nativeElement);
     const userRolesChart = echarts.getInstanceByDom(this.userRolesChartElement.nativeElement);
@@ -173,17 +326,14 @@ export class TableauDeBordComponent implements OnInit, AfterViewInit {
     if (userRolesChart) userRolesChart.resize();
   }
 
-  // Méthode pour la recherche dans l'en-tête
   onSearch() {
     console.log('Recherche:', this.searchQuery);
   }
 
-  // Ouvre/ferme le menu de profil
   toggleProfile() {
     this.isProfileMenuOpen = !this.isProfileMenuOpen;
   }
 
-  // Ferme le menu de profil si clic en dehors
   @HostListener('document:click', ['$event'])
   onDocumentClick(event: Event) {
     const target = event.target as HTMLElement;
@@ -192,39 +342,57 @@ export class TableauDeBordComponent implements OnInit, AfterViewInit {
     }
   }
 
+  getTimeAgo(date: Date): string {
+    const now = new Date();
+    const diffInSeconds = Math.floor((now.getTime() - date.getTime()) / 1000);
 
-
-  
-
-  
-
-  
-  
-  // Afficher le modal pour ajouter/modifier un utilisateur
-  showUserModal(title: string = 'Ajouter un utilisateur') {
-    this.modalTitle = title;
-    this.isUserModalOpen = true;
-    this.selectedUser = { nom: '', prenom: '', email: '', role: '' };
+    if (diffInSeconds < 60) return `Il y a ${diffInSeconds} secondes`;
+    const diffInMinutes = Math.floor(diffInSeconds / 60);
+    if (diffInMinutes < 60) return `Il y a ${diffInMinutes} minute${diffInMinutes > 1 ? 's' : ''}`;
+    const diffInHours = Math.floor(diffInMinutes / 60);
+    if (diffInHours < 24) return `Il y a ${diffInHours} heure${diffInHours > 1 ? 's' : ''}`;
+    const diffInDays = Math.floor(diffInHours / 24);
+    return `Il y a ${diffInDays} jour${diffInDays > 1 ? 's' : ''}`;
   }
 
-  // Fermer le modal utilisateur
-  closeUserModal() {
-    this.isUserModalOpen = false;
-    this.selectedUser = { nom: '', prenom: '', email: '', role: '' };
+  deleteActivity(activity: Activity) {
+    Swal.fire({
+      title: 'Êtes-vous sûr ?',
+      text: 'Voulez-vous vraiment supprimer cette activité ?',
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonColor: '#d33',
+      cancelButtonColor: '#3085d6',
+      confirmButtonText: 'Supprimer',
+      cancelButtonText: 'Annuler'
+    }).then((result) => {
+      if (result.isConfirmed) {
+        this.userService.deleteActivity(activity._id).subscribe({
+          next: () => {
+            this.recentActivities = this.recentActivities.filter(a => a._id !== activity._id);
+            Swal.fire(
+              'Supprimé !',
+              'L\'activité a été supprimée avec succès.',
+              'success'
+            );
+          },
+          error: (error) => {
+            console.error('Erreur lors de la suppression de l\'activité:', error);
+            Swal.fire(
+              'Erreur !',
+              'Une erreur s\'est produite lors de la suppression de l\'activité. Veuillez réessayer.',
+              'error'
+            );
+          }
+        });
+      }
+    });
   }
 
-  // Soumettre le formulaire utilisateur
-  handleUserSubmit() {
-    // Ici, vous feriez normalement un appel API pour ajouter/modifier l'utilisateur
-    console.log('Utilisateur soumis:', this.selectedUser);
-    this.closeUserModal();
-  }
-
-
-
-
-  // Fermer le modal de message
-  closeMessageModal() {
-    this.showMessageModal = false;
+  // Ajout de la méthode logout()
+  logout() {
+    localStorage.removeItem('token');
+    localStorage.removeItem('user');
+    this.router.navigate(['/connexion']);
   }
 }

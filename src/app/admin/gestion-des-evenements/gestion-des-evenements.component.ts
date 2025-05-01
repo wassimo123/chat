@@ -3,8 +3,10 @@ import { Chart } from 'chart.js';
 import { registerables } from 'chart.js';
 import { EvenementService } from '../../services/evenement.service';
 import { Evenement, Stats } from '../../models/evenement.model';
-
+import { UserService } from '../../services/user.service';
+import { NotificationService } from 'src/app/services/notification.service';
 Chart.register(...registerables);
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-gestion-des-evenements',
@@ -17,19 +19,20 @@ export class GestionDesEvenementsComponent implements OnInit, AfterViewInit {
 
   eventsByMonthChart: Chart | null = null;
   eventsByCategoryChart: Chart | null = null;
-
+  isAuthenticated: boolean = false;
   evenements: Evenement[] = [];
   filteredEvents: Evenement[] = [];
   paginatedEvents: Evenement[] = [];
-  stats: Stats = { total: 0, upcoming: 0, participants: 0, participationRate: 0 };
+  stats: Stats = { total: 0, upcoming: 0, inProgress: 0, completed: 0 };
+  notifications: any[] = [];
 
   tableSearchQuery = '';
   selectedStatus = 'Tous';
-  selectedTypeEtablissement = 'Tous'; // New property
+  selectedTypeEtablissement = 'Tous';
   selectedSort = '';
   showSortFilter = false;
   showStatusFilter = false;
-  showTypeEtablissementFilter = false; // New property
+  showTypeEtablissementFilter = false;
 
   sortField = '';
   sortDirection: 'asc' | 'desc' = 'asc';
@@ -45,8 +48,8 @@ export class GestionDesEvenementsComponent implements OnInit, AfterViewInit {
   isArchiveModalOpen = false;
   eventToArchive: Evenement | null = null;
 
-  photoPreviews: string[] = [];
-  selectedFiles: File[] = [];
+  photoPreview: string | null = null;
+  selectedFile: File | null = null;
   etablissementsType: { _id: string; nom: string }[] = [];
 
   selectAll = false;
@@ -59,14 +62,76 @@ export class GestionDesEvenementsComponent implements OnInit, AfterViewInit {
   messageModalTitle = '';
   messageModalMessage = '';
 
-  constructor(private evenementService: EvenementService) {}
+  private readonly API_BASE_URL = 'http://localhost:5000';
+
+  constructor(
+    private evenementService: EvenementService,
+    private userService: UserService,
+    private notificationService: NotificationService,
+    private router: Router
+  ) {}
 
   ngOnInit(): void {
+    const token = localStorage.getItem('token');
+    const userData = localStorage.getItem('user');
+    if (!token || !userData) {
+      this.isAuthenticated = false;
+      this.router.navigate(['/connexion'], { queryParams: { error: 'unauthorized' } });
+      return;
+    }
+
+    const user = JSON.parse(userData);
+    if (!user || !user.email) {
+      this.isAuthenticated = false;
+      localStorage.removeItem('user');
+      localStorage.removeItem('token');
+      this.router.navigate(['/connexion'], { queryParams: { error: 'unauthorized' } });
+      return;
+    }
+
+    this.isAuthenticated = true;
+
     this.loadEvenements();
+    this.notificationService.notifications$.subscribe(notifications => {
+      console.log('Notifications reçues:', notifications);
+      let unreadNotifications = notifications.filter(notif => !notif.read);
+      const updatedNotifications: any[] = [];
+      let checkPromises = unreadNotifications.map(notif => {
+        if (!notif.email) {
+          return Promise.resolve(null);
+        }
+        return this.userService.checkUserExists(notif.email).toPromise().then(
+          (response) => {
+            if (response && response.exists) {
+              return notif;
+            } else {
+              console.log(`Utilisateur avec email ${notif.email} n'existe plus, suppression de la notification.`);
+              return null;
+            }
+          },
+          error => {
+            console.error(`Erreur lors de la vérification de l'utilisateur ${notif.email}:`, error);
+            return null;
+          }
+        );
+      });
+
+      Promise.all(checkPromises).then(results => {
+        const validNotifications = results.filter(notif => notif !== null);
+        this.notifications = validNotifications;
+      });
+    });
   }
 
   ngAfterViewInit(): void {
-    this.initCharts();
+    if (this.isAuthenticated) {
+      this.initCharts();
+    }
+  }
+
+  private getTimestampFromId(id: string): number {
+    const timestampHex = id.substring(0, 8);
+    return parseInt(timestampHex, 16) * 1000;
   }
 
   loadEvenements(): void {
@@ -76,6 +141,7 @@ export class GestionDesEvenementsComponent implements OnInit, AfterViewInit {
           ...e,
           selected: false
         }));
+        this.evenements.sort((a, b) => this.getTimestampFromId(b.id) - this.getTimestampFromId(a.id));
         this.filteredEvents = this.evenements;
         this.updateStats();
         this.updatePagination();
@@ -129,9 +195,9 @@ export class GestionDesEvenementsComponent implements OnInit, AfterViewInit {
         this.eventsByCategoryChart = new Chart(ctx, {
           type: 'pie',
           data: {
-            labels: ['Gastronomie', 'Musique', 'Littérature', 'Cinéma', 'Art', 'Sport', 'Autre'],
+            labels: ['Gastronomie', 'Musique', 'Littérature', 'Cinéma', 'Art', 'Sport', 'Conférences', 'Festivals', 'Autre'],
             datasets: [{
-              data: [24, 18, 15, 12, 10, 8, 5],
+              data: [24, 18, 15, 12, 10, 8, 5, 7, 5],
               backgroundColor: [
                 'rgba(87, 181, 231, 1)',
                 'rgba(141, 211, 199, 1)',
@@ -139,6 +205,8 @@ export class GestionDesEvenementsComponent implements OnInit, AfterViewInit {
                 'rgba(252, 141, 98, 1)',
                 'rgba(186, 147, 216, 1)',
                 'rgba(104, 211, 145, 1)',
+                'rgba(255, 159, 243, 1)',
+                'rgba(255, 217, 102, 1)',
                 'rgba(163, 163, 163, 1)'
               ],
               borderWidth: 2,
@@ -165,39 +233,53 @@ export class GestionDesEvenementsComponent implements OnInit, AfterViewInit {
   }
 
   updateStats(): void {
-    const today = new Date();
     this.stats.total = this.evenements.length;
     this.stats.upcoming = this.evenements.filter(e => e.statut === 'À venir').length;
-    this.stats.participants = this.evenements.reduce((sum, e) => sum + e.participants, 0);
-    this.stats.participationRate = Math.round(
-      this.evenements.length ? (this.stats.participants / this.evenements.reduce((sum, e) => sum + e.capacite, 0)) * 100 : 0
-    );
+    this.stats.inProgress = this.evenements.filter(e => e.statut === 'En cours').length;
+    this.stats.completed = this.evenements.filter(e => e.statut === 'Terminé').length;
   }
 
   filterEvents(): void {
     this.filteredEvents = this.evenements.filter((e) => {
       const matchesSearch =
         e.nom.toLowerCase().includes(this.tableSearchQuery.toLowerCase()) ||
-        e.lieu.toLowerCase().includes(this.tableSearchQuery.toLowerCase());
-      const matchesStatus = this.selectedStatus === 'Tous' || e.statut === this.selectedStatus;
+        e.lieu.toLowerCase().includes(this.tableSearchQuery.toLowerCase())||
+        e.typeEtablissement.toLowerCase().includes(this.tableSearchQuery.toLowerCase());
+
+      let matchesStatus = true;
+      if (this.selectedStatus !== 'Tous') {
+        matchesStatus = e.statut === this.selectedStatus;
+      }
+
       const matchesType = this.selectedTypeEtablissement === 'Tous' || e.typeEtablissement === this.selectedTypeEtablissement;
+
       return matchesSearch && matchesStatus && matchesType;
     });
+
     this.currentPage = 1;
     this.updatePagination();
     this.updateCharts();
   }
 
+  logout(): void {
+    localStorage.removeItem('token');
+    localStorage.removeItem('user');
+    this.isAuthenticated = false;
+    this.router.navigate(['/connexion']);
+  }
+
   updateCharts(): void {
-    if (this.eventsByMonthChart && this.eventsByCategoryChart) {
+    if (this.eventsByMonthChart) {
       const monthCounts = Array(12).fill(0);
       this.filteredEvents.forEach(e => {
-        const month = new Date(e.date).getMonth();
+        const month = new Date(e.dateDebut).getMonth();
         monthCounts[month]++;
       });
       this.eventsByMonthChart.data.datasets[0].data = monthCounts;
       this.eventsByMonthChart.update();
+    }
 
+    if (this.eventsByCategoryChart) {
       const categoryCounts: { [key: string]: number } = {
         Gastronomie: 0,
         Musique: 0,
@@ -205,9 +287,11 @@ export class GestionDesEvenementsComponent implements OnInit, AfterViewInit {
         Cinéma: 0,
         Art: 0,
         Sport: 0,
+        Conférences: 0,
+        Festivals: 0,
         Autre: 0
       };
-      const validCategories = ['Gastronomie', 'Musique', 'Littérature', 'Cinéma', 'Art', 'Sport', 'Autre'];
+      const validCategories = ['Gastronomie', 'Musique', 'Littérature', 'Cinéma', 'Art', 'Sport', 'Conférences', 'Festivals', 'Autre'];
       this.filteredEvents.forEach(e => {
         if (validCategories.includes(e.categorie)) {
           categoryCounts[e.categorie]++;
@@ -231,12 +315,15 @@ export class GestionDesEvenementsComponent implements OnInit, AfterViewInit {
       if (field === 'nom' || field === 'lieu') {
         valueA = a[field].toLowerCase();
         valueB = b[field].toLowerCase();
-      } else if (field === 'date') {
-        valueA = new Date(a.date);
-        valueB = new Date(b.date);
-      } else if (field === 'participants') {
-        valueA = a.participants;
-        valueB = b.participants;
+      } else if (field === 'dateDebut') {
+        valueA = new Date(a.dateDebut);
+        valueB = new Date(b.dateDebut);
+      } else if (field === 'prix') {
+        valueA = a.prix.montant;
+        valueB = b.prix.montant;
+      } else if (field === 'estPublic') {
+        valueA = a.estPublic;
+        valueB = b.estPublic;
       }
       if (valueA < valueB) return this.sortDirection === 'asc' ? -1 : 1;
       if (valueA > valueB) return this.sortDirection === 'asc' ? 1 : -1;
@@ -334,13 +421,13 @@ export class GestionDesEvenementsComponent implements OnInit, AfterViewInit {
     return {
       id: '',
       nom: '',
-      date: '',
+      dateDebut: '',
+      dateFin: '',
       heureDebut: '',
       heureFin: '',
       lieu: '',
       ville: '',
       capacite: 0,
-      participants: 0,
       categorie: '',
       organisateur: '',
       description: '',
@@ -349,14 +436,19 @@ export class GestionDesEvenementsComponent implements OnInit, AfterViewInit {
       typeEtablissement: '',
       establishmentId: '',
       selected: false,
-      photos: []
+      photo: '',
+      prix: {
+        estGratuit: false,
+        montant: 0
+      }
     };
   }
 
   openAddEventModal(): void {
     this.modalTitle = 'Ajouter un événement';
     this.currentEvent = this.getDefaultEvent();
-    this.photoPreviews = [];
+    this.photoPreview = null;
+    this.selectedFile = null;
     this.etablissementsType = [];
     this.isModalOpen = true;
     setTimeout(() => {
@@ -369,9 +461,13 @@ export class GestionDesEvenementsComponent implements OnInit, AfterViewInit {
 
   editEvent(event: Evenement): void {
     this.modalTitle = 'Modifier un événement';
-    this.currentEvent = { ...event, photos: event.photos || [] };
-    this.photoPreviews = event.photos || [];
-    this.selectedFiles = [];
+    this.currentEvent = { ...event, photo: event.photo || '', prix: { ...event.prix } };
+    this.photoPreview = event.photo
+      ? (event.photo.startsWith('data:') || event.photo.startsWith('http'))
+        ? event.photo
+        : `${this.API_BASE_URL}${event.photo}`
+      : null;
+    this.selectedFile = null;
     if (this.currentEvent.typeEtablissement) {
       this.onTypeChange();
     }
@@ -381,7 +477,8 @@ export class GestionDesEvenementsComponent implements OnInit, AfterViewInit {
   saveEvent(): void {
     if (
       !this.currentEvent.nom ||
-      !this.currentEvent.date ||
+      !this.currentEvent.dateDebut ||
+      !this.currentEvent.dateFin ||
       !this.currentEvent.heureDebut ||
       !this.currentEvent.lieu ||
       !this.currentEvent.ville ||
@@ -389,26 +486,44 @@ export class GestionDesEvenementsComponent implements OnInit, AfterViewInit {
       !this.currentEvent.categorie ||
       !this.currentEvent.typeEtablissement ||
       !this.currentEvent.establishmentId ||
-      !this.currentEvent.statut
+      !this.currentEvent.statut ||
+      this.currentEvent.estPublic === undefined ||
+      (this.currentEvent.prix.estGratuit === false && (!this.currentEvent.prix.montant || this.currentEvent.prix.montant <= 0))
     ) {
-      this.showNotification('Veuillez remplir tous les champs obligatoires.', 'error');
+      this.showNotification('Veuillez remplir tous les champs obligatoires, y compris un établissement valide, un prix valide si non gratuit, et la visibilité.', 'error');
       return;
     }
 
+    const startDate = new Date(this.currentEvent.dateDebut);
+    const endDate = new Date(this.currentEvent.dateFin);
+    if (endDate < startDate) {
+      this.showNotification('La date de fin ne peut pas être antérieure à la date de début.', 'error');
+      return;
+    }
+
+    console.log('Données de l\'événement avant envoi :', {
+      nom: this.currentEvent.nom,
+      typeEtablissement: this.currentEvent.typeEtablissement,
+      establishmentId: this.currentEvent.establishmentId,
+      prix: this.currentEvent.prix,
+    });
+
     const formData = new FormData();
     Object.keys(this.currentEvent).forEach(key => {
-      if (key !== 'photos' && key !== 'id' && this.currentEvent[key as keyof Evenement] !== undefined) {
+      if (key !== 'photo' && key !== 'id' && key !== 'prix' && this.currentEvent[key as keyof Evenement] !== undefined) {
         formData.append(key, this.currentEvent[key as keyof Evenement]!.toString());
       }
     });
-    this.selectedFiles.forEach(file => {
-      formData.append('photos', file);
-    });
+    formData.append('prix', JSON.stringify(this.currentEvent.prix));
+    if (this.selectedFile) {
+      formData.append('photo', this.selectedFile);
+    }
 
     if (this.modalTitle === 'Ajouter un événement') {
       this.evenementService.addEvenement(formData).subscribe({
         next: (response: Evenement) => {
-          this.evenements.push({ ...response, selected: false });
+          this.evenements.unshift({ ...response, selected: false });
+          this.evenements.sort((a, b) => this.getTimestampFromId(b.id) - this.getTimestampFromId(a.id));
           this.closeModal();
           this.updateStats();
           this.filterEvents();
@@ -423,6 +538,7 @@ export class GestionDesEvenementsComponent implements OnInit, AfterViewInit {
         next: (response: Evenement) => {
           const index = this.evenements.findIndex((e) => e.id === response.id);
           if (index !== -1) this.evenements[index] = { ...response, selected: false };
+          this.evenements.sort((a, b) => this.getTimestampFromId(b.id) - this.getTimestampFromId(a.id));
           this.closeModal();
           this.updateStats();
           this.filterEvents();
@@ -437,7 +553,8 @@ export class GestionDesEvenementsComponent implements OnInit, AfterViewInit {
 
   closeModal(): void {
     this.isModalOpen = false;
-    this.photoPreviews = [];
+    this.photoPreview = null;
+    this.selectedFile = null;
     this.etablissementsType = [];
   }
 
@@ -459,6 +576,7 @@ export class GestionDesEvenementsComponent implements OnInit, AfterViewInit {
           if (index !== -1) {
             this.evenements[index] = { ...response, selected: false };
           }
+          this.evenements.sort((a, b) => this.getTimestampFromId(b.id) - this.getTimestampFromId(a.id));
           this.closeArchiveModal();
           this.updateStats();
           this.filterEvents();
@@ -471,22 +589,46 @@ export class GestionDesEvenementsComponent implements OnInit, AfterViewInit {
     }
   }
 
-  onPhotosChange(event: Event): void {
+  onPhotoChange(event: Event): void {
     const input = event.target as HTMLInputElement;
     if (input.files && input.files.length > 0) {
-      this.photoPreviews = [];
-      Array.from(input.files).forEach(file => {
-        const reader = new FileReader();
-        reader.onload = (e: any) => {
-          this.photoPreviews.push(e.target.result as string);
-        };
-        reader.readAsDataURL(file);
-      });
+      const file = input.files[0];
+      const filetypes = /jpeg|jpg|png|gif/;
+      const isValidType = filetypes.test(file.type);
+      const isValidSize = file.size <= 5 * 1024 * 1024;
+      if (!isValidType) {
+        this.showNotification(`Le fichier ${file.name} n'est pas une image valide (JPEG, PNG, GIF requis).`, 'error');
+        return;
+      }
+      if (!isValidSize) {
+        this.showNotification(`Le fichier ${file.name} dépasse la limite de 5MB.`, 'error');
+        return;
+      }
+
+      this.selectedFile = file;
+
+      const reader = new FileReader();
+      reader.onload = (e: any) => {
+        this.photoPreview = e.target.result as string;
+      };
+      reader.onerror = () => {
+        this.showNotification(`Erreur lors de la lecture du fichier ${file.name}.`, 'error');
+      };
+      reader.readAsDataURL(file);
+
+      input.value = '';
     }
   }
 
-  removePhoto(index: number): void {
-    this.photoPreviews.splice(index, 1);
+  removePhoto(): void {
+    this.photoPreview = null;
+    this.selectedFile = null;
+  }
+
+  handleImageError(): void {
+    this.showNotification(`Impossible de charger l'image. Elle peut avoir été supprimée ou le serveur est inaccessible.`, 'error');
+    this.photoPreview = null;
+    this.selectedFile = null;
   }
 
   onTypeChange(): void {
@@ -494,12 +636,15 @@ export class GestionDesEvenementsComponent implements OnInit, AfterViewInit {
       this.evenementService.getEtablissementsByType(this.currentEvent.typeEtablissement).subscribe({
         next: (etabs) => {
           this.etablissementsType = etabs;
+          console.log('Établissements récupérés pour type', this.currentEvent.typeEtablissement, ':', etabs);
           if (!etabs.some(e => e._id === this.currentEvent.establishmentId)) {
             this.currentEvent.establishmentId = '';
           }
         },
         error: (err: any) => {
           this.showNotification('Erreur lors du chargement des établissements: ' + err.message, 'error');
+          this.etablissementsType = [];
+          this.currentEvent.establishmentId = '';
         }
       });
     } else {
@@ -541,6 +686,8 @@ export class GestionDesEvenementsComponent implements OnInit, AfterViewInit {
       case 'Cinéma': return 'bg-red-100';
       case 'Art': return 'bg-purple-100';
       case 'Sport': return 'bg-green-200';
+      case 'Conférences': return 'bg-pink-100';
+      case 'Festivals': return 'bg-yellow-200';
       case 'Autre': return 'bg-gray-100';
       default: return 'bg-gray-100';
     }
@@ -554,6 +701,8 @@ export class GestionDesEvenementsComponent implements OnInit, AfterViewInit {
       case 'Cinéma': return 'text-red-500';
       case 'Art': return 'text-purple-500';
       case 'Sport': return 'text-green-600';
+      case 'Conférences': return 'text-pink-500';
+      case 'Festivals': return 'text-yellow-600';
       case 'Autre': return 'text-gray-500';
       default: return 'text-gray-500';
     }
@@ -567,6 +716,8 @@ export class GestionDesEvenementsComponent implements OnInit, AfterViewInit {
       case 'Cinéma': return 'ri-movie-line';
       case 'Art': return 'ri-paint-brush-line';
       case 'Sport': return 'ri-run-line';
+      case 'Conférences': return 'ri-mic-line';
+      case 'Festivals': return 'ri-star-line';
       case 'Autre': return 'ri-calendar-line';
       default: return 'ri-calendar-line';
     }

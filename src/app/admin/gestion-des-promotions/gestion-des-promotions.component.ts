@@ -2,13 +2,11 @@ import { Component, OnInit, AfterViewInit, ElementRef, ViewChild } from '@angula
 import { Chart } from 'chart.js';
 import { registerables } from 'chart.js';
 import { PromotionService, Promotion } from '../../services/promotion.service';
+import { NotificationService } from 'src/app/services/notification.service';
+import { UserService } from '../../services/user.service';
+import { Router } from '@angular/router';
 
 Chart.register(...registerables);
-
-interface Establishment {
-  id: number;
-  name: string;
-}
 
 interface PromoStats {
   total: number;
@@ -32,13 +30,10 @@ export class GestionDesPromotionsComponent implements OnInit, AfterViewInit {
   statusChart: Chart | null = null;
 
   promotions: Promotion[] = [];
-  establishments: Establishment[] = [
-    { id: 1, name: "Café" },
-    { id: 2, name: "Hôtel" },
-    { id: 3, name: "Restaurant" },
-    
-   
-  ];
+  notifications: any[] = [];
+  etablissementsType: any[] = []; // Dynamic establishments based on type
+  availableTypes: string[] = ['Hôtel', 'Restaurant', 'Café', 'Sfax']; // Added Sfax
+  selectedType: string = '';
 
   stats: PromoStats = { total: 0, percentage: 0, fixed: 0, freeitem: 0, bundle: 0, special: 0 };
   filteredPromotions: Promotion[] = [];
@@ -59,8 +54,7 @@ export class GestionDesPromotionsComponent implements OnInit, AfterViewInit {
   showStatusFilter: boolean = false;
   showEstablishmentFilter: boolean = false;
   days: string[] = ['lundi', 'mardi', 'mercredi', 'jeudi', 'vendredi', 'samedi', 'dimanche'];
-
-  notificationCount: number = 3;
+  isAuthenticated: boolean = false;
   isProfileMenuOpen: boolean = false;
   currentPage: number = 1;
   itemsPerPage: number = 5;
@@ -71,33 +65,90 @@ export class GestionDesPromotionsComponent implements OnInit, AfterViewInit {
 
   selectedFiles: File[] = [];
 
-  constructor(private promotionService: PromotionService) {}
+  constructor(
+    private promotionService: PromotionService,
+    private notificationService: NotificationService,
+    private userService: UserService,
+    private router: Router
+  ) {}
 
   ngOnInit() {
+    // Vérification de l'authentification
+    const token = localStorage.getItem('token');
+    const userData = localStorage.getItem('user');
+    if (!token || !userData) {
+      this.isAuthenticated = false;
+      this.router.navigate(['/connexion'], { queryParams: { error: 'unauthorized' } });
+      return;
+    }
+
+    const user = JSON.parse(userData);
+    if (!user || !user.email) {
+      this.isAuthenticated = false;
+      localStorage.removeItem('user');
+      localStorage.removeItem('token');
+      this.router.navigate(['/connexion'], { queryParams: { error: 'unauthorized' } });
+      return;
+    }
+
+    this.isAuthenticated = true;
+
     this.loadPromotions();
+    this.notificationService.notifications$.subscribe(notifications => {
+      let unreadNotifications = notifications.filter(notif => !notif.read);
+      const updatedNotifications: any[] = [];
+      const checkPromises = unreadNotifications.map(notif => {
+        if (!notif.email) {
+          return Promise.resolve(null);
+        }
+        return this.userService.checkUserExists(notif.email).toPromise().then(
+          (response) => {
+            if (response && response.exists) {
+              return notif;
+            } else {
+              console.log(`Utilisateur avec email ${notif.email} n'existe plus, suppression de la notification.`);
+              return null;
+            }
+          },
+          error => {
+            console.error(`Erreur lors de la vérification de l'utilisateur ${notif.email}:`, error);
+            return null;
+          }
+        );
+      });
+
+      Promise.all(checkPromises).then(results => {
+        this.notifications = results.filter(notif => notif !== null);
+      });
+    });
   }
 
   ngAfterViewInit(): void {
-    this.initCharts();
+    if (this.isAuthenticated) {
+      this.initCharts();
+    }
   }
-  availableTypes: string[] = ['Hôtel', 'Restaurant', 'Café']; // You can modify this list based on your backend
-  selectedType: string = '';
-  etablissementsType: any[] = [];
-  
+
   onTypeChange(): void {
     if (this.selectedType) {
-      console.log("type");
       this.promotionService.getEtablissementsByType(this.selectedType).subscribe({
         next: (etabs) => {
           this.etablissementsType = etabs;
-          console.log("etabs: ", etabs)
+          // Reset establishmentId if it's not in the new list
+          if (!etabs.some(e => e._id === this.currentPromotion.establishmentId)) {
+            this.currentPromotion.establishmentId = '';
+          }
         },
         error: () => {
           this.showNotification('Erreur lors du chargement des établissements', 'error');
         }
       });
+    } else {
+      this.etablissementsType = [];
+      this.currentPromotion.establishmentId = '';
     }
   }
+
   loadPromotions(): void {
     this.promotionService.getPromotions().subscribe({
       next: (promotions) => {
@@ -105,6 +156,7 @@ export class GestionDesPromotionsComponent implements OnInit, AfterViewInit {
           ...p,
           id: p._id,
           selected: false,
+          establishmentId: p.establishmentId.toString(), // Convert to string
           startDate: new Date(p.startDate).toISOString().split('T')[0],
           endDate: new Date(p.endDate).toISOString().split('T')[0]
         }));
@@ -178,13 +230,13 @@ export class GestionDesPromotionsComponent implements OnInit, AfterViewInit {
           this.promotions.filter((p) => p.status === 'active').length,
           this.promotions.filter((p) => p.status === 'scheduled').length,
           this.promotions.filter((p) => p.status === 'expired').length,
-          this.promotions.filter((p) => p.status === 'pending').length, // Changé de 'draft' à 'pending'
+          this.promotions.filter((p) => p.status === 'pending').length,
         ];
 
         this.statusChart = new Chart(ctx, {
           type: 'bar',
           data: {
-            labels: ['Actif', 'Programmé', 'Expiré', 'En Attente'], // Changé de 'Brouillon' à 'En Attente'
+            labels: ['Actif', 'Programmé', 'Expiré', 'En Attente'],
             datasets: [
               {
                 data: statusCounts,
@@ -192,7 +244,7 @@ export class GestionDesPromotionsComponent implements OnInit, AfterViewInit {
                   'rgba(87, 181, 231, 1)',
                   'rgba(141, 211, 199, 1)',
                   'rgba(251, 191, 114, 1)',
-                  'rgba(252, 141, 98, 1)', // Couleur pour 'En Attente' (anciennement 'Brouillon')
+                  'rgba(252, 141, 98, 1)',
                 ],
                 borderRadius: 8,
                 borderWidth: 0,
@@ -249,7 +301,7 @@ export class GestionDesPromotionsComponent implements OnInit, AfterViewInit {
         this.promotions.filter((p) => p.status === 'active').length,
         this.promotions.filter((p) => p.status === 'scheduled').length,
         this.promotions.filter((p) => p.status === 'expired').length,
-        this.promotions.filter((p) => p.status === 'pending').length, // Changé de 'draft' à 'pending'
+        this.promotions.filter((p) => p.status === 'pending').length,
       ];
       this.statusChart.data.datasets[0].data = statusCounts;
       this.statusChart.update();
@@ -259,11 +311,11 @@ export class GestionDesPromotionsComponent implements OnInit, AfterViewInit {
   createEmptyPromotion(): Promotion {
     return {
       name: '',
-      establishmentId: 0,
+      establishmentId: '',
       discount: '',
       startDate: '',
       endDate: '',
-      status: 'pending', // Changé de 'draft' à 'pending'
+      status: 'pending',
       type: '',
       code: '',
       limit: undefined,
@@ -312,6 +364,8 @@ export class GestionDesPromotionsComponent implements OnInit, AfterViewInit {
   openAddPromotionModal(): void {
     this.modalTitle = 'Ajouter une promotion';
     this.currentPromotion = this.createEmptyPromotion();
+    this.selectedType = '';
+    this.etablissementsType = [];
     this.selectedFiles = [];
     this.isModalOpen = true;
     setTimeout(() => {
@@ -320,6 +374,13 @@ export class GestionDesPromotionsComponent implements OnInit, AfterViewInit {
         modalContent.scrollTop = 0;
       }
     });
+  }
+
+  logout(): void {
+    localStorage.removeItem('token');
+    localStorage.removeItem('user');
+    this.isAuthenticated = false;
+    this.router.navigate(['/connexion']);
   }
 
   editPromotion(promotion: Promotion): void {
@@ -333,10 +394,21 @@ export class GestionDesPromotionsComponent implements OnInit, AfterViewInit {
         this.currentPromotion = {
           ...updatedPromotion,
           id: updatedPromotion._id,
+          establishmentId: updatedPromotion.establishmentId.toString(),
           startDate: new Date(updatedPromotion.startDate).toISOString().split('T')[0],
           endDate: new Date(updatedPromotion.endDate).toISOString().split('T')[0],
           selected: false
         };
+        // Load the establishment type and list
+        this.promotionService.getEtablissementsByType(this.currentPromotion.establishmentId).subscribe({
+          next: (etabs) => {
+            this.etablissementsType = etabs;
+            this.selectedType = etabs.find(e => e._id === this.currentPromotion.establishmentId)?.type || '';
+          },
+          error: () => {
+            this.showNotification('Erreur lors du chargement des établissements', 'error');
+          }
+        });
         this.selectedFiles = [];
         this.isModalOpen = true;
       },
@@ -349,6 +421,8 @@ export class GestionDesPromotionsComponent implements OnInit, AfterViewInit {
   closeModal(): void {
     this.isModalOpen = false;
     this.selectedFiles = [];
+    this.selectedType = '';
+    this.etablissementsType = [];
   }
 
   openArchiveModal(promotion: Promotion): void {
@@ -366,6 +440,18 @@ export class GestionDesPromotionsComponent implements OnInit, AfterViewInit {
         !this.currentPromotion.discount || !this.currentPromotion.startDate || !this.currentPromotion.endDate ||
         !this.currentPromotion.status) {
       this.showNotification('Veuillez remplir tous les champs obligatoires.', 'error');
+      return;
+    }
+
+    // Validate dates
+    const startDate = new Date(this.currentPromotion.startDate);
+    const endDate = new Date(this.currentPromotion.endDate);
+    if (isNaN(startDate.getTime()) || isNaN(endDate.getTime())) {
+      this.showNotification('Format de date invalide.', 'error');
+      return;
+    }
+    if (startDate > endDate) {
+      this.showNotification('La date de début doit être antérieure à la date de fin.', 'error');
       return;
     }
 
@@ -463,7 +549,7 @@ export class GestionDesPromotionsComponent implements OnInit, AfterViewInit {
         ? promotion.status === this.selectedStatus
         : true;
       const matchesEstablishment = this.selectedEstablishment
-        ? promotion.establishmentId === +this.selectedEstablishment
+        ? promotion.establishmentId === this.selectedEstablishment
         : true;
 
       return matchesSearch && matchesStatus && matchesEstablishment;
@@ -588,8 +674,8 @@ export class GestionDesPromotionsComponent implements OnInit, AfterViewInit {
     });
   }
 
-  getEstablishmentName(id: number): string {
-    return this.establishments.find(e => e.id === id)?.name || 'Inconnu';
+  getEstablishmentName(id: string): string {
+    return this.etablissementsType.find(e => e._id === id)?.nom || 'Inconnu';
   }
 
   getStatusBadgeClass(status: string): string {
@@ -600,7 +686,7 @@ export class GestionDesPromotionsComponent implements OnInit, AfterViewInit {
         return 'bg-blue-100 text-blue-800';
       case 'expired':
         return 'bg-gray-100 text-gray-800';
-      case 'pending': // Changé de 'draft' à 'pending'
+      case 'pending':
         return 'bg-yellow-100 text-yellow-800';
       default:
         return 'bg-gray-100 text-gray-800';
@@ -610,28 +696,15 @@ export class GestionDesPromotionsComponent implements OnInit, AfterViewInit {
   getStatusLabel(status: string): string {
     switch (status) {
       case 'active':
-        return 'Actif'; // Inchangé
+        return 'Actif';
       case 'scheduled':
-        return 'Programmé'; // Inchangé
+        return 'Programmé';
       case 'expired':
-        return 'Expiré'; // Inchangé
-      case 'pending': // Changé de 'draft' à 'pending'
-        return 'En Attente'; // Changé de 'Brouillon' à 'En Attente'
+        return 'Expiré';
+      case 'pending':
+        return 'En Attente';
       default:
         return 'Inconnu';
     }
   }
-
-  loadEtablissementsByType(type: string): void {
-    this.promotionService.getEtablissementsByType(type).subscribe({
-      next: (etabs) => {
-        this.etablissementsType = etabs;
-      },
-      error: (err) => {
-        this.showNotification('Erreur lors du chargement des établissements par type', 'error');
-      }
-    });
-  }
-  
-  
 }
