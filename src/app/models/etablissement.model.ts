@@ -43,6 +43,7 @@ export interface ReseauxSociaux {
     horaires: Horaires;
     photos: (string | File)[];
     selected?: boolean;
+    
   }
   
   export interface Stats {

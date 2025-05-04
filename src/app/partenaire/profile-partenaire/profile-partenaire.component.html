@@ -1,206 +1,187 @@
 <div class="flex h-screen bg-gray-50 min-h-screen">
-    <!-- Sidebar: Menu de navigation latéral -->
-    <aside class="w-64 bg-white shadow-sm">
-      <div class="h-16 flex items-center px-6">
-        <div class="text-2xl font-['Pacifico'] text-primary">Sfax</div>
-      </div>
-      <nav class="mt-4">
-        <a routerLink="/partenaire" routerLinkActive="bg-gray-50 text-primary" class="flex items-center px-6 py-3 text-gray-600 hover:bg-gray-50 hover:text-primary">
-          <i class="ri-home-line mr-3"></i>
-          <span>Accueil</span>
-        </a>
-        <a routerLink="/partenaire-etablissements" routerLinkActive="bg-gray-50 text-primary" class="flex items-center px-6 py-3 text-gray-600 hover:bg-gray-50 hover:text-primary">
-          <i class="ri-building-line mr-3"></i>
-          <span>Établissements</span>
-        </a>
-        <a routerLink="/partenaire-promotions" routerLinkActive="bg-gray-50 text-primary" class="flex items-center px-6 py-3 text-gray-600 hover:bg-gray-50 hover:text-primary">
-          <i class="ri-price-tag-3-line mr-3"></i>
-          <span>Promotions</span>
-        </a>
-        <a routerLink="/partenaire-evenements" routerLinkActive="bg-gray-50 text-primary" class="flex items-center px-6 py-3 text-gray-600 hover:bg-gray-50 hover:text-primary">
-          <i class="ri-calendar-line mr-3"></i>
-          <span>Événements</span>
-        </a>
-        <a routerLink="/profile-partenaire" routerLinkActive="bg-gray-50 text-primary" class="flex items-center px-6 py-3 text-gray-600 hover:bg-gray-50 hover:text-primary">
-          <i class="ri-user-line mr-3"></i>
-          <span>Mon profil</span>
-        </a>
-      </nav>
-    </aside>
-  
-    <!-- Contenu principal -->
-    <div class="flex-1 flex flex-col">
-      <!-- En-tête -->
-      <header class="bg-white shadow-sm h-16">
-        <div class="h-full px-6 flex items-center justify-between">
-          <div class="flex items-center">
-            <h1 class="text-xl font-semibold text-gray-900">Profil Partenaire</h1>
-          </div>
-          <div class="flex items-center space-x-4">
-            <div class="relative">
-              <button id="profileButton" class="flex items-center space-x-2 cursor-pointer" (click)="toggleProfile()">
-                <div class="w-8 h-8 rounded-full bg-gray-200 flex items-center justify-center">
-                  <i class="ri-user-line text-gray-600"></i>
-                </div>
-                <span class="text-gray-700">{{ user?.nom || 'Partenaire' }}</span>
-                <i class="ri-arrow-down-s-line ml-1 text-gray-600"></i>
-              </button>
-              <div id="profileMenu" class="absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-lg py-2 z-50" [class.hidden]="!isProfileMenuOpen">
-                <a routerLink="/profile-partenaire" class="px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 flex items-center">
-                  <i class="ri-user-line mr-2"></i>
-                  Mon profil
-                </a>
-                <div class="border-t border-gray-100 my-1"></div>
-                <a (click)="logout()" class="px-4 py-2 text-sm text-red-600 hover:bg-gray-100 flex items-center cursor-pointer">
-                  <i class="ri-logout-box-line mr-2"></i>
-                  Déconnexion
-                </a>
+  <!-- Sidebar: Menu de navigation latéral -->
+  <aside class="w-64 bg-white shadow-sm">
+    <div class="h-16 flex items-center px-6">
+      <div class="text-2xl font-['Pacifico'] text-primary">Sfax</div>
+    </div>
+    <nav class="mt-4">
+      <a routerLink="/partenaire" routerLinkActive="bg-gray-50 text-primary" class="flex items-center px-6 py-3 text-gray-600 hover:bg-gray-50 hover:text-primary">
+        <i class="ri-home-line mr-3"></i>
+        <span>Accueil</span>
+      </a>
+      <a routerLink="/partenaire-etablissements" routerLinkActive="bg-gray-50 text-primary" class="flex items-center px-6 py-3 text-gray-600 hover:bg-gray-50 hover:text-primary">
+        <i class="ri-building-line mr-3"></i>
+        <span>Établissements</span>
+      </a>
+      <a routerLink="/partenaire-promotions" routerLinkActive="bg-gray-50 text-primary" class="flex items-center px-6 py-3 text-gray-600 hover:bg-gray-50 hover:text-primary">
+        <i class="ri-price-tag-3-line mr-3"></i>
+        <span>Promotions</span>
+      </a>
+      <a routerLink="/partenaire-evenements" routerLinkActive="bg-gray-50 text-primary" class="flex items-center px-6 py-3 text-gray-600 hover:bg-gray-50 hover:text-primary">
+        <i class="ri-calendar-line mr-3"></i>
+        <span>Événements</span>
+      </a>
+      <a routerLink="/profile-partenaire" routerLinkActive="bg-gray-50 text-primary" class="flex items-center px-6 py-3 text-gray-600 hover:bg-gray-50 hover:text-primary">
+        <i class="ri-user-line mr-3"></i>
+        <span>Mon profil</span>
+      </a>
+    </nav>
+  </aside>
+
+  <!-- Contenu principal -->
+  <div class="flex-1 flex flex-col">
+    <!-- En-tête -->
+    <header class="bg-white shadow-sm h-16">
+      <div class="h-full px-6 flex items-center justify-between">
+        <div class="flex items-center">
+          <h1 class="text-xl font-semibold text-gray-900">Profil Partenaire</h1>
+        </div>
+        <div class="flex items-center space-x-4">
+          <div class="relative">
+            <button id="profileButton" class="flex items-center space-x-2 cursor-pointer" (click)="toggleProfile()">
+              <div class="w-8 h-8 rounded-full bg-gray-200 flex items-center justify-center">
+                <i class="ri-user-line text-gray-600"></i>
               </div>
+              <span class="text-gray-700">{{ user?.nom || 'Partenaire' }}</span>
+              <i class="ri-arrow-down-s-line ml-1 text-gray-600"></i>
+            </button>
+            <div id="profileMenu" class="absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-lg py-2 z-50" [class.hidden]="!isProfileMenuOpen">
+              <a routerLink="/profile-partenaire" class="px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 flex items-center">
+                <i class="ri-user-line mr-2"></i>
+                Mon profil
+              </a>
+              <div class="border-t border-gray-100 my-1"></div>
+              <a (click)="logout()" class="px-4 py-2 text-sm text-red-600 hover:bg-gray-100 flex items-center cursor-pointer">
+                <i class="ri-logout-box-line mr-2"></i>
+                Déconnexion
+              </a>
             </div>
           </div>
         </div>
-      </header>
-  
-      <!-- Contenu principal -->
-      <main class="flex-1 overflow-auto p-6">
-        <div class="px-4 py-6 sm:px-0">
-          <!-- Modal pour les messages -->
-          <div *ngIf="showMessageModal" class="fixed inset-0 flex items-center justify-center z-50">
-            <div class="bg-white rounded-lg shadow-xl p-6 max-w-sm w-full mx-4">
-              <div class="flex items-center mb-4" [ngClass]="messageModalType === 'error' ? 'text-red-600' : 'text-green-600'">
-                <i [ngClass]="messageModalType === 'error' ? 'ri-error-warning-line' : 'ri-checkbox-circle-line'" class="text-2xl mr-2"></i>
-                <h3 class="text-lg font-semibold">{{ messageModalTitle }}</h3>
-              </div>
-              <p class="text-gray-700 mb-6">{{ messageModalMessage }}</p>
-              <div class="flex justify-end">
-                <button (click)="closeMessageModal()" class="px-4 py-2 bg-primary text-white rounded-button">OK</button>
-              </div>
+      </div>
+    </header>
+
+    <!-- Contenu principal -->
+    <main class="flex-1 overflow-auto p-6">
+      <div class="px-4 py-6 sm:px-0">
+        <!-- Modal pour les messages -->
+        <div *ngIf="showMessageModal" class="fixed inset-0 flex items-center justify-center z-50">
+          <div class="bg-white rounded-lg shadow-xl p-6 max-w-sm w-full mx-4">
+            <div class="flex items-center mb-4" [ngClass]="messageModalType === 'error' ? 'text-red-600' : 'text-green-600'">
+              <i [ngClass]="messageModalType === 'error' ? 'ri-error-warning-line' : 'ri-checkbox-circle-line'" class="text-2xl mr-2"></i>
+              <h3 class="text-lg font-semibold">{{ messageModalTitle }}</h3>
+            </div>
+            <p class="text-gray-700 mb-6">{{ messageModalMessage }}</p>
+            <div class="flex justify-end">
+              <button (click)="closeMessageModal()" class="px-4 py-2 bg-primary text-white rounded-button">OK</button>
             </div>
           </div>
-  
-          <!-- Profil utilisateur -->
-          <div class="bg-white rounded-lg shadow p-6">
-            <div class="flex justify-between items-center mb-6">
-              <h2 class="text-2xl font-semibold text-gray-900">Mon Profil</h2>
-              <button (click)="openPasswordModal()" class="text-primary hover:text-primary-dark flex items-center">
-                <i class="ri-lock-line mr-2"></i>
-                Changer le mot de passe
-              </button>
-            </div>
-  
-            <form (ngSubmit)="updateProfile()">
-              <div class="flex flex-wrap -mx-2 space-y-4">
-                <!-- Matricule Fiscale et Nom -->
-                <div class="w-1/2 px-2">
-                  <label for="matriculeFiscale" class="block text-sm font-medium text-gray-700 mb-1">Matricule Fiscale</label>
-                  <input type="text" id="matriculeFiscale" class="mt-1 block w-full border border-gray-300 rounded-button px-3 py-2 focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent" [disabled]="true" [(ngModel)]="user.matriculeFiscale" name="matriculeFiscale" readonly>
-                </div>
-                <div class="w-1/2 px-2">
-                  <label for="nom" class="block text-sm font-medium text-gray-700 mb-1">Nom</label>
-                  <input type="text" id="nom" class="mt-1 block w-full border border-gray-300 rounded-button px-3 py-2 focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent" [disabled]="true" [(ngModel)]="user.nom" name="nom" readonly>
-                </div>
-  
-                <!-- Prénom et Email -->
-                <div class="w-1/2 px-2">
+        </div>
+
+        <!-- Profil utilisateur -->
+        <div class="bg-white rounded-lg shadow p-6">
+          <h2 class="text-2xl font-semibold text-gray-900 mb-6">Mon Profil</h2>
+
+          <form (ngSubmit)="updateProfile()">
+            <div class="space-y-4">
+              <!-- Prénom et Nom -->
+              <div class="flex space-x-4">
+                <div class="w-1/2">
                   <label for="prenom" class="block text-sm font-medium text-gray-700 mb-1">Prénom</label>
                   <input type="text" id="prenom" class="mt-1 block w-full border border-gray-300 rounded-button px-3 py-2 focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent" [disabled]="true" [(ngModel)]="user.prenom" name="prenom" readonly>
+                  <p class="text-xs text-red-500 mt-1">Le prénom ne peut pas être modifié.</p>
                 </div>
-                <div class="w-1/2 px-2">
-                  <label for="email" class="block text-sm font-medium text-gray-700 mb-1">Email</label>
-                  <input type="email" id="email" class="mt-1 block w-full border border-gray-300 rounded-button px-3 py-2 focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent" [disabled]="true" [(ngModel)]="user.email" name="email" readonly>
-                </div>
-  
-                <!-- Téléphone et Adresse -->
-                <div class="w-1/2 px-2">
-                  <label for="telephone" class="block text-sm font-medium text-gray-700 mb-1">Téléphone</label>
-                  <input type="tel" id="telephone" class="mt-1 block w-full border border-gray-300 rounded-button px-3 py-2 focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent" [(ngModel)]="user.telephone" name="telephone" required>
-                </div>
-                <div class="w-1/2 px-2">
-                  <label for="adresse" class="block text-sm font-medium text-gray-700 mb-1">Adresse</label>
-                  <input type="text" id="adresse" class="mt-1 block w-full border border-gray-300 rounded-button px-3 py-2 focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent" [(ngModel)]="user.adresse" name="adresse" required>
-                </div>
-  
-                <!-- Date de création et Statut -->
-                <div class="w-1/2 px-2">
-                  <label for="dateCreation" class="block text-sm font-medium text-gray-700 mb-1">Date de création</label>
-                  <input type="date" id="dateCreation" class="mt-1 block w-full border border-gray-300 rounded-button px-3 py-2 focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent" [disabled]="true" [(ngModel)]="user.dateCreation" name="dateCreation" readonly>
-                </div>
-                <div class="w-1/2 px-2">
-                  <label for="statut" class="block text-sm font-medium text-gray-700 mb-1">Statut</label>
-                  <input type="text" id="statut" class="mt-1 block w-full border border-gray-300 rounded-button px-3 py-2 focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent" [value]="user.statusAccepted ? 'Actif' : 'En attente'" [disabled]="true" readonly>
-                </div>
-  
-                <!-- Role -->
-                <div class="w-1/2 px-2">
-                  <label for="role" class="block text-sm font-medium text-gray-700 mb-1">Rôle</label>
-                  <input type="text" id="role" class="mt-1 block w-full border border-gray-300 rounded-button px-3 py-2 focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent" [value]="user.role" [disabled]="true" readonly>
+                <div class="w-1/2">
+                  <label for="nom" class="block text-sm font-medium text-gray-700 mb-1">Nom</label>
+                  <input type="text" id="nom" class="mt-1 block w-full border border-gray-300 rounded-button px-3 py-2 focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent" [disabled]="true" [(ngModel)]="user.nom" name="nom" readonly>
+                  <p class="text-xs text-red-500 mt-1">Le nom ne peut pas être modifié.</p>
                 </div>
               </div>
-  
-              <div class="mt-6 flex justify-end">
-                <button type="submit" class="px-4 py-2 bg-primary text-white rounded-button">Enregistrer les modifications</button>
+
+              <!-- Email -->
+              <div>
+                <label for="email" class="block text-sm font-medium text-gray-700 mb-1">Email</label>
+                <input type="email" id="email" class="mt-1 block w-full border border-gray-300 rounded-button px-3 py-2 focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent" [disabled]="true" [(ngModel)]="user.email" name="email" readonly>
+                <p class="text-xs text-red-500 mt-1">L'email ne peut pas être modifié.</p>
               </div>
-            </form>
-          </div>
-        </div>
-  
-        <!-- Modal pour changer le mot de passe -->
-        <div id="passwordModal" class="modal" [class.hidden]="!isPasswordModalOpen">
-          <div class="fixed inset-0 flex items-center justify-center">
-            <div class="bg-white rounded-lg shadow-xl w-full max-w-md">
-              <div class="p-6">
-                <h2 class="text-xl font-semibold text-gray-900 mb-6">Changer le mot de passe</h2>
-                <form (ngSubmit)="handlePasswordSubmit()">
-                  <div class="space-y-4">
-                    <div>
-                      <label for="currentPassword" class="block text-sm font-medium text-gray-700 mb-1">Mot de passe actuel <span class="text-red-500">*</span></label>
-                      <div class="relative">
-                        <input [type]="showCurrentPassword ? 'text' : 'password'" id="currentPassword" [(ngModel)]="currentPassword" name="currentPassword" required class="mt-1 block w-full border border-gray-300 rounded-button px-3 py-2 focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent">
-                        <button type="button" (click)="toggleCurrentPasswordVisibility()" class="absolute inset-y-0 right-0 flex items-center pr-3">
-                          <i [class]="showCurrentPassword ? 'ri-eye-off-line' : 'ri-eye-line'" class="text-gray-500"></i>
-                        </button>
-                      </div>
-                    </div>
-                    <div>
-                      <label for="newPassword" class="block text-sm font-medium text-gray-700 mb-1">Nouveau mot de passe <span class="text-red-500">*</span></label>
-                      <div class="relative">
-                        <input [type]="showNewPassword ? 'text' : 'password'" id="newPassword" [(ngModel)]="newPassword" name="newPassword" required class="mt-1 block w-full border border-gray-300 rounded-button px-3 py-2 focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent" (input)="checkPasswordStrength(); checkPasswordMatch()">
-                        <button type="button" (click)="toggleNewPasswordVisibility()" class="absolute inset-y-0 right-0 flex items-center pr-3">
-                          <i [class]="showNewPassword ? 'ri-eye-off-line' : 'ri-eye-line'" class="text-gray-500"></i>
-                        </button>
-                      </div>
-                      <div [ngClass]="passwordStrengthClass" class="password-strength"></div>
-                      <div class="mt-2 text-xs text-gray-500">
-                        Le mot de passe doit contenir au moins :
-                        <ul class="list-disc list-inside">
-                          <li>8 caractères</li>
-                          <li>Une lettre majuscule</li>
-                          <li>Une lettre minuscule</li>
-                          <li>Un chiffre</li>
-                          <li>Un caractère spécial</li>
-                        </ul>
-                      </div>
-                    </div>
-                    <div>
-                      <label for="confirmPasswordModal" class="block text-sm font-medium text-gray-700 mb-1">Confirmer le nouveau mot de passe <span class="text-red-500">*</span></label>
-                      <div class="relative">
-                        <input [type]="showConfirmPassword ? 'text' : 'password'" id="confirmPasswordModal" [(ngModel)]="confirmPassword" name="confirmPassword" required class="mt-1 block w-full border border-gray-300 rounded-button px-3 py-2 focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent" (input)="checkPasswordMatch()">
-                        <button type="button" (click)="toggleConfirmPasswordVisibility()" class="absolute inset-y-0 right-0 flex items-center pr-3">
-                          <i [class]="showConfirmPassword ? 'ri-eye-off-line' : 'ri-eye-line'" class="text-gray-500"></i>
-                        </button>
-                      </div>
-                      <div class="mt-1 text-xs" [ngClass]="passwordMatchClass">{{ passwordMatchMessage }}</div>
+
+              <!-- Téléphone -->
+              <div>
+                <label for="telephone" class="block text-sm font-medium text-gray-700 mb-1">Téléphone *</label>
+                <input type="tel" id="telephone" class="mt-1 block w-full border border-gray-300 rounded-button px-3 py-2 focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent" [(ngModel)]="user.telephone" name="telephone" required>
+              </div>
+
+              <!-- Adresse -->
+              <div>
+                <label for="adresse" class="block text-sm font-medium text-gray-700 mb-1">Adresse *</label>
+                <input type="text" id="adresse" class="mt-1 block w-full border border-gray-300 rounded-button px-3 py-2 focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent" [(ngModel)]="user.adresse" name="adresse" required>
+              </div>
+
+              <!-- Mot de passe actuel -->
+              <div>
+                <label for="currentPasswordDisplay" class="block text-sm font-medium text-gray-700 mb-1">Mot de passe actuel</label>
+                <div class="relative">
+                  <input [type]="showCurrentPassword ? 'text' : 'password'" id="currentPasswordDisplay" class="mt-1 block w-full border border-gray-300 rounded-button px-3 py-2 focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent" [value]="user.password" [disabled]="true" readonly>
+                  <button type="button" (click)="toggleCurrentPasswordVisibility()" class="absolute inset-y-0 right-0 flex items-center pr-3">
+                    <i [class]="showCurrentPassword ? 'ri-eye-off-line' : 'ri-eye-line'" class="text-gray-500"></i>
+                  </button>
+                </div>
+              </div>
+
+              <!-- Changer le mot de passe -->
+              <div>
+                <h3 class="text-lg font-semibold text-gray-900 mb-4">Changer le mot de passe</h3>
+                <div class="space-y-4">
+                  <div>
+                    <label for="currentPassword" class="block text-sm font-medium text-gray-700 mb-1">Ancien mot de passe</label>
+                    <div class="relative">
+                      <input [type]="showCurrentPasswordInput ? 'text' : 'password'" id="currentPassword" [(ngModel)]="currentPassword" name="currentPassword" required class="mt-1 block w-full border border-gray-300 rounded-button px-3 py-2 focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent">
+                      <button type="button" (click)="toggleCurrentPasswordInputVisibility()" class="absolute inset-y-0 right-0 flex items-center pr-3">
+                        <i [class]="showCurrentPasswordInput ? 'ri-eye-off-line' : 'ri-eye-line'" class="text-gray-500"></i>
+                      </button>
                     </div>
                   </div>
-                  <div class="mt-6 flex justify-end space-x-3">
-                    <button type="button" class="px-4 py-2 border border-gray-300 rounded-button text-gray-700" (click)="closePasswordModal()">Annuler</button>
-                    <button type="submit" class="px-4 py-2 bg-primary text-white rounded-button">Enregistrer</button>
+                  <div>
+                    <label for="newPassword" class="block text-sm font-medium text-gray-700 mb-1">Nouveau mot de passe</label>
+                    <div class="relative">
+                      <input [type]="showNewPassword ? 'text' : 'password'" id="newPassword" [(ngModel)]="newPassword" name="newPassword" required class="mt-1 block w-full border border-gray-300 rounded-button px-3 py-2 focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent" (input)="checkPasswordStrength(); checkPasswordMatch()">
+                      <button type="button" (click)="toggleNewPasswordVisibility()" class="absolute inset-y-0 right-0 flex items-center pr-3">
+                        <i [class]="showNewPassword ? 'ri-eye-off-line' : 'ri-eye-line'" class="text-gray-500"></i>
+                      </button>
+                    </div>
+                    <div [ngClass]="passwordStrengthClass" class="password-strength mt-1"></div>
+                    <div class="mt-2 text-xs text-gray-500">
+                      Le mot de passe doit contenir au moins :
+                      <ul class="list-disc list-inside">
+                        <li>8 caractères</li>
+                        <li>Une lettre majuscule</li>
+                        <li>Une lettre minuscule</li>
+                        <li>Un chiffre</li>
+                        <li>Un caractère spécial</li>
+                      </ul>
+                    </div>
                   </div>
-                </form>
+                  <div>
+                    <label for="confirmPassword" class="block text-sm font-medium text-gray-700 mb-1">Confirmer le nouveau mot de passe</label>
+                    <div class="relative">
+                      <input [type]="showConfirmPassword ? 'text' : 'password'" id="confirmPassword" [(ngModel)]="confirmPassword" name="confirmPassword" required class="mt-1 block w-full border border-gray-300 rounded-button px-3 py-2 focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent" (input)="checkPasswordMatch()">
+                      <button type="button" (click)="toggleConfirmPasswordVisibility()" class="absolute inset-y-0 right-0 flex items-center pr-3">
+                        <i [class]="showConfirmPassword ? 'ri-eye-off-line' : 'ri-eye-line'" class="text-gray-500"></i>
+                      </button>
+                    </div>
+                    <div class="mt-1 text-xs" [ngClass]="passwordMatchClass">{{ passwordMatchMessage }}</div>
+                  </div>
+                </div>
               </div>
             </div>
-          </div>
+
+            <div class="mt-6 flex justify-end space-x-3">
+              <button type="button" class="px-4 py-2 border border-gray-300 rounded-button text-gray-700" (click)="cancel()">Annuler</button>
+              <button type="submit" class="px-4 py-2 bg-primary text-white rounded-button">Enregistrer</button>
+            </div>
+          </form>
         </div>
-      </main>
-    </div>
+      </div>
+    </main>
   </div>
+</div>

@@ -312,6 +312,7 @@ export class GestionDesPromotionsComponent implements OnInit, AfterViewInit {
     return {
       name: '',
       establishmentId: '',
+      establishmentName: '',
       discount: '',
       startDate: '',
       endDate: '',

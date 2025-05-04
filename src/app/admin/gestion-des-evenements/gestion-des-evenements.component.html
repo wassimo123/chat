@@ -316,7 +316,8 @@
                     </div>
                   </th>
                   <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Type d'établissement
+                    <!-- Type d'établissement -->
+                    Etablissement
                   </th>
                   <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                     Statut
@@ -442,11 +443,98 @@
     </div>
   </ng-template>
 
-  <!-- Add/Edit Event Modal -->
-  <div class="fixed inset-0 bg-gray-900 bg-opacity-50 flex items-center justify-center z-50 overflow-y-auto" [class.hidden]="!isModalOpen">
-    <div class="bg-white rounded-lg shadow-xl w-full max-w-lg m-4">
-      <div class="p-6 modal-content overflow-y-auto max-h-[90vh]">
-        <h2 class="text-xl font-semibold text-gray-900 mb-6">{{ modalTitle }}</h2>
+  <!-- Add/Edit/View Event Modal -->
+<div class="fixed inset-0 bg-gray-900 bg-opacity-50 flex items-center justify-center z-50 overflow-y-auto" [class.hidden]="!isModalOpen">
+  <div class="bg-white rounded-lg shadow-xl w-full max-w-lg m-4">
+    <div class="p-6 modal-content overflow-y-auto max-h-[90vh]">
+      <h2 class="text-xl font-semibold text-gray-900 mb-6">{{ modalTitle }}</h2>
+      <div *ngIf="isViewMode; else editForm">
+        <!-- Mode Visualisation -->
+        <div class="space-y-4">
+          <div>
+            <label class="block text-sm font-medium text-gray-700">Nom de l'événement</label>
+            <p class="mt-1 text-gray-900">{{ currentEvent.nom }}</p>
+          </div>
+          <div class="grid grid-cols-2 gap-4">
+            <div>
+              <label class="block text-sm font-medium text-gray-700">Date de début</label>
+              <p class="mt-1 text-gray-900">{{ currentEvent.dateDebut | date:'mediumDate' }}</p>
+            </div>
+            <div>
+              <label class="block text-sm font-medium text-gray-700">Date de fin</label>
+              <p class="mt-1 text-gray-900">{{ currentEvent.dateFin | date:'mediumDate' }}</p>
+            </div>
+          </div>
+          <div class="grid grid-cols-2 gap-4">
+            <div>
+              <label class="block text-sm font-medium text-gray-700">Heure de début</label>
+              <p class="mt-1 text-gray-900">{{ currentEvent.heureDebut }}</p>
+            </div>
+            <div>
+              <label class="block text-sm font-medium text-gray-700">Heure de fin</label>
+              <p class="mt-1 text-gray-900">{{ currentEvent.heureFin || 'Non spécifiée' }}</p>
+            </div>
+          </div>
+          <div>
+            <label class="block text-sm font-medium text-gray-700">Lieu</label>
+            <p class="mt-1 text-gray-900">{{ currentEvent.lieu }}</p>
+          </div>
+          <div>
+            <label class="block text-sm font-medium text-gray-700">Ville</label>
+            <p class="mt-1 text-gray-900">{{ currentEvent.ville }}</p>
+          </div>
+          <div>
+            <label class="block text-sm font-medium text-gray-700">Capacité maximale</label>
+            <p class="mt-1 text-gray-900">{{ currentEvent.capacite }}</p>
+          </div>
+          <div>
+            <label class="block text-sm font-medium text-gray-700">Catégorie</label>
+            <p class="mt-1 text-gray-900">{{ currentEvent.categorie }}</p>
+          </div>
+          <div>
+            <label class="block text-sm font-medium text-gray-700">Type d'établissement</label>
+            <p class="mt-1 text-gray-900">{{ currentEvent.typeEtablissement }}</p>
+          </div>
+          <div>
+            <label class="block text-sm font-medium text-gray-700">Nom Établissement</label>
+            <p class="mt-1 text-gray-900">{{ getEstablishmentName() }}</p>
+          </div>
+          <div>
+            <label class="block text-sm font-medium text-gray-700">Statut</label>
+            <p class="mt-1 text-gray-900">{{ currentEvent.statut }}</p>
+          </div>
+          <div>
+            <label class="block text-sm font-medium text-gray-700">Visibilité</label>
+            <p class="mt-1 text-gray-900">{{ currentEvent.estPublic ? 'Public' : 'Privé' }}</p>
+          </div>
+          <div>
+            <label class="block text-sm font-medium text-gray-700">Prix</label>
+            <p class="mt-1 text-gray-900">{{ currentEvent.prix.estGratuit ? 'Gratuit' : (currentEvent.prix.montant + ' TND') }}</p>
+          </div>
+          <div>
+            <label class="block text-sm font-medium text-gray-700">Photo de l'événement</label>
+            <div class="mt-2" *ngIf="photoPreview; else noPhoto">
+              <img [src]="photoPreview" alt="Photo de l'événement" class="w-full h-24 object-cover rounded-lg" (error)="handleImageError()">
+            </div>
+            <ng-template #noPhoto>
+              <p class="mt-1 text-gray-900">Aucune photo disponible.</p>
+            </ng-template>
+          </div>
+          <div>
+            <label class="block text-sm font-medium text-gray-700">Organisateur</label>
+            <p class="mt-1 text-gray-900">{{ currentEvent.organisateur || 'Non spécifié' }}</p>
+          </div>
+          <div>
+            <label class="block text-sm font-medium text-gray-700">Description</label>
+            <p class="mt-1 text-gray-900">{{ currentEvent.description || 'Aucune description disponible.' }}</p>
+          </div>
+        </div>
+        <div class="mt-6 flex justify-end">
+          <button type="button" class="px-4 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50" (click)="closeModal()">Fermer</button>
+        </div>
+      </div>
+      <ng-template #editForm>
+        <!-- Mode Édition/Ajout -->
         <form (ngSubmit)="saveEvent()">
           <div class="space-y-4">
             <div>
@@ -570,9 +658,10 @@
             <button type="submit" class="px-4 py-2 bg-primary text-white rounded-lg hover:bg-primary-dark">Enregistrer</button>
           </div>
         </form>
-      </div>
+      </ng-template>
     </div>
   </div>
+</div>
 
   <!-- Archive Confirmation Modal -->
   <div class="fixed inset-0 bg-gray-900 bg-opacity-50 flex items-center justify-center z-50" [class.hidden]="!isArchiveModalOpen">

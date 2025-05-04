@@ -188,6 +188,7 @@ export class EtablissementService {
     // formData.append('partenaireId', '664f6bc9c4f95f28d0c5e782'); // <-- Remplace par un ObjectId réel
 
     console.log('Sending form data to backend');
+    
   
     // Send the POST request with FormData
     return this.http.post<EtablissementRaw>(this.apiUrl, formData).pipe(

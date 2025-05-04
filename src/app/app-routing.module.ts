@@ -29,7 +29,7 @@ import { ProfilePartenaireComponent } from './partenaire/profile-partenaire/prof
 import { PartenaireEtablissementsComponent } from './partenaire/partenaire-etablissements/partenaire-etablissements.component';
 import { PartenaireEvenementsComponent } from './partenaire/partenaire-evenements/partenaire-evenements.component';
 import { PartenairePromotionsComponent } from './partenaire/partenaire-promotions/partenaire-promotions.component';
-
+import { GestionDesPublicitesComponent } from './admin/gestion-des-publicites/gestion-des-publicites.component';
 
 
 const routes: Routes = [
@@ -62,6 +62,8 @@ const routes: Routes = [
   { path: 'partenaire-etablissements', component: PartenaireEtablissementsComponent , canActivate: [AuthGuard]},
   { path: 'partenaire-evenements', component: PartenaireEvenementsComponent , canActivate: [AuthGuard]},
   { path: 'partenaire-promotions', component: PartenairePromotionsComponent , canActivate: [AuthGuard]},
+  { path: 'publicites', component: GestionDesPublicitesComponent , canActivate: [AuthGuard]},
+
   
   
   

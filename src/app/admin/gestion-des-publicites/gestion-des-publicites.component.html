@@ -1,0 +1,96 @@
+<div class="flex h-screen bg-gray-50 min-h-screen">
+    <!-- Sidebar -->
+    <aside class="w-64 bg-white shadow-sm">
+      <div class="h-16 flex items-center px-6">
+        <div class="text-2xl font-['Pacifico'] text-primary">Sfax</div>
+      </div>
+      <nav class="mt-4">
+        <a routerLink="/dashboard" class="flex items-center px-6 py-3 text-gray-600 hover:bg-gray-50 hover:text-primary">
+          <i class="ri-dashboard-line mr-3"></i> <span>Tableau de bord</span>
+        </a>
+        <a routerLink="/users" class="flex items-center px-6 py-3 text-gray-600 hover:bg-gray-50 hover:text-primary">
+          <i class="ri-user-line mr-3"></i> <span>Utilisateurs</span>
+        </a>
+        <a routerLink="/etablissements" routerLinkActive="bg-gray-50 text-primary" class="flex items-center px-6 py-3 text-gray-600 hover:bg-gray-50 hover:text-primary">
+          <i class="ri-building-line mr-3"></i>
+          <span>Établissements</span>
+        </a>
+        <a routerLink="/promo" routerLinkActive="bg-gray-50 text-primary" class="flex items-center px-6 py-3 text-gray-600 hover:bg-gray-50 hover:text-primary">
+          <i class="ri-price-tag-3-line mr-3"></i>
+          <span>Promotions</span>
+        </a>
+        <a routerLink="/event" routerLinkActive="bg-gray-50 text-primary" class="flex items-center px-6 py-3 text-gray-600 hover:bg-gray-50 hover:text-primary">
+          <i class="ri-calendar-line mr-3"></i>
+          <span>Événements</span>
+        </a>
+        <a routerLink="/publicites" routerLinkActive="bg-gray-50 text-primary" class="flex items-center px-6 py-3 text-gray-600 hover:bg-gray-50 hover:text-primary">
+          <i class="ri-advertisement-line mr-3"></i> <span>Publicités</span>
+        </a>
+        <a routerLink="/notifications" class="flex items-center px-6 py-3 text-gray-600 hover:bg-gray-50 hover:text-primary">
+          <i class="ri-notification-line mr-3"></i> <span>Notifications</span>
+        </a>
+      </nav>
+    </aside>
+  
+    <!-- Contenu principal -->
+    <div class="flex-1 flex flex-col">
+      <div *ngIf="isAuthenticated; else notAuthenticated">
+        <!-- Header -->
+        <header class="bg-white shadow-sm h-16">
+          <div class="h-full px-6 flex items-center justify-between">
+            <div class="flex items-center">
+              <div class="relative">
+                <input type="text" placeholder="Rechercher..." class="w-64 pl-10 pr-4 py-2 border border-gray-300 rounded-button focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent" [(ngModel)]="searchQuery" (input)="onSearch()">
+                <div class="absolute left-3 top-2.5 text-gray-400">
+                  <i class="ri-search-line"></i>
+                </div>
+              </div>
+            </div>
+            <div class="flex items-center space-x-4">
+              <button routerLink="/notifications" class="w-8 h-8 flex items-center justify-center text-gray-600 hover:text-primary relative">
+                <i class="ri-notification-3-line"></i>
+                <span class="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">
+                  {{ notifications.length }}
+                </span>
+              </button>
+              <div class="relative">
+                <button id="profileButton" class="flex items-center space-x-2 cursor-pointer" (click)="toggleProfile()">
+                  <div class="w-8 h-8 rounded-full bg-gray-200 flex items-center justify-center">
+                    <i class="ri-user-line text-gray-600"></i>
+                  </div>
+                  <span class="text-gray-700">Admin</span>
+                  <i class="ri-arrow-down-s-line ml-1 text-gray-600"></i>
+                </button>
+                <div id="profileMenu" class="absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-lg py-2 z-50" [class.hidden]="!isProfileMenuOpen">
+                  <a routerLink="/profile" class="px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 flex items-center">
+                    <i class="ri-user-line mr-2"></i> Mon profil
+                  </a>
+                  <div class="border-t border-gray-100 my-1"></div>
+                  <a (click)="logout()" class="px-4 py-2 text-sm text-red-600 hover:bg-gray-100 flex items-center cursor-pointer">
+                    <i class="ri-logout-box-line mr-2"></i> Déconnexion
+                  </a>
+                </div>
+              </div>
+            </div>
+          </div>
+        </header>
+  
+        <!-- Main content (empty) -->
+        <main class="flex-1 overflow-auto p-6">
+          <div class="px-4 py-6 sm:px-0">
+            <!-- Content will be added here -->
+             ecrire un texte
+          </div>
+        </main>
+      </div>
+  
+      <!-- Si l'utilisateur n'est pas authentifié -->
+      <ng-template #notAuthenticated>
+        <div class="flex h-screen items-center justify-center bg-gray-50">
+          <div class="text-center">
+            <p class="text-lg font-semibold text-gray-700">Redirection en cours...</p>
+          </div>
+        </div>
+      </ng-template>
+    </div>
+  </div>

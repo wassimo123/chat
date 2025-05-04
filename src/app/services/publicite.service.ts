@@ -38,6 +38,7 @@ export class PubliciteService {
    * Envoie une nouvelle demande de publicité (côté partenaire)
    */
   submitPublicite(data: any): Observable<any> {
+    console.log("data: ",data);
     return this.http.post(`${this.apiUrl}`, data);
   }
 

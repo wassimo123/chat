@@ -1,7 +1,7 @@
 import { Component, OnInit, ChangeDetectorRef, HostListener } from '@angular/core';
 import { FormBuilder, FormGroup, Validators, FormArray, FormControl } from '@angular/forms';
 import { Router } from '@angular/router';
-import { PubliciteService } from 'src/app/services/publicite.service';
+import { PubliciteService } from '../../services/publicite.service';
 import jsPDF from 'jspdf';
 
 interface PricingPlan {
@@ -37,48 +37,48 @@ export class PartenaireEtablissementsComponent implements OnInit {
     { name: 'Premium', duration: '6 Mois', price: 200, impressions: '6000 impressions', adsPerWeek: '5 annonces/semaine', support: 'Support prioritaire 24/7' }
   ];
   selectedPlan: PricingPlan | null = null;
-  servicesOptions: string[] = ['Wi-Fi', 'Parking', 'Piscine', 'Petit-déjeuner inclus', 'Climatisation', 'Accès handicapés'];
+  servicesOptions: string[] = [
+    'WiFi gratuit', 'Parking', 'Terrasse', 'Livraison', 'À emporter', 'Réservation',
+    'Accessibilité PMR', 'Climatisation', 'Piscine', 'Petit-déjeuner inclus',
+    'Paiement par carte', 'Service de chambre'
+  ];
+  photosPreview: string[] = [];
   partenaireId: any;
   user: any = null;
   isProfileMenuOpen: boolean = false;
+  jours: string[] = ['lundi', 'mardi', 'mercredi', 'jeudi', 'vendredi', 'samedi', 'dimanche'];
+  currentEtablissement: any;
 
   constructor(
     private fb: FormBuilder, 
-    private cdr: ChangeDetectorRef, 
+    private cdr: ChangeDetectorRef,
+    //private showErrorDialog: boolean = false, 
     private publiciteService: PubliciteService, 
     private router: Router
   ) {
-    // Establishment Form
+    // Establishment Form (without openingHours and is24_7)
     this.establishmentForm = this.fb.group({
       establishmentName: ['', Validators.required],
       establishmentType: ['', Validators.required],
+      statut: ['En attente'], // Default to "En attente"
+      visibility: ['public'], // Default to "public"
       address: ['', Validators.required],
-      postalCode: ['', [Validators.required, Validators.pattern(/^\d{4,5}$/)]],
-      city: ['', Validators.required],
-      country: ['', Validators.required],
-      mapsUrl: ['', [Validators.required, Validators.pattern(/^https:\/\/(www\.)?google\.com\/maps\/.*/)]],
-      phone: ['', [Validators.required, Validators.pattern(/^\d{8,}$/)]],
-      email: ['', [Validators.required, Validators.email]],
-      website: ['', Validators.pattern(/^https:\/\/(www\.)?[a-zA-Z0-9-]+\.[a-zA-Z]{2,}(\/.*)?$/i)],
+      postalCode: ['', Validators.pattern(/^\d{4}$/)],
+      city: [''],
+      country: ['Tunisie'],
+      showMap: [false],
+      phone: ['', Validators.pattern(/^\+?\d{8,}$/)],
+      email: ['', [Validators.email]],
+      website: ['', Validators.pattern(/^https?:\/\/(www\.)?[a-zA-Z0-9-]+\.[a-zA-Z]{2,}(\/.*)?$/)],
       description: [''],
       services: this.fb.array(this.servicesOptions.map(() => this.fb.control(false))),
-      openingHours: this.fb.array([
-        this.fb.group({ day: ['Lundi'], openTime: [''], closeTime: [''] }),
-        this.fb.group({ day: ['Mardi'], openTime: [''], closeTime: [''] }),
-        this.fb.group({ day: ['Mercredi'], openTime: [''], closeTime: [''] }),
-        this.fb.group({ day: ['Jeudi'], openTime: [''], closeTime: [''] }),
-        this.fb.group({ day: ['Vendredi'], openTime: [''], closeTime: [''] }),
-        this.fb.group({ day: ['Samedi'], openTime: [''], closeTime: [''] }),
-        this.fb.group({ day: ['Dimanche'], openTime: [''], closeTime: [''] })
-      ]),
-      specialHours: this.fb.array([]),
       socialMedia: this.fb.group({
         facebook: ['', Validators.pattern(/^https:\/\/(www\.)?facebook\.com\/.*/)],
         instagram: ['', Validators.pattern(/^https:\/\/(www\.)?instagram\.com\/.*/)],
         twitter: ['', Validators.pattern(/^https:\/\/(www\.)?twitter\.com\/.*/)],
         linkedin: ['', Validators.pattern(/^https:\/\/(www\.)?linkedin\.com\/.*/)]
       }),
-      photos: [null, Validators.required]
+      photos: this.fb.array([])
     });
 
     // Payment Form
@@ -89,6 +89,21 @@ export class PartenaireEtablissementsComponent implements OnInit {
       cardExpiry: ['', [Validators.required, Validators.pattern(/^(0[1-9]|1[0-2])\/\d{2}$/)]],
       cardCvv: ['', [Validators.required, Validators.pattern(/^\d{3}$/)]]
     });
+
+    // Initialize currentEtablissement
+    this.currentEtablissement = {
+      horaires: {
+        is24_7: false,
+        specialHours: '',
+        lundi: { open: '', close: '', closed: false },
+        mardi: { open: '', close: '', closed: false },
+        mercredi: { open: '', close: '', closed: false },
+        jeudi: { open: '', close: '', closed: false },
+        vendredi: { open: '', close: '', closed: false },
+        samedi: { open: '', close: '', closed: false },
+        dimanche: { open: '', close: '', closed: false }
+      }
+    };
   }
 
   ngOnInit(): void {
@@ -129,49 +144,85 @@ export class PartenaireEtablissementsComponent implements OnInit {
     return (this.establishmentForm.get('services') as FormArray).controls as FormControl[];
   }
 
-  // Getter for opening hours
-  get openingHours(): FormArray {
-    return this.establishmentForm.get('openingHours') as FormArray;
+  // Getter for photos
+  get photos(): FormArray {
+    return this.establishmentForm.get('photos') as FormArray;
   }
 
-  // Getter for special hours
-  get specialHours(): FormArray {
-    return this.establishmentForm.get('specialHours') as FormArray;
-  }
+  resetForm(): void {
+    this.establishmentForm.reset({
+      establishmentName: '',
+      establishmentType: '',
+      statut: 'En attente',
+      visibility: 'public',
+      address: '',
+      postalCode: '',
+      city: '',
+      country: 'Tunisie',
+      showMap: false,
+      phone: '',
+      email: '',
+      website: '',
+      description: '',
+      socialMedia: {
+        facebook: '',
+        instagram: '',
+        twitter: '',
+        linkedin: ''
+      }
+    });
+    this.servicesControls.forEach(control => control.setValue(false));
+    while (this.photos.length) {
+      this.photos.removeAt(0);
+    }
+    this.photosPreview = [];
 
-  addSpecialHour(): void {
-    this.specialHours.push(this.fb.group({
-      date: ['', Validators.required],
-      openTime: [''],
-      closeTime: ['']
-    }));
-  }
-
-  removeSpecialHour(index: number): void {
-    this.specialHours.removeAt(index);
+    // Reset currentEtablissement.horaires
+    this.currentEtablissement.horaires = {
+      is24_7: false,
+      specialHours: '',
+      lundi: { open: '', close: '', closed: false },
+      mardi: { open: '', close: '', closed: false },
+      mercredi: { open: '', close: '', closed: false },
+      jeudi: { open: '', close: '', closed: false },
+      vendredi: { open: '', close: '', closed: false },
+      samedi: { open: '', close: '', closed: false },
+      dimanche: { open: '', close: '', closed: false }
+    };
   }
 
   onImageUpload(event: Event): void {
     const input = event.target as HTMLInputElement;
     if (input.files && input.files.length > 0) {
-      this.establishmentForm.patchValue({ photos: input.files[0] });
+      Array.from(input.files).forEach(file => {
+        this.photos.push(this.fb.control(file));
+        const reader = new FileReader();
+        reader.onload = (e) => {
+          if (e.target && e.target.result) {
+            this.photosPreview.push(e.target.result as string);
+          }
+          this.cdr.detectChanges();
+        };
+        reader.readAsDataURL(file);
+      });
     }
   }
 
-  onSubmitEstablishmentForm(event: Event): void {
-    event.preventDefault();
-    console.log('Form validity:', this.establishmentForm.valid);
-    console.log('Form errors:', this.establishmentForm.errors);
-    if (this.establishmentForm.valid) {
-      console.log('Establishment Form Submitted:', this.establishmentForm.value);
-      this.showPricingModal = true;
-    } else {
-      console.log('Form invalid, showing validation dialog');
-      this.establishmentForm.markAllAsTouched();
-      this.showValidationDialog = true;
-      this.cdr.detectChanges();
-    }
+  removePhoto(index: number): void {
+    this.photos.removeAt(index);
+    this.photosPreview.splice(index, 1);
+    this.cdr.detectChanges();
   }
+    onSubmitEstablishmentForm(event: Event): void {
+      event.preventDefault();
+      if (this.establishmentForm.valid) {
+        this.showPricingModal = true;
+      } else {
+        this.establishmentForm.markAllAsTouched();
+        this.showValidationDialog = true;
+        this.cdr.detectChanges();
+      }
+    }
 
   closeValidationDialog(): void {
     this.showValidationDialog = false;
@@ -186,6 +237,7 @@ export class PartenaireEtablissementsComponent implements OnInit {
   selectPlan(plan: PricingPlan): void {
     this.selectedPlan = plan;
     this.generateInvoicePDF(plan);
+    this.submitFinal();
   }
 
   submitFinal(): void {
@@ -198,17 +250,15 @@ export class PartenaireEtablissementsComponent implements OnInit {
       description: this.establishmentForm.value.description,
       services: this.servicesOptions.filter((_, i) => this.establishmentForm.value.services[i]),
       socialMedia: this.establishmentForm.value.socialMedia,
-      horaires: {
-        opening: this.establishmentForm.value.openingHours,
-        special: this.establishmentForm.value.specialHours,
-      },
+      horaires: this.currentEtablissement.horaires,
       telephone: this.establishmentForm.value.phone,
       email: this.establishmentForm.value.email,
       siteWeb: this.establishmentForm.value.website,
       ville: this.establishmentForm.value.city,
       pays: this.establishmentForm.value.country,
       codePostal: this.establishmentForm.value.postalCode,
-      showMap: true
+      showMap: this.establishmentForm.value.showMap,
+      photos: this.establishmentForm.value.photos
     };
 
     const data = {
@@ -216,6 +266,8 @@ export class PartenaireEtablissementsComponent implements OnInit {
       nom: this.establishmentForm.value.establishmentName,
       adresse: this.establishmentForm.value.address,
       type: this.establishmentForm.value.establishmentType,
+      statut: this.establishmentForm.value.statut,
+      visibility: this.establishmentForm.value.visibility,
       pack: this.selectedPlan.name,
       informations: infos
     };
@@ -229,7 +281,7 @@ export class PartenaireEtablissementsComponent implements OnInit {
           timestamp: new Date()
         });
         this.closePricingModal();
-        this.establishmentForm.reset();
+        this.resetForm();
       },
       error: err => {
         console.error('Erreur d\'envoi:', err);
@@ -241,15 +293,7 @@ export class PartenaireEtablissementsComponent implements OnInit {
   onSubmitPaymentForm(event: Event): void {
     event.preventDefault();
     if (this.paymentForm.valid || this.paymentForm.get('paymentMethod')?.value !== 'card') {
-      console.log('Payment Form Submitted:', this.paymentForm.value, 'Selected Plan:', this.selectedPlan);
-      this.pendingConfirmation = true;
-      this.pendingRequests.push({
-        establishment: this.establishmentForm.value,
-        plan: this.selectedPlan!,
-        timestamp: new Date()
-      });
-      this.closePricingModal();
-      this.establishmentForm.reset();
+      this.submitFinal();
     } else {
       this.paymentForm.markAllAsTouched();
     }
@@ -300,7 +344,7 @@ export class PartenaireEtablissementsComponent implements OnInit {
 
     // Footer
     doc.setFontSize(10);
-    doc.setTextColor(100); // Correction ici : dociteralColor -> setTextColor
+    doc.setTextColor(100);
     doc.text('Merci pour votre confiance !', 105, 280, { align: 'center' });
 
     const safeName = data.establishmentName.replace(/\s+/g, '_');

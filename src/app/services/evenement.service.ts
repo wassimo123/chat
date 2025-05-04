@@ -98,6 +98,7 @@ export class EvenementService {
   getEtablissementById(id: string): Observable<{ _id: string; nom: string }> {
     return this.http.get<{ _id: string; nom: string }>(`${this.typeEtabUrl}/id/${id}`).pipe(
       catchError(this.handleError)
-    );
-  }
+    );}
+
+    
 }

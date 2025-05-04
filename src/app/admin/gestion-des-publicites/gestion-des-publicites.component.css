@@ -1,0 +1,16 @@
+/* Styles spécifiques au composant GestionDesPublicites */
+.text-primary {
+  color: #4F46E5;
+}
+
+.hover\:text-primary-dark:hover {
+  color: #4338CA;
+}
+
+.rounded-button {
+  border-radius: 0.375rem;
+}
+
+button.w-8.h-8 {
+  position: relative;
+}

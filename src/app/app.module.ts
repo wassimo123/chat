@@ -36,6 +36,7 @@ import { ProfilePartenaireComponent } from './partenaire/profile-partenaire/prof
 import { PartenaireEtablissementsComponent } from './partenaire/partenaire-etablissements/partenaire-etablissements.component';
 import { PartenaireEvenementsComponent } from './partenaire/partenaire-evenements/partenaire-evenements.component';
 import { PartenairePromotionsComponent } from './partenaire/partenaire-promotions/partenaire-promotions.component';
+import { GestionDesPublicitesComponent } from './admin/gestion-des-publicites/gestion-des-publicites.component';
 
 
 
@@ -64,7 +65,8 @@ import { PartenairePromotionsComponent } from './partenaire/partenaire-promotion
    ProfilePartenaireComponent,
    PartenaireEtablissementsComponent,
    PartenaireEvenementsComponent,
-   PartenairePromotionsComponent
+   PartenairePromotionsComponent,
+   GestionDesPublicitesComponent
   
     
 

@@ -25,7 +25,7 @@ export class GestionDesEvenementsComponent implements OnInit, AfterViewInit {
   paginatedEvents: Evenement[] = [];
   stats: Stats = { total: 0, upcoming: 0, inProgress: 0, completed: 0 };
   notifications: any[] = [];
-
+  isViewMode = false; // Nouvelle propriété pour le mode visualisation
   tableSearchQuery = '';
   selectedStatus = 'Tous';
   selectedTypeEtablissement = 'Tous';
@@ -450,6 +450,7 @@ export class GestionDesEvenementsComponent implements OnInit, AfterViewInit {
     this.photoPreview = null;
     this.selectedFile = null;
     this.etablissementsType = [];
+    this.isViewMode = false; // Assurez-vous que le mode visualisation est désactivé
     this.isModalOpen = true;
     setTimeout(() => {
       const modalContent = document.querySelector('.modal-content');
@@ -471,6 +472,7 @@ export class GestionDesEvenementsComponent implements OnInit, AfterViewInit {
     if (this.currentEvent.typeEtablissement) {
       this.onTypeChange();
     }
+    this.isViewMode = false; // Assurez-vous que le mode visualisation est désactivé
     this.isModalOpen = true;
   }
 
@@ -553,11 +555,11 @@ export class GestionDesEvenementsComponent implements OnInit, AfterViewInit {
 
   closeModal(): void {
     this.isModalOpen = false;
+    this.isViewMode = false; // Réinitialisez le mode visualisation
     this.photoPreview = null;
     this.selectedFile = null;
     this.etablissementsType = [];
   }
-
   openArchiveModal(event: Evenement): void {
     this.eventToArchive = event;
     this.isArchiveModalOpen = true;
@@ -588,7 +590,13 @@ export class GestionDesEvenementsComponent implements OnInit, AfterViewInit {
       });
     }
   }
+  
 
+
+getEstablishmentName(): string {
+  const establishment = this.etablissementsType.find(e => e._id === this.currentEvent.establishmentId);
+  return establishment ? establishment.nom : 'Non spécifié';
+}
   onPhotoChange(event: Event): void {
     const input = event.target as HTMLInputElement;
     if (input.files && input.files.length > 0) {
@@ -654,8 +662,35 @@ export class GestionDesEvenementsComponent implements OnInit, AfterViewInit {
   }
 
   viewEvent(event: Evenement): void {
-    console.log('Voir événement:', event);
+    this.modalTitle = "Détails de l'événement";
+    this.currentEvent = {
+      ...event,
+      organisateur: event.organisateur || '',
+      description: event.description || '',
+      photo: event.photo || '',
+      prix: { ...event.prix }
+    };
+    this.photoPreview = event.photo
+      ? (event.photo.startsWith('data:') || event.photo.startsWith('http'))
+        ? event.photo
+        : `${this.API_BASE_URL}${event.photo}`
+      : null;
+    this.selectedFile = null;
+    if (this.currentEvent.typeEtablissement) {
+      this.onTypeChange();
+    }
+    this.isViewMode = true; // Activez le mode visualisation
+    this.isModalOpen = true;
+    setTimeout(() => {
+      const modalContent = document.querySelector('.modal-content');
+      if (modalContent) {
+        modalContent.scrollTop = 0;
+      }
+    });
   }
+
+
+  
 
   toggleProfile(): void {
     this.isProfileMenuOpen = !this.isProfileMenuOpen;

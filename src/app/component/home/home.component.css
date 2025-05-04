@@ -324,11 +324,11 @@ iframe {
   background-clip: text;
   color: transparent;
 }
-.container {
+/* .container {
   max-width: 800px;
   margin: 2rem auto;
   padding: 0 1rem;
-}
+} */
 
 .form-group {
   margin-bottom: 1.5rem;
@@ -392,10 +392,4 @@ iframe {
   color: #d1d5db;
 }
 
-.bg-primary {
-  background-color: #3b82f6;
-}
 
-.bg-primary:hover {
-  background-color: #2563ea;
-}

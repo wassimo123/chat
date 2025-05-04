@@ -227,9 +227,9 @@ LinkActive="bg-gray-50 text-primary" class="flex items-center px-6 py-3 text-gra
                 <th scope="col" class="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                   <div class="flex items-center">
                     <span>Établissement</span>
-                    <button class="ml-1 text-gray-400 hover:text-gray-500" (click)="sortBy('establishmentId')">
+                    <button class="ml-1 text-gray-400 hover:text-gray-500" (click)="sortBy('establishmentName')">
                       <div class="w-4 h-4 flex items-center justify-center">
-                        <i [ngClass]="sortField === 'establishmentId' && sortDirection === 'asc' ? 'ri-arrow-up-s-line' : 'ri-arrow-down-s-line'"></i>
+                        <i [ngClass]="sortField === 'establishmentName' && sortDirection === 'asc' ? 'ri-arrow-up-s-line' : 'ri-arrow-down-s-line'"></i>
                       </div>
                     </button>
                   </div>
@@ -289,7 +289,7 @@ LinkActive="bg-gray-50 text-primary" class="flex items-center px-6 py-3 text-gra
                   <div class="text-xs text-gray-500">ID: {{ promotion.id }}</div>
                 </td>
                 <td class="px-6 py-4 whitespace-nowrap">
-                  <div class="text-sm text-gray-900">{{ getEstablishmentName(promotion.establishmentId) }}</div>
+                  <div class="text-sm text-gray-900">{{ promotion.establishmentName }}</div>
                 </td>
                 <td class="px-6 py-4 whitespace-nowrap">
                   <div class="text-sm text-gray-900">{{ promotion.discount }}</div>

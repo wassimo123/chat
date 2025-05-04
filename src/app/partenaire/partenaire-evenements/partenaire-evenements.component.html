@@ -90,17 +90,17 @@
           <div class="space-y-6">
             <!-- Event Name -->
             <div>
-              <label for="eventName" class="block text-sm font-medium text-gray-700 mb-2">
+              <label for="nom" class="block text-sm font-medium text-gray-700 mb-2">
                 Nom de l'événement <span class="text-red-500">*</span>
               </label>
               <input
-                id="eventName"
-                formControlName="eventName"
+                id="nom"
+                formControlName="nom"
                 type="text"
                 class="w-full px-3 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-colors"
-                [ngClass]="{'border-red-500': eventForm.get('eventName')?.touched && eventForm.get('eventName')?.invalid}"
+                [ngClass]="{'border-red-500': eventForm.get('nom')?.touched && eventForm.get('nom')?.invalid}"
               />
-              <p *ngIf="eventForm.get('eventName')?.touched && eventForm.get('eventName')?.invalid" class="text-red-500 text-sm mt-1">
+              <p *ngIf="eventForm.get('nom')?.touched && eventForm.get('nom')?.invalid" class="text-red-500 text-sm mt-1">
                 Le nom de l'événement est requis.
               </p>
             </div>
@@ -108,133 +108,278 @@
             <!-- Date and Start Time -->
             <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div>
-                <label for="date" class="block text-sm font-medium text-gray-700 mb-2">
-                  Date <span class="text-red-500">*</span>
+                <label for="dateDebut" class="block text-sm font-medium text-gray-700 mb-2">
+                  Date de début <span class="text-red-500">*</span>
                 </label>
                 <div class="relative">
                   <input
-                    id="date"
-                    formControlName="date"
+                    id="dateDebut"
+                    formControlName="dateDebut"
                     type="date"
                     class="w-full px-3 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
-                    [ngClass]="{'border-red-500': eventForm.get('date')?.touched && eventForm.get('date')?.invalid}"
+                    [ngClass]="{'border-red-500': eventForm.get('dateDebut')?.touched && eventForm.get('dateDebut')?.invalid}"
                   />
-                  <i class="ri-calendar-line absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500 pointer-events-none"></i>
+                  <i class=" text-gray-500 pointer-events-none"></i>
                 </div>
-                <p *ngIf="eventForm.get('date')?.touched && eventForm.get('date')?.invalid" class="text-red-500 text-sm mt-1">
-                  La date est requise.
+                <p *ngIf="eventForm.get('dateDebut')?.touched && eventForm.get('dateDebut')?.invalid" class="text-red-500 text-sm mt-1">
+                  La date de début est requise.
                 </p>
               </div>
               <div>
-                <label for="startTime" class="block text-sm font-medium text-gray-700 mb-2">
-                  Heure de début <span class="text-red-500">*</span>
+                <label for="dateFin" class="block text-sm font-medium text-gray-700 mb-2">
+                  Date de fin <span class="text-red-500">*</span>
                 </label>
                 <div class="relative">
                   <input
-                    id="startTime"
-                    formControlName="startTime"
-                    type="time"
+                    id="dateFin"
+                    formControlName="dateFin"
+                    type="date"
                     class="w-full px-3 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
-                    [ngClass]="{'border-red-500': eventForm.get('startTime')?.touched && eventForm.get('startTime')?.invalid}"
+                    [ngClass]="{'border-red-500': eventForm.get('dateFin')?.touched && eventForm.get('dateFin')?.invalid}"
                   />
-                  <i class="ri-time-line absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500 pointer-events-none"></i>
+                  <i class=" text-gray-500 pointer-events-none"></i>
                 </div>
-                <p *ngIf="eventForm.get('startTime')?.touched && eventForm.get('startTime')?.invalid" class="text-red-500 text-sm mt-1">
-                  L'heure de début est requise.
+                <p *ngIf="eventForm.get('dateFin')?.touched && eventForm.get('dateFin')?.invalid" class="text-red-500 text-sm mt-1">
+                  La date de fin est requise.
                 </p>
               </div>
             </div>
     
-            <!-- End Time -->
-            <div>
-              <label for="endTime" class="block text-sm font-medium text-gray-700 mb-2">
-                Heure de fin
-              </label>
-              <div class="relative">
-                <input
-                  id="endTime"
-                  formControlName="endTime"
-                  type="time"
-                  class="w-full px-3 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
-                />
-                <i class="ri-time-line absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500 pointer-events-none"></i>
+            <!-- Start and End Time -->
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div>
+                <label for="heureDebut" class="block text-sm font-medium text-gray-700 mb-2">
+                  Heure de début <span class="text-red-500">*</span>
+                </label>
+                <div class="relative">
+                  <input
+                    id="heureDebut"
+                    formControlName="heureDebut"
+                    type="time"
+                    class="w-full px-3 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
+                    [ngClass]="{'border-red-500': eventForm.get('heureDebut')?.touched && eventForm.get('heureDebut')?.invalid}"
+                  />
+                  <i class=" text-gray-500 pointer-events-none"></i>
+                </div>
+                <p *ngIf="eventForm.get('heureDebut')?.touched && eventForm.get('heureDebut')?.invalid" class="text-red-500 text-sm mt-1">
+                  L'heure de début est requise.
+                </p>
+              </div>
+              <div>
+                <label for="heureFin" class="block text-sm font-medium text-gray-700 mb-2">
+                  Heure de fin
+                </label>
+                <div class="relative">
+                  <input
+                    id="heureFin"
+                    formControlName="heureFin"
+                    type="time"
+                    class="w-full px-3 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
+                  />
+                  <i class=" text-gray-500 pointer-events-none"></i>
+                </div>
               </div>
             </div>
     
             <!-- Location -->
             <div>
-              <label for="location" class="block text-sm font-medium text-gray-700 mb-2">
+              <label for="lieu" class="block text-sm font-medium text-gray-700 mb-2">
                 Lieu <span class="text-red-500">*</span>
               </label>
               <input
-                id="location"
-                formControlName="location"
+                id="lieu"
+                formControlName="lieu"
                 type="text"
                 class="w-full px-3 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
-                [ngClass]="{'border-red-500': eventForm.get('location')?.touched && eventForm.get('location')?.invalid}"
+                [ngClass]="{'border-red-500': eventForm.get('lieu')?.touched && eventForm.get('lieu')?.invalid}"
               />
-              <p *ngIf="eventForm.get('location')?.touched && eventForm.get('location')?.invalid" class="text-red-500 text-sm mt-1">
+              <p *ngIf="eventForm.get('lieu')?.touched && eventForm.get('lieu')?.invalid" class="text-red-500 text-sm mt-1">
                 Le lieu est requis.
               </p>
             </div>
     
             <!-- City -->
             <div>
-              <label for="city" class="block text-sm font-medium text-gray-700 mb-2">
+              <label for="ville" class="block text-sm font-medium text-gray-700 mb-2">
                 Ville <span class="text-red-500">*</span>
               </label>
               <input
-                id="city"
-                formControlName="city"
+                id="ville"
+                formControlName="ville"
                 type="text"
                 class="w-full px-3 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
-                [ngClass]="{'border-red-500': eventForm.get('city')?.touched && eventForm.get('city')?.invalid}"
+                [ngClass]="{'border-red-500': eventForm.get('ville')?.touched && eventForm.get('ville')?.invalid}"
               />
-              <p *ngIf="eventForm.get('city')?.touched && eventForm.get('city')?.invalid" class="text-red-500 text-sm mt-1">
+              <p *ngIf="eventForm.get('ville')?.touched && eventForm.get('ville')?.invalid" class="text-red-500 text-sm mt-1">
                 La ville est requise.
               </p>
             </div>
     
             <!-- Maximum Capacity -->
             <div>
-              <label for="maxCapacity" class="block text-sm font-medium text-gray-700 mb-2">
+              <label for="capacite" class="block text-sm font-medium text-gray-700 mb-2">
                 Capacité maximale <span class="text-red-500">*</span>
               </label>
               <input
-                id="maxCapacity"
-                formControlName="maxCapacity"
+                id="capacite"
+                formControlName="capacite"
                 type="number"
                 min="1"
                 class="w-full px-3 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
-                [ngClass]="{'border-red-500': eventForm.get('maxCapacity')?.touched && eventForm.get('maxCapacity')?.invalid}"
+                [ngClass]="{'border-red-500': eventForm.get('capacite')?.touched && eventForm.get('capacite')?.invalid}"
               />
-              <p *ngIf="eventForm.get('maxCapacity')?.touched && eventForm.get('maxCapacity')?.invalid" class="text-red-500 text-sm mt-1">
+              <p *ngIf="eventForm.get('capacite')?.touched && eventForm.get('capacite')?.invalid" class="text-red-500 text-sm mt-1">
                 Une capacité maximale supérieure à 0 est requise.
               </p>
             </div>
     
             <!-- Category -->
             <div>
-              <label for="category" class="block text-sm font-medium text-gray-700 mb-2">
+              <label for="categorie" class="block text-sm font-medium text-gray-700 mb-2">
                 Catégorie <span class="text-red-500">*</span>
               </label>
               <div class="relative">
                 <select
-                  id="category"
-                  formControlName="category"
+                  id="categorie"
+                  formControlName="categorie"
                   class="w-full px-3 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent appearance-none pr-8"
-                  [ngClass]="{'border-red-500': eventForm.get('category')?.touched && eventForm.get('category')?.invalid}"
+                  [ngClass]="{'border-red-500': eventForm.get('categorie')?.touched && eventForm.get('categorie')?.invalid}"
                 >
                   <option value="">Sélectionnez une catégorie</option>
-                  <option *ngFor="let category of categories" [value]="category.value">
-                    {{ category.label }}
-                  </option>
+                  <option>Gastronomie</option>
+                  <option>Musique</option>
+                  <option>Littérature</option>
+                  <option>Cinéma</option>
+                  <option>Art</option>
+                  <option>Sport</option>
+                  <option>Conférences</option>
+                  <option>Festivals</option>
+                  <option>Autre</option>
                 </select>
                 <i class="ri-arrow-down-s-line absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500 pointer-events-none"></i>
               </div>
-              <p *ngIf="eventForm.get('category')?.touched && eventForm.get('category')?.invalid" class="text-red-500 text-sm mt-1">
+              <p *ngIf="eventForm.get('categorie')?.touched && eventForm.get('categorie')?.invalid" class="text-red-500 text-sm mt-1">
                 La catégorie est requise.
               </p>
+            </div>
+
+            <!-- Type d'Établissement -->
+            <div>
+              <label for="typeEtablissement" class="block text-sm font-medium text-gray-700 mb-2">
+                Type d'établissement <span class="text-red-500">*</span>
+              </label>
+              <div class="relative">
+                <select
+                  id="typeEtablissement"
+                  formControlName="typeEtablissement"
+                  class="w-full px-3 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent appearance-none pr-8"
+                  [ngClass]="{'border-red-500': eventForm.get('typeEtablissement')?.touched && eventForm.get('typeEtablissement')?.invalid}"
+                >
+                  <option value="">Sélectionnez un type</option>
+                  <option>Restaurant</option>
+                  <option>Hôtel</option>
+                  <option>Café</option>
+                  <option>Sfax</option>
+                </select>
+                <i class="ri-arrow-down-s-line absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500 pointer-events-none"></i>
+              </div>
+              <p *ngIf="eventForm.get('typeEtablissement')?.touched && eventForm.get('typeEtablissement')?.invalid" class="text-red-500 text-sm mt-1">
+                Le type d'établissement est requis.
+              </p>
+            </div>
+
+            <!-- Establishment (Static Dropdown) -->
+            <div>
+              <label for="establishmentId" class="block text-sm font-medium text-gray-700 mb-2">
+                Nom Établissement <span class="text-red-500">*</span>
+              </label>
+              <div class="relative">
+                <select
+                  id="establishmentId"
+                  formControlName="establishmentId"
+                  class="w-full px-3 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent appearance-none pr-8"
+                  [ngClass]="{'border-red-500': eventForm.get('establishmentId')?.touched && eventForm.get('establishmentId')?.invalid}"
+                >
+                  <option value="">Sélectionnez un établissement</option>
+                  <option *ngFor="let etab of etablissementsType" [value]="etab._id">{{ etab.nom }}</option>
+                </select>
+                <i class="ri-arrow-down-s-line absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500 pointer-events-none"></i>
+              </div>
+              <p *ngIf="eventForm.get('establishmentId')?.touched && eventForm.get('establishmentId')?.invalid" class="text-red-500 text-sm mt-1">
+                Le nom de l'établissement est requis.
+              </p>
+            </div>
+
+            <!-- Price -->
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-2">
+                Prix <span class="text-red-500">*</span>
+              </label>
+              <div class="mt-1 flex items-center">
+                <input
+                  id="estGratuit"
+                  formControlName="estGratuit"
+                  type="checkbox"
+                  class="h-4 w-4 text-primary focus:ring-primary border-gray-300 rounded"
+                />
+                <label for="estGratuit" class="ml-2 text-sm text-gray-700">Événement gratuit</label>
+              </div>
+              <div *ngIf="!eventForm.get('estGratuit')?.value" class="mt-2">
+                <label for="montant" class="block text-sm font-medium text-gray-700">Montant (TND) <span class="text-red-500">*</span></label>
+                <input
+                  id="montant"
+                  formControlName="montant"
+                  type="number"
+                  min="0"
+                  class="mt-1 block w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-primary"
+                  [ngClass]="{'border-red-500': eventForm.get('montant')?.touched && eventForm.get('montant')?.invalid}"
+                />
+                <p *ngIf="eventForm.get('montant')?.touched && eventForm.get('montant')?.invalid" class="text-red-500 text-sm mt-1">
+                  Un montant valide est requis si l'événement n'est pas gratuit.
+                </p>
+              </div>
+            </div>
+
+            <!-- Photo de l'événement -->
+            <div>
+              <label for="event-photo" class="block text-sm font-medium text-gray-700 mb-2">Photo de l'événement</label>
+              <input
+                id="event-photo"
+                type="file"
+                accept="image/*"
+                (change)="onPhotoChange($event)"
+                class="mt-1 block w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-primary"
+              />
+              <div class="mt-2" *ngIf="photoPreview">
+                <div class="relative">
+                  <img [src]="photoPreview" alt="Aperçu de la photo" class="w-full h-24 object-cover rounded-lg" (error)="handleImageError()">
+                  <button type="button" class="absolute top-1 right-1 bg-red-500 text-white rounded-full w-6 h-6 flex items-center justify-center" (click)="removePhoto()">
+                    <i class="ri-close-line"></i>
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            <!-- Organisateur -->
+            <div>
+              <label for="organisateur" class="block text-sm font-medium text-gray-700 mb-2">Organisateur</label>
+              <input
+                id="organisateur"
+                formControlName="organisateur"
+                type="text"
+                class="w-full px-3 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
+              />
+            </div>
+
+            <!-- Description -->
+            <div>
+              <label for="description" class="block text-sm font-medium text-gray-700 mb-2">Description</label>
+              <textarea
+                id="description"
+                formControlName="description"
+                rows="3"
+                class="w-full px-3 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
+              ></textarea>
             </div>
           </div>
     

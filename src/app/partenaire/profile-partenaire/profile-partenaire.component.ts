@@ -8,9 +8,8 @@ import { UserService } from '../../services/user.service';
   styleUrls: ['./profile-partenaire.component.css']
 })
 export class ProfilePartenaireComponent implements OnInit {
-  user: any = null;
+  user: any = {};
   isProfileMenuOpen: boolean = false;
-  isPasswordModalOpen: boolean = false;
   showMessageModal: boolean = false;
   messageModalType: 'success' | 'error' = 'success';
   messageModalTitle: string = '';
@@ -20,6 +19,7 @@ export class ProfilePartenaireComponent implements OnInit {
   newPassword: string = '';
   confirmPassword: string = '';
   showCurrentPassword: boolean = false;
+  showCurrentPasswordInput: boolean = false;
   showNewPassword: boolean = false;
   showConfirmPassword: boolean = false;
   passwordStrengthClass: string = '';
@@ -29,20 +29,34 @@ export class ProfilePartenaireComponent implements OnInit {
   constructor(private router: Router, private userService: UserService) {}
 
   ngOnInit() {
-    // Récupérer les informations de l'utilisateur depuis localStorage
     const storedUser = localStorage.getItem('user');
     if (storedUser) {
       this.user = JSON.parse(storedUser);
-      // Vérifier que le rôle est bien "Partenaire"
-      if (this.user.role !== 'Partenaire') {
-        this.showMessageModal = true;
-        this.messageModalType = 'error';
-        this.messageModalTitle = 'Accès non autorisé';
-        this.messageModalMessage = 'Seuls les partenaires peuvent accéder à cette page.';
-        setTimeout(() => {
-          this.router.navigate(['/connexion']);
-        }, 2000);
-      }
+      // Récupérer les données de l'utilisateur depuis la base de données
+      this.userService.getUserByEmail(this.user.email).subscribe(
+        (userData) => {
+          this.user = userData;
+          localStorage.setItem('user', JSON.stringify(userData));
+          if (this.user.role !== 'Partenaire') {
+            this.showMessageModal = true;
+            this.messageModalType = 'error';
+            this.messageModalTitle = 'Accès non autorisé';
+            this.messageModalMessage = 'Seuls les partenaires peuvent accéder à cette page.';
+            setTimeout(() => {
+              this.router.navigate(['/connexion']);
+            }, 2000);
+          }
+        },
+        (error) => {
+          this.showMessageModal = true;
+          this.messageModalType = 'error';
+          this.messageModalTitle = 'Erreur';
+          this.messageModalMessage = 'Erreur lors de la récupération des données utilisateur.';
+          setTimeout(() => {
+            this.router.navigate(['/connexion']);
+          }, 2000);
+        }
+      );
     } else {
       this.router.navigate(['/connexion']);
     }
@@ -66,18 +80,25 @@ export class ProfilePartenaireComponent implements OnInit {
     this.router.navigate(['/connexion']);
   }
 
-  openPasswordModal() {
-    this.isPasswordModalOpen = true;
-  }
-
-  closePasswordModal() {
-    this.isPasswordModalOpen = false;
-    this.currentPassword = '';
-    this.newPassword = '';
-    this.confirmPassword = '';
-    this.passwordStrengthClass = '';
-    this.passwordMatchClass = 'text-gray-500';
-    this.passwordMatchMessage = '';
+  cancel() {
+    // Recharger les données de l'utilisateur pour annuler les modifications
+    this.userService.getUserByEmail(this.user.email).subscribe(
+      (userData) => {
+        this.user = userData;
+        this.currentPassword = '';
+        this.newPassword = '';
+        this.confirmPassword = '';
+        this.passwordStrengthClass = '';
+        this.passwordMatchClass = 'text-gray-500';
+        this.passwordMatchMessage = '';
+      },
+      (error) => {
+        this.showMessageModal = true;
+        this.messageModalType = 'error';
+        this.messageModalTitle = 'Erreur';
+        this.messageModalMessage = 'Erreur lors de la récupération des données utilisateur.';
+      }
+    );
   }
 
   closeMessageModal() {
@@ -86,6 +107,10 @@ export class ProfilePartenaireComponent implements OnInit {
 
   toggleCurrentPasswordVisibility() {
     this.showCurrentPassword = !this.showCurrentPassword;
+  }
+
+  toggleCurrentPasswordInputVisibility() {
+    this.showCurrentPasswordInput = !this.showCurrentPasswordInput;
   }
 
   toggleNewPasswordVisibility() {
@@ -105,11 +130,11 @@ export class ProfilePartenaireComponent implements OnInit {
     const hasSpecialChar = /[!@#$%^&*(),.?":{}|<>]/.test(password);
 
     if (hasLength && hasUpperCase && hasLowerCase && hasNumber && hasSpecialChar) {
-      this.passwordStrengthClass = 'bg-green-500';
+      this.passwordStrengthClass = 'password-strength strong';
     } else if (password.length >= 6) {
-      this.passwordStrengthClass = 'bg-yellow-500';
+      this.passwordStrengthClass = 'password-strength medium';
     } else {
-      this.passwordStrengthClass = 'bg-red-500';
+      this.passwordStrengthClass = 'password-strength weak';
     }
   }
 
@@ -128,48 +153,8 @@ export class ProfilePartenaireComponent implements OnInit {
     }
   }
 
-  handlePasswordSubmit() {
-    if (!this.currentPassword || !this.newPassword || !this.confirmPassword) {
-      this.showMessageModal = true;
-      this.messageModalType = 'error';
-      this.messageModalTitle = 'Erreur';
-      this.messageModalMessage = 'Veuillez remplir tous les champs.';
-      return;
-    }
-
-    if (this.newPassword !== this.confirmPassword) {
-      this.showMessageModal = true;
-      this.messageModalType = 'error';
-      this.messageModalTitle = 'Erreur';
-      this.messageModalMessage = 'Les mots de passe ne correspondent pas.';
-      return;
-    }
-
-    const passwordData = {
-      currentPassword: this.currentPassword,
-      newPassword: this.newPassword,
-      confirmPassword: this.confirmPassword
-    };
-
-    this.userService.changePassword(passwordData).subscribe(
-      (response) => {
-        this.showMessageModal = true;
-        this.messageModalType = 'success';
-        this.messageModalTitle = 'Succès';
-        this.messageModalMessage = 'Mot de passe changé avec succès.';
-        this.closePasswordModal();
-      },
-      (error) => {
-        this.showMessageModal = true;
-        this.messageModalType = 'error';
-        this.messageModalTitle = 'Erreur';
-        this.messageModalMessage = error.error.message || 'Erreur lors du changement de mot de passe.';
-      }
-    );
-  }
-
   updateProfile() {
-    // Vérifier que les champs requis sont remplis
+    // Vérifier les champs obligatoires
     if (!this.user.telephone || !this.user.adresse) {
       this.showMessageModal = true;
       this.messageModalType = 'error';
@@ -178,7 +163,48 @@ export class ProfilePartenaireComponent implements OnInit {
       return;
     }
 
-    // Mettre à jour uniquement les champs modifiables (téléphone et adresse)
+    // Vérifier si un changement de mot de passe est demandé
+    if (this.currentPassword || this.newPassword || this.confirmPassword) {
+      if (!this.currentPassword || !this.newPassword || !this.confirmPassword) {
+        this.showMessageModal = true;
+        this.messageModalType = 'error';
+        this.messageModalTitle = 'Erreur';
+        this.messageModalMessage = 'Veuillez remplir tous les champs de mot de passe.';
+        return;
+      }
+
+      if (this.newPassword !== this.confirmPassword) {
+        this.showMessageModal = true;
+        this.messageModalType = 'error';
+        this.messageModalTitle = 'Erreur';
+        this.messageModalMessage = 'Les mots de passe ne correspondent pas.';
+        return;
+      }
+
+      const passwordData = {
+        currentPassword: this.currentPassword,
+        newPassword: this.newPassword,
+        confirmPassword: this.confirmPassword
+      };
+
+      this.userService.changePassword(passwordData).subscribe(
+        (response) => {
+          this.user.password = this.newPassword; // Simulé pour l'affichage
+          this.updateUserProfile();
+        },
+        (error) => {
+          this.showMessageModal = true;
+          this.messageModalType = 'error';
+          this.messageModalTitle = 'Erreur';
+          this.messageModalMessage = error.error.message || 'Erreur lors du changement de mot de passe.';
+        }
+      );
+    } else {
+      this.updateUserProfile();
+    }
+  }
+
+  updateUserProfile() {
     const updatedUser = {
       telephone: this.user.telephone,
       adresse: this.user.adresse
@@ -186,7 +212,6 @@ export class ProfilePartenaireComponent implements OnInit {
 
     this.userService.updateUser(this.user.matriculeFiscale, updatedUser).subscribe(
       (response) => {
-        // Recharger les données de l'utilisateur depuis le serveur pour s'assurer que tout est synchronisé
         this.userService.getUserByEmail(this.user.email).subscribe(
           (userData) => {
             this.user = userData;
@@ -195,6 +220,12 @@ export class ProfilePartenaireComponent implements OnInit {
             this.messageModalType = 'success';
             this.messageModalTitle = 'Succès';
             this.messageModalMessage = 'Profil mis à jour avec succès.';
+            this.currentPassword = '';
+            this.newPassword = '';
+            this.confirmPassword = '';
+            this.passwordStrengthClass = '';
+            this.passwordMatchClass = 'text-gray-500';
+            this.passwordMatchMessage = '';
           },
           (error) => {
             this.showMessageModal = true;
@@ -213,4 +244,3 @@ export class ProfilePartenaireComponent implements OnInit {
     );
   }
 }
-

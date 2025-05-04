@@ -8,6 +8,7 @@ export interface Promotion {
   id?: string;
   name: string;
   establishmentId: string; // Changed to string to match backend
+  establishmentName: string; // Changed to string to match backend
   discount: string;
   startDate: string;
   endDate: string;

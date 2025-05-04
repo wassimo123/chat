@@ -43,6 +43,8 @@ export class NotificationService {
     this.saveNotificationsToStorage(updatedNotifications);
   }
 
+  
+
   private saveNotificationsToStorage(notifications: Notification[]) {
     localStorage.setItem('notifications', JSON.stringify(notifications));
   }

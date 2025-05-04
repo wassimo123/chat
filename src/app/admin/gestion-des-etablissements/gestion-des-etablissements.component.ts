@@ -360,6 +360,12 @@ export class GestionDesEtablissementsComponent implements OnInit, AfterViewInit 
     return pages;
   }
 
+// Méthode pour valider le format de l'email
+isValidEmail(email: string): boolean {
+  const emailPattern = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+  return emailPattern.test(email);
+}
+
   toggleTypeFilter(): void {
     this.showTypeFilter = !this.showTypeFilter;
     this.showStatusFilter = false;
@@ -467,11 +473,28 @@ export class GestionDesEtablissementsComponent implements OnInit, AfterViewInit 
     this.isModalOpen = true;
   }
 
-  saveEtablissement(): void {
-    if (!this.currentEtablissement.nom || !this.currentEtablissement.type || !this.currentEtablissement.statut || !this.currentEtablissement.adresse) {
-      this.showNotification("Veuillez remplir tous les champs obligatoires (Nom, Type, Statut, Adresse).", "error");
-      return;
-    }
+// Remplacer la méthode saveEtablissement
+saveEtablissement(): void {
+  // Vérifier les champs obligatoires
+  if (
+    !this.currentEtablissement.nom ||
+    !this.currentEtablissement.type ||
+    !this.currentEtablissement.statut ||
+    !this.currentEtablissement.adresse ||
+    !this.currentEtablissement.email
+  ) {
+    this.showNotification(
+      "Veuillez remplir tous les champs obligatoires : Nom, Type, Statut, Adresse, Email.",
+      "error"
+    );
+    return;
+  }
+
+// Vérifier la validité de l'email
+if (!this.isValidEmail(this.currentEtablissement.email)) {
+  this.showNotification("Veuillez entrer une adresse email valide.", "error");
+  return;
+}
 
     if (this.modalTitle === "Ajouter un établissement") {
       this.etablissementService.addEtablissement(this.currentEtablissement).subscribe({
@@ -540,13 +563,39 @@ export class GestionDesEtablissementsComponent implements OnInit, AfterViewInit 
     }
   }
 
+  // viewEtablissement1(etablissement: Etablissement): void {
+  //   console.log("Voir établissement:", etablissement);
+  // }
+
+  
+  // viewEtablissement(etablissement: Etablissement): void {
+  //   this.selectedAddressForMap = `${etablissement.adresse}, ${etablissement.ville ?? ''}, ${etablissement.codePostal ?? ''}, ${etablissement.pays ?? ''}`;
+  //   this.showMapPopup = true;
+  // }
   viewEtablissement1(etablissement: Etablissement): void {
-    console.log("Voir établissement:", etablissement);
+    this.modalTitle = "Détails de l'établissement";
+    this.currentEtablissement = {
+      ...etablissement,
+      reseauxSociaux: etablissement.reseauxSociaux || { facebook: "", instagram: "", twitter: "", linkedin: "" },
+      description: etablissement.description || "",
+      services: etablissement.services || [],
+      horaires: etablissement.horaires || this.getDefaultHoraires(),
+      photos: etablissement.photos || [],
+    };
+    this.isModalOpen = true;
+    setTimeout(() => {
+      const modalContent = document.querySelector(".modal-content");
+      if (modalContent) {
+        modalContent.scrollTop = 0;
+      }
+    });
   }
 
   
   viewEtablissement(etablissement: Etablissement): void {
-    this.selectedAddressForMap = `${etablissement.adresse}, ${etablissement.ville ?? ''}, ${etablissement.codePostal ?? ''}, ${etablissement.pays ?? ''}`;
+    // Nettoyer l'adresse en supprimant les codes comme QPBF+GCQ
+    let cleanedAddress = etablissement.adresse.replace(/^[A-Z0-9+]+,\s*/, ''); // Supprime le code Plus Code au début
+    this.selectedAddressForMap = `${cleanedAddress}, ${etablissement.ville ?? ''}, ${etablissement.codePostal ?? ''}, ${etablissement.pays ?? ''}`;
     this.showMapPopup = true;
   }
 
@@ -683,13 +732,21 @@ export class GestionDesEtablissementsComponent implements OnInit, AfterViewInit 
     if (input.files && input.files.length) {
       const files = Array.from(input.files);
   
-      // Initialize the photos array if it's not set
+      // Initialiser le tableau photos s'il n'existe pas
       if (!this.currentEtablissement.photos) {
         this.currentEtablissement.photos = [];
       }
   
-      // Append selected files to the photos array
-      this.currentEtablissement.photos.push(...files);
+      // Convertir chaque fichier en URL et ajouter au tableau
+      files.forEach((file) => {
+        const reader = new FileReader();
+        reader.onload = (e) => {
+          if (e.target && e.target.result) {
+            this.currentEtablissement.photos.push(e.target.result as string); // Ajouter l'URL générée
+          }
+        };
+        reader.readAsDataURL(file); // Lire le fichier comme une URL de données
+      });
     }
   }
   
@@ -701,28 +758,23 @@ export class GestionDesEtablissementsComponent implements OnInit, AfterViewInit 
   }
   
   deletePhoto(photo: string | File): void {
-    // Only proceed if it's a File
-    if (photo instanceof File) {
-      const index = this.currentEtablissement.photos.indexOf(photo);
-      if (index !== -1) {
-        // Revoke the object URL if it's a file
+    const index = this.currentEtablissement.photos.indexOf(photo);
+    if (index !== -1) {
+      this.currentEtablissement.photos.splice(index, 1);
+    }
+  }
+  
+  
+// Supprimer cette méthode
+ngOnDestroy() {
+  if (this.currentEtablissement.photos) {
+    this.currentEtablissement.photos.forEach(photo => {
+      if (photo instanceof File) {
         URL.revokeObjectURL(this.resolvePhotoUrl(photo));
-        // Remove the photo from the array
-        this.currentEtablissement.photos.splice(index, 1);
       }
-    }
+    });
   }
-  
-  
-  ngOnDestroy() {
-    if (this.currentEtablissement.photos) {
-      this.currentEtablissement.photos.forEach(photo => {
-        if (photo instanceof File) {
-          URL.revokeObjectURL(this.resolvePhotoUrl(photo));
-        }
-      });
-    }
-  }
+}
   
   
 }

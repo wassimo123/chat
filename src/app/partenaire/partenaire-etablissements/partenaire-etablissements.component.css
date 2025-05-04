@@ -1,0 +1,94 @@
+.checkbox-custom {
+    position: relative;
+    width: 18px;
+    height: 18px;
+    border: 2px solid #d1d5db;
+    border-radius: 4px;
+    cursor: pointer;
+  }
+  
+  .checkbox-custom.checked {
+    background-color: #6366f1;
+    border-color: #6366f1;
+  }
+  
+  .checkbox-custom.checked::after {
+    content: "";
+    position: absolute;
+    left: 5px;
+    top: 2px;
+    width: 6px;
+    height: 10px;
+    border: solid white;
+    border-width: 0 2px 2px 0;
+    transform: rotate(45deg);
+  }
+  
+  .text-green-500 { color: #34d399; }
+  .text-red-500 { color: #f87171; }
+  .text-yellow-500 { color: #fbbf24; }
+  .text-blue-500 { color: #3b82f6; }
+  
+  .bg-green-100 { background-color: #d1fae5; }
+  .bg-blue-100 { background-color: #dbeafe; }
+  .bg-yellow-100 { background-color: #fef3c7; }
+  .bg-red-100 { background-color: #fee2e2; }
+  
+  .text-green-800 { color: #065f46; }
+  .text-blue-800 { color: #1e40af; }
+  .text-yellow-800 { color: #92400e; }
+  .text-red-800 { color: #991b1b; }
+  
+  .bg-indigo-100 { background-color: #e0e7ff; }
+  .text-indigo-500 { color: #6366f1; }
+  
+  .modal .bg-white {
+    max-height: 90vh;
+    overflow-y: auto;
+  }
+  
+  .ri-facebook-fill { color: #3b5998; }
+  .ri-instagram-fill { color: #e1306c; }
+  .ri-twitter-fill { color: #1da1f2; }
+  .ri-linkedin-fill { color: #0077b5; }
+  
+  input, select, textarea {
+    transition: all 0.2s ease-in-out;
+  }
+  
+  input:focus, select:focus, textarea:focus {
+    border-color: #6366f1;
+    box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
+  }
+  
+  .form-checkbox {
+    appearance: none;
+    width: 1.25rem;
+    height: 1.25rem;
+    border: 2px solid #d1d5db;
+    border-radius: 0.25rem;
+    background-color: #fff;
+    cursor: pointer;
+    position: relative;
+  }
+  
+  .form-checkbox:checked {
+    background-color: #6366f1;
+    border-color: #6366f1;
+  }
+  
+  .form-checkbox:checked::after {
+    content: "";
+    position: absolute;
+    left: 6px;
+    top: 2px;
+    width: 5px;
+    height: 10px;
+    border: solid white;
+    border-width: 0 2px 2px 0;
+    transform: rotate(45deg);
+  }
+  
+  .bg-primary-dark {
+    background-color: #4f46e5;
+  }
