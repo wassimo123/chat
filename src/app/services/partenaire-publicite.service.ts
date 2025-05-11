@@ -10,6 +10,7 @@ export class PubliciteService {
   constructor(private http: HttpClient) {}
 
   createPublicite(formData: FormData) {
+    console.log("ICI");
     return this.http.post(this.apiUrl, formData);
   }
 }

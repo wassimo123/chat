@@ -1,0 +1,322 @@
+<app-navbar></app-navbar>
+<div class="min-h-screen bg-white">
+    
+<!-- Hero Section -->
+<section class="relative w-full h-screen pt-16 overflow-hidden" data-aos="fade-up">
+    <div class="absolute top-20 left-6 z-30 inline-flex items-center gap-2 bg-white text-black px-4 py-2 rounded-full shadow" data-aos="fade-right" data-aos-delay="100">
+      <div class="w-4 h-4 flex items-center justify-center">
+        <i class="ri-map-pin-line" aria-hidden="true"></i>
+      </div>
+      <span class="font-medium">BIENVENUE À SFAX</span>
+    </div>
+  
+    <div class="absolute inset-0 bg-gradient-to-r from-gray-800/70 to-gray-900/30 z-10"></div>
+
+    <div class="absolute inset-0 bg-cover bg-center" style="background-image: url('assets/images/Made with insMind-sia.png');"></div>
+    
+    <div class="relative z-20 container mx-auto px-6 h-full flex items-center justify-center">
+      <div class="max-w-2xl text-white">
+        <h1 class="hero-title text-5xl md:text-6xl font-bold mb-6" data-aos="fade-up" data-aos-delay="200">Découvrez la Magie de Sfax</h1>
+        <p class="text-lg md:text-xl opacity-90 mb-10" data-aos="fade-up" data-aos-delay="300">
+          Plongez dans une ville où les traditions ancestrales rencontrent le dynamisme moderne. Vivez l’expérience de la riche mosaïque de culture méditerranéenne, d’histoire et de gastronomie.
+        </p>
+        <div class="flex flex-wrap gap-4" data-aos="fade-up" data-aos-delay="400">
+            <a routerLink="/home" class="px-6 py-3 bg-white text-primary font-medium transition-all hover:bg-opacity-90 flex items-center !rounded-button whitespace-nowrap">
+                Retour à l’accueil
+                <div class="w-5 h-5 flex items-center justify-center ml-2">
+                  <i class="ri-arrow-left-line" aria-hidden="true"></i>
+                </div>
+              </a>
+              
+          <button (click)="openVideoModal()" class="px-6 py-3 bg-white/20 backdrop-blur-sm text-white border border-white/30 font-medium transition-all hover:bg-white/30 flex items-center !rounded-button whitespace-nowrap" aria-label="Play video">
+            <div class="w-5 h-5 flex items-center justify-center mr-2">
+              <i class="ri-play-fill" aria-hidden="true"></i>
+            </div>
+            Regarder la vidéo
+          </button>
+  
+          <!-- Video Modal -->
+          <div *ngIf="isVideoModalOpen" class="fixed inset-0 z-50">
+            <div (click)="closeVideoModal()" class="absolute inset-0 bg-black/70"></div>
+            <div class="relative z-10 min-h-screen flex items-center justify-center p-4">
+              <div class="bg-white rounded-lg w-full max-w-4xl">
+                <div class="p-6 border-b border-gray-200">
+                  <div class="flex justify-between items-center">
+                    <h3 class="text-2xl font-bold text-gray-800">Découvrez Sfax</h3>
+                    <button (click)="closeVideoModal()" class="text-gray-500 hover:text-gray-700" aria-label="Close video modal">
+                      <div class="w-8 h-8 flex items-center justify-center">
+                        <i class="ri-close-line ri-lg" aria-hidden="true"></i>
+                      </div>
+                    </button>
+                  </div>
+                </div>
+                <div class="relative" style="padding-top: 56.25%">
+                  <iframe [src]="videoUrl" class="absolute inset-0 w-full h-full" title="Découvrez Sfax" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+                </div>
+              </div>
+            </div>
+          </div>
+          <!-- End Modal -->
+        </div>
+      </div>
+    </div>
+  </section>
+
+<!-- Featured Destinations -->
+<section id="experiences" class="py-32 bg-white relative overflow-hidden" data-aos="fade-up">
+    <div class="absolute inset-0 bg-[radial-gradient(circle_at_bottom_left,rgba(30,58,138,0.05),transparent_50%)]"></div>
+    <div class="container mx-auto px-6 relative z-10">
+      <div class="text-center max-w-3xl mx-auto mb-20">
+        <div class="inline-flex items-center gap-2 bg-primary/10 text-primary px-4 py-2 rounded-full mb-8" data-aos="fade-up" data-aos-delay="100">
+          <div class="w-4 h-4 flex items-center justify-center">
+            <i class="ri-compass-3-line" aria-hidden="true"></i>
+          </div>
+          <span class="font-medium">DÉCOUVRIR SFAX</span>
+        </div>
+        <h2 class="text-4xl md:text-6xl font-bold text-gray-900 mb-6 hero-title" data-aos="fade-up" data-aos-delay="200">Explorez Sfax<br>à Votre Façon</h2>
+        <p class="text-lg text-gray-600" data-aos="fade-up" data-aos-delay="300">Partez à la découverte de Sfax, une ville où tradition et modernité se rencontrent. Explorez ses trésors historiques, ses paysages pittoresques et son atmosphère unique qui en font une destination incontournable.</p>
+      </div>
+  
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+  
+        <!-- Destination 1 : Les Îles Kerkennah -->
+        <div class="group bg-white rounded-2xl overflow-hidden hover:shadow-xl transition-all duration-500" data-aos="fade-up" data-aos-delay="200" data-aos-duration="400">
+          <div class="relative h-72 overflow-hidden">
+            <img src="https://voyage-tunisie.info/wp-content/uploads/2018/01/Plage-de-Kerkennah-.jpg"
+                 alt="Îles Kerkennah"
+                 class="w-full h-full object-cover transform group-hover:scale-105 transition-transform duration-700" />
+            <div class="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent"></div>
+          </div>
+          <div class="p-6">
+            <h3 class="text-xl font-bold text-gray-900 mb-2">Les Îles Kerkennah</h3>
+            <p class="text-gray-600 mb-6">Un archipel paradisiaque à 20 km de Sfax, connu pour ses plages de sable fin, ses palmiers et sa pêche traditionnelle à la charfia, inscrite à l’UNESCO.</p>
+            <div class="flex justify-between">
+              <button class="bg-primary text-white px-4 py-2 rounded-button hover:bg-secondary transition duration-300"
+                      (click)="ouvrirModal('kerkennah')">Voir toutes les photos</button>
+            </div>
+          </div>
+        </div>
+  
+        <!-- Destination 2 : Musée Dar Jellouli -->
+        <div class="group bg-white rounded-2xl overflow-hidden hover:shadow-xl transition-all duration-500" data-aos="fade-up" data-aos-delay="400" data-aos-duration="600">
+          <div class="relative h-72 overflow-hidden">
+            <img src="https://media-cdn.tripadvisor.com/media/photo-s/05/11/48/b6/musee-dar-jallouli.jpg"
+                 alt="Musée Dar Jellouli"
+                 class="w-full h-full object-cover transform group-hover:scale-105 transition-transform duration-700" />
+            <div class="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent"></div>
+          </div>
+          <div class="p-6">
+            <h3 class="text-xl font-bold text-gray-900 mb-2">Musée Dar Jellouli</h3>
+            <p class="text-gray-600 mb-6">Nichée dans un palais du XVIIe siècle, cette maison andalouse expose costumes traditionnels, calligraphies arabes et scènes de la vie sfaxienne.</p>
+            <div class="flex justify-between">
+              <button class="bg-primary text-white px-4 py-2 rounded-button hover:bg-secondary transition duration-300"
+                      (click)="ouvrirModal('darjellouli')">Voir toutes les photos</button>
+            </div>
+          </div>
+        </div>
+  
+        <!-- Destination 3 : Sfax Beb Bhar -->
+        <div class="group bg-white rounded-2xl overflow-hidden hover:shadow-xl transition-all duration-500" data-aos="fade-up" data-aos-delay="600" data-aos-duration="800">
+          <div class="relative h-72 overflow-hidden">
+            <img src="https://dynamic-media-cdn.tripadvisor.com/media/photo-o/2e/65/f3/28/caption.jpg?w=900&h=500&s=1"
+                 alt="Sfax Beb Bhar"
+                 class="w-full h-full object-cover transform group-hover:scale-105 transition-transform duration-700" />
+            <div class="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent"></div>
+          </div>
+          <div class="p-6">
+            <h3 class="text-xl font-bold text-gray-900 mb-2">Sfax Beb Bhar</h3>
+            <p class="text-gray-600 mb-6">Porte emblématique de la médina, Beb Bhar mène à la ville moderne, offrant une vue sur la mairie et l’architecture arabo-mauresque.</p>
+            <div class="flex justify-between">
+              <button class="bg-primary text-white px-4 py-2 rounded-button hover:bg-secondary transition duration-300"
+                      (click)="ouvrirModal('bebbhar')">Voir toutes les photos</button>
+            </div>
+          </div>
+        </div>
+  
+        <!-- Destination 4 : Stade Taïeb Mhiri -->
+        <div class="group bg-white rounded-2xl overflow-hidden hover:shadow-xl transition-all duration-500" data-aos="fade-up" data-aos-delay="200" data-aos-duration="400">
+          <div class="relative h-72 overflow-hidden">
+            <img src="https://content.mosaiquefm.net/uploads/content/thumbnails/stade_mhiri_1667600196.jpg"
+                 alt="Stade Taïeb Mhiri"
+                 class="w-full h-full object-cover transform group-hover:scale-105 transition-transform duration-700" />
+            <div class="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent"></div>
+          </div>
+          <div class="p-6">
+            <h3 class="text-xl font-bold text-gray-900 mb-2">Stade Taïeb Mhiri</h3>
+            <p class="text-gray-600 mb-6">Cœur du football sfaxien, ce stade emblématique accueille les matchs du Club Sportif Sfaxien et vibre d’une énergie unique.</p>
+            <div class="flex justify-between">
+              <button class="bg-primary text-white px-4 py-2 rounded-button hover:bg-secondary transition duration-300"
+                      (click)="ouvrirModal('stade')">Voir toutes les photos</button>
+            </div>
+          </div>
+        </div>
+  
+        <!-- Destination 5 : Beb El Diwén -->
+        <div class="group bg-white rounded-2xl overflow-hidden hover:shadow-xl transition-all duration-500" data-aos="fade-up" data-aos-delay="400" data-aos-duration="600">
+          <div class="relative h-72 overflow-hidden">
+            <img src="https://lh3.googleusercontent.com/gps-cs-s/AC9h4nojLKwnBv1AotY0Xyl9kedSnQQXAd1cw7lmQvBrSnPF7z-E3_cLCHs9MxlH7R2POSH8D9NMtRqyWPjZH6tydaJsGifom568XJO5vnMuHPv3wCWvFwCjNfXePg10QN9S7Tw-9C0=s1360-w1360-h1020-rw"
+                 alt="Beb El Diwén"
+                 class="w-full h-full object-cover transform group-hover:scale-105 transition-transform duration-700" />
+            <div class="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent"></div>
+          </div>
+          <div class="p-6">
+            <h3 class="text-xl font-bold text-gray-900 mb-2">Beb El Diwén</h3>
+            <p class="text-gray-600 mb-6">Porte historique de la médina, Beb El Diwén est entourée de remparts et mène aux ruelles animées du cœur de Sfax.</p>
+            <div class="flex justify-between">
+              <button class="bg-primary text-white px-4 py-2 rounded-button hover:bg-secondary transition duration-300"
+                      (click)="ouvrirModal('bebdiwen')">Voir toutes les photos</button>
+            </div>
+          </div>
+        </div>
+  
+        <!-- Destination 6 : Plage Casino Sfax -->
+        <div class="group bg-white rounded-2xl overflow-hidden hover:shadow-xl transition-all duration-500" data-aos="fade-up" data-aos-delay="600" data-aos-duration="800">
+          <div class="relative h-72 overflow-hidden">
+            <img src="https://lh3.googleusercontent.com/gps-cs-s/AC9h4nrHbMMq9F1COGNQkk5pIUneJK9kaMwvJS5xgg682Ne-WmgmelNPkuoGBhAgH2_ttrdXCbXOTIxHLkt6pERo8ViDctuMR7Pn2U1Fx0QOwiZIov1XV1T2qFYx-XaA_0GQbEGtHH4=s1360-w1360-h1020-rw"
+                 alt="Plage Casino Sfax"
+                 class="w-full h-full object-cover transform group-hover:scale-105 transition-transform duration-700" />
+            <div class="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent"></div>
+          </div>
+          <div class="p-6">
+            <h3 class="text-xl font-bold text-gray-900 mb-2">Plage Casino Sfax</h3>
+            <p class="text-gray-600 mb-6">Une plage urbaine en développement, idéale pour une promenade relaxante le long de la côte sfaxienne.</p>
+            <div class="flex justify-between">
+              <button class="bg-primary text-white px-4 py-2 rounded-button hover:bg-secondary transition duration-300"
+                      (click)="ouvrirModal('plagecasino')">Voir toutes les photos</button>
+            </div>
+          </div>
+        </div>
+  
+      </div>
+
+      <!-- Maps Section -->
+      <div class="mt-16" data-aos="fade-up">
+        <h3 class="text-2xl font-bold text-gray-900 text-center mb-8" data-aos="fade-up" data-aos-delay="100">Localisez Nos Destinations</h3>
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+          <!-- Map 1: Les Îles Kerkennah -->
+          <div class="bg-white rounded-2xl overflow-hidden shadow-lg hover:shadow-xl hover:scale-105 transition-all duration-500" data-aos="fade-up" data-aos-delay="200" data-aos-duration="400">
+            <div class="p-4 bg-gray-100 border-b-2 border-gray-200">
+              <h4 class="text-lg font-semibold text-gray-900">Les Îles Kerkennah</h4>
+            </div>
+            <div class="p-4">
+                <iframe src="https://www.google.com/maps/embed?pb=!1m14!1m8!1m3!1d94964.06607930103!2d11.156696!3d34.721958!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x1301ac8b90185bc7%3A0x560489b737949fdf!2sKerkennah%20Islands!5e1!3m2!1sen!2stn!4v1746933812077!5m2!1sen!2stn" width="400" height="300" style="border:0;" allowfullscreen="" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>
+            </div>
+            <div class="p-4 border-t-2 border-gray-200">
+              <p class="text-sm text-gray-600 mb-2">Un archipel paradisiaque à 20 km de Sfax, connu pour ses plages et sa pêche traditionnelle.</p>
+              <p class="text-xs text-gray-500">Coords: 34.7047° N, 11.1717° E</p>
+              <a href="https://www.google.com/maps/place/Kerkennah+Islands/@34.7047,11.1717,10z/data=!3m1!4b1!4m6!3m5!1s0x130235a7e91c4b29:0xbec2d3c0e0e6c5f!8m2!3d34.7047!4d11.1717!16zL20vMDZmc3c?entry=ttu" target="_blank" class="text-blue-600 hover:text-blue-800 text-xs underline">View on Google Maps</a>
+            </div>
+          </div>
+          <!-- Map 2: Musée Dar Jellouli -->
+          <div class="bg-white rounded-2xl overflow-hidden shadow-lg hover:shadow-xl hover:scale-105 transition-all duration-500" data-aos="fade-up" data-aos-delay="400" data-aos-duration="600">
+            <div class="p-4 bg-gray-100 border-b-2 border-gray-200">
+              <h4 class="text-lg font-semibold text-gray-900">Musée Dar Jellouli</h4>
+            </div>
+            <div class="p-4">
+                <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d2967.1080360088126!2d10.759572075207503!3d34.736415481296596!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x13002d2ccbbfd8dd%3A0x858eadc7cb979353!2sDar%20Jellouli%20Museum!5e1!3m2!1sen!2stn!4v1746933750371!5m2!1sen!2stn" width="400" height="300" style="border:0;" allowfullscreen="" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>
+            </div>
+            <div class="p-4 border-t-2 border-gray-200">
+              <p class="text-sm text-gray-600 mb-2">Un musée dans un palais du XVIIe siècle, exposant costumes et calligraphies.</p>
+              <p class="text-xs text-gray-500">Coords: 34.7356° N, 10.7608° E</p>
+              <a href="https://www.google.com/maps/place/Dar+Jellouli+Museum/@34.7356,10.7608,15z/data=!3m1!4b1!4m6!3m5!1s0x13022c7b8f2b1c4d:0x9c7b2e4a5f6d7c8!8m2!3d34.7356!4d10.7608!16zL20vMDZmdzQ?entry=ttu" target="_blank" class="text-blue-600 hover:text-blue-800 text-xs underline">View on Google Maps</a>
+            </div>
+          </div>
+          <!-- Map 3: Sfax Beb Bhar -->
+          <div class="bg-white rounded-2xl overflow-hidden shadow-lg hover:shadow-xl hover:scale-105 transition-all duration-500" data-aos="fade-up" data-aos-delay="600" data-aos-duration="800">
+            <div class="p-4 bg-gray-100 border-b-2 border-gray-200">
+              <h4 class="text-lg font-semibold text-gray-900">Sfax Beb Bhar</h4>
+            </div>
+            <div class="p-4">
+                <iframe src="https://www.google.com/maps/embed?pb=!1m14!1m8!1m3!1d11564.538707973401!2d10.1756!3d36.799158!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x12fd34747e7c439f%3A0x33bb3de9840cf64c!2sBab%20El%20Bhar%2C%20Rue%20de%20la%20Kasbah%2C%20Tunis!5e1!3m2!1sen!2stn!4v1746933841739!5m2!1sen!2stn" width="400" height="300" style="border:0;" allowfullscreen="" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>
+            </div>
+            <div class="p-4 border-t-2 border-gray-200">
+              <p class="text-sm text-gray-600 mb-2">Porte emblématique menant à la ville moderne avec une vue sur la mairie.</p>
+              <p class="text-xs text-gray-500">Coords: 34.7350° N, 10.7580° E</p>
+              <a href="https://www.google.com/maps/place/Beb+Bhar/@34.7350,10.7580,15z/data=!3m1!4b1!4m6!3m5!1s0x13022c7b8f2b1c4e:0x8b6a1d3b4e5c6d9!8m2!3d34.7350!4d10.7580!16zL20vMDZmdzY?entry=ttu" target="_blank" class="text-blue-600 hover:text-blue-800 text-xs underline">View on Google Maps</a>
+            </div>
+          </div>
+          <!-- Map 4: Stade Taïeb Mhiri -->
+          <div class="bg-white rounded-2xl overflow-hidden shadow-lg hover:shadow-xl hover:scale-105 transition-all duration-500" data-aos="fade-up" data-aos-delay="200" data-aos-duration="400">
+            <div class="p-4 bg-gray-100 border-b-2 border-gray-200">
+              <h4 class="text-lg font-semibold text-gray-900">Stade Taïeb Mhiri</h4>
+            </div>
+            <div class="p-4">
+                <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d2967.2093222006806!2d10.743500175207332!3d34.73359458144821!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x13002cd186e44753%3A0x3591e03eaff26d96!2sTaieb%20Mhiri%20Stadium!5e1!3m2!1sen!2stn!4v1746933877476!5m2!1sen!2stn" width="400" height="300" style="border:0;" allowfullscreen="" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>
+            </div>
+            <div class="p-4 border-t-2 border-gray-200">
+              <p class="text-sm text-gray-600 mb-2">Stade emblématique du football sfaxien, vibrant lors des matchs.</p>
+              <p class="text-xs text-gray-500">Coords: 34.7325° N, 10.7510° E</p>
+              <a href="https://www.google.com/maps/place/Stade+Ta%C3%AFeb+Mhiri/@34.7325,10.7510,15z/data=!3m1!4b1!4m6!3m5!1s0x13022c7b8f2b1c4f:0x7a5b0c2a3d4b5e0!8m2!3d34.7325!4d10.7510!16zL20vMDZmdzc?entry=ttu" target="_blank" class="text-blue-600 hover:text-blue-800 text-xs underline">View on Google Maps</a>
+            </div>
+          </div>
+          <!-- Map 5: Beb El Diwén -->
+          <div class="bg-white rounded-2xl overflow-hidden shadow-lg hover:shadow-xl hover:scale-105 transition-all duration-500" data-aos="fade-up" data-aos-delay="400" data-aos-duration="600">
+            <div class="p-4 bg-gray-100 border-b-2 border-gray-200">
+              <h4 class="text-lg font-semibold text-gray-900">Beb El Diwén</h4>
+            </div>
+            <div class="p-4">
+                <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d2967.168085452581!2d10.759645775207394!3d34.734743081386405!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x13002d2cf433e675%3A0xd40bddfba257ecaf!2sBeb%20Eddiwen!5e1!3m2!1sen!2stn!4v1746933908699!5m2!1sen!2stn" width="400" height="300" style="border:0;" allowfullscreen="" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>
+            </div>
+            <div class="p-4 border-t-2 border-gray-200">
+              <p class="text-sm text-gray-600 mb-2">Porte historique entourée de remparts menant aux ruelles animées.</p>
+              <p class="text-xs text-gray-500">Coords: 34.7360° N, 10.7590° E</p>
+              <a href="https://www.google.com/maps/place/Beb+El+Diw%C3%A9n/@34.7360,10.7590,15z/data=!3m1!4b1!4m6!3m5!1s0x13022c7b8f2b1c50:0x6b4a9b1a2c3a4f1!8m2!3d34.7360!4d10.7590!16zL20vMDZmdzE?entry=ttu" target="_blank" class="text-blue-600 hover:text-blue-800 text-xs underline">View on Google Maps</a>
+            </div>
+          </div>
+          <!-- Map 6: Plage Casino Sfax -->
+          <div class="bg-white rounded-2xl overflow-hidden shadow-lg hover:shadow-xl hover:scale-105 transition-all duration-500" data-aos="fade-up" data-aos-delay="600" data-aos-duration="800">
+            <div class="p-4 bg-gray-100 border-b-2 border-gray-200">
+              <h4 class="text-lg font-semibold text-gray-900">Plage Casino Sfax</h4>
+            </div>
+            <div class="p-4">
+                <iframe src="https://www.google.com/maps/embed?pb=!1m14!1m8!1m3!1d11869.719833131589!2d10.782007!3d34.727449!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x13002d4920d20e67%3A0xff41500ed4c8a95!2splage%20casino%20sfax!5e1!3m2!1sen!2stn!4v1746933933468!5m2!1sen!2stn" width="400" height="300" style="border:0;" allowfullscreen="" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>
+            </div>
+            <div class="p-4 border-t-2 border-gray-200">
+              <p class="text-sm text-gray-600 mb-2">Plage urbaine en développement pour une promenade relaxante.</p>
+              <p class="text-xs text-gray-500">Coords: 34.7200° N, 10.7680° E</p>
+              <a href="https://www.google.com/maps/place/Plage+Casino+Sfax/@34.7200,10.7680,15z/data=!3m1!4b1!4m6!3m5!1s0x13022c7b8f2b1c51:0x5c3a8a0a1b2a3g2!8m2!3d34.7200!4d10.7680!16zL20vMDZmdzQ?entry=ttu" target="_blank" class="text-blue-600 hover:text-blue-800 text-xs underline">View on Google Maps</a>
+            </div>
+          </div>
+        </div>
+      </div>
+  
+    </div>
+  </section>
+  
+  <!-- MODAL -->
+  <div *ngIf="modalVisible" class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-60">
+    <div class="bg-white rounded-lg max-w-2xl w-full p-6 relative">
+      
+      <!-- Fermer -->
+      <button
+        (click)="fermerModal()"
+        class="absolute top-2 right-2 text-white bg-red-600 hover:bg-red-700 rounded-full w-8 h-8 flex items-center justify-center shadow"
+        aria-label="Fermer la galerie"
+      >
+        ×
+      </button>
+  
+      <h2 class="text-xl font-semibold mb-4 text-center">{{ modalTitle }}</h2>
+  
+      <div class="flex flex-col items-center justify-center">
+        <img [src]="modalPhotos[currentIndex]" alt="Photo" class="rounded-lg max-h-[60vh] w-auto mx-auto shadow" />
+  
+        <div class="flex justify-between items-center w-full mt-6 px-4">
+          <button (click)="precedente()" [disabled]="currentIndex === 0"
+                  class="text-3xl text-gray-700 hover:text-primary disabled:opacity-30">
+            <i class="ri-arrow-left-s-line"></i>
+          </button>
+  
+          <p class="text-sm text-gray-500 text-center">Photo {{ currentIndex + 1 }} sur {{ modalPhotos.length }}</p>
+  
+          <button (click)="suivante()" [disabled]="currentIndex === modalPhotos.length - 1"
+                  class="text-3xl text-gray-700 hover:text-primary disabled:opacity-30">
+            <i class="ri-arrow-right-s-line"></i>
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+  
+</div>
+<app-footer></app-footer>

@@ -1,13 +1,15 @@
-<nav class="fixed top-0 w-full bg-white shadow-md z-50">
+<nav
+  class="fixed top-0 w-full bg-white shadow-md z-50 transition-transform duration-500"
+  [class.-translate-y-full]="!isNavbarVisible"
+  [class.translate-y-0]="isNavbarVisible"
+>
   <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
     <div class="flex justify-between h-16">
       <div class="flex items-center">
         <a routerLink="#" class="text-2xl font-['Pacifico'] text-primary">Sfax</a>
         <div class="hidden md:flex items-center space-x-8 ml-10">
           <a routerLink="/home" class="text-gray-700 hover:text-primary">Home</a>
-          <a routerLink="/actualites" class="text-gray-700 hover:text-primary">Actualités</a>
-          
-          <!-- Dropdown menu for Etablissements -->
+          <a routerLink="/histoire" class="text-gray-700 hover:text-primary">Historique</a>
           <div class="relative group">
             <button class="text-gray-700 hover:text-primary flex items-center">
               Etablissements
@@ -19,10 +21,8 @@
               <a routerLink="/hotels" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Hôtel</a>
               <a routerLink="/cafes" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Café</a>
               <a routerLink="/restaurants" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Restaurant</a>
-              
             </div>
           </div>
-          
           <a routerLink="/evenement" class="text-gray-700 hover:text-primary">Evenements</a>
           <a routerLink="/promotion" class="text-gray-700 hover:text-primary">Promotions</a>
           <a routerLink="/Experience" class="text-gray-700 hover:text-primary">Experience</a>

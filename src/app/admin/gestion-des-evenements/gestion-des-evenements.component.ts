@@ -25,7 +25,7 @@ export class GestionDesEvenementsComponent implements OnInit, AfterViewInit {
   paginatedEvents: Evenement[] = [];
   stats: Stats = { total: 0, upcoming: 0, inProgress: 0, completed: 0 };
   notifications: any[] = [];
-  isViewMode = false; // Nouvelle propriété pour le mode visualisation
+  isViewMode = false;
   tableSearchQuery = '';
   selectedStatus = 'Tous';
   selectedTypeEtablissement = 'Tous';
@@ -141,6 +141,7 @@ export class GestionDesEvenementsComponent implements OnInit, AfterViewInit {
           ...e,
           selected: false
         }));
+        console.log(" this.evenements", this.evenements)
         this.evenements.sort((a, b) => this.getTimestampFromId(b.id) - this.getTimestampFromId(a.id));
         this.filteredEvents = this.evenements;
         this.updateStats();
@@ -243,15 +244,15 @@ export class GestionDesEvenementsComponent implements OnInit, AfterViewInit {
     this.filteredEvents = this.evenements.filter((e) => {
       const matchesSearch =
         e.nom.toLowerCase().includes(this.tableSearchQuery.toLowerCase()) ||
-        e.lieu.toLowerCase().includes(this.tableSearchQuery.toLowerCase())||
-        e.typeEtablissement.toLowerCase().includes(this.tableSearchQuery.toLowerCase());
+        e.lieu.toLowerCase().includes(this.tableSearchQuery.toLowerCase()) ||
+        e.etablissementId.type.toLowerCase().includes(this.tableSearchQuery.toLowerCase());
 
       let matchesStatus = true;
       if (this.selectedStatus !== 'Tous') {
         matchesStatus = e.statut === this.selectedStatus;
       }
 
-      const matchesType = this.selectedTypeEtablissement === 'Tous' || e.typeEtablissement === this.selectedTypeEtablissement;
+      const matchesType = this.selectedTypeEtablissement === 'Tous' || e.etablissementId.type === this.selectedTypeEtablissement;
 
       return matchesSearch && matchesStatus && matchesType;
     });
@@ -434,7 +435,11 @@ export class GestionDesEvenementsComponent implements OnInit, AfterViewInit {
       estPublic: true,
       statut: '',
       typeEtablissement: '',
-      establishmentId: '',
+      etablissementId: {
+        _id:'',
+        nom: '',
+        type: ''
+      },
       selected: false,
       photo: '',
       prix: {
@@ -450,7 +455,7 @@ export class GestionDesEvenementsComponent implements OnInit, AfterViewInit {
     this.photoPreview = null;
     this.selectedFile = null;
     this.etablissementsType = [];
-    this.isViewMode = false; // Assurez-vous que le mode visualisation est désactivé
+    this.isViewMode = false;
     this.isModalOpen = true;
     setTimeout(() => {
       const modalContent = document.querySelector('.modal-content');
@@ -461,105 +466,176 @@ export class GestionDesEvenementsComponent implements OnInit, AfterViewInit {
   }
 
   editEvent(event: Evenement): void {
-    this.modalTitle = 'Modifier un événement';
-    this.currentEvent = { ...event, photo: event.photo || '', prix: { ...event.prix } };
+    console.log("event", event);
+    console.log("event.etablissementId", event.etablissementId);
+  
+    this.currentEvent = {
+      ...event,
+      photo: event.photo || '',
+      prix: { ...event.prix },
+      etablissementId: event.etablissementId ? { ...event.etablissementId } : { _id: '', nom: '', type: '' },
+    };
+  
     this.photoPreview = event.photo
-      ? (event.photo.startsWith('data:') || event.photo.startsWith('http'))
+      ? event.photo.startsWith('data:') || event.photo.startsWith('http')
         ? event.photo
         : `${this.API_BASE_URL}${event.photo}`
       : null;
     this.selectedFile = null;
-    if (this.currentEvent.typeEtablissement) {
-      this.onTypeChange();
+  
+    // Fetch establishments for the selected type
+    if (this.currentEvent.etablissementId.type) {
+      this.evenementService.getEtablissementsByType(this.currentEvent.etablissementId.type).subscribe({
+        next: (etabs) => {
+          this.etablissementsType = etabs;
+          // Ensure the current establishment is still in the list; if not, reset only the _id
+          if (!etabs.some((e) => e._id === this.currentEvent.etablissementId._id)) {
+            this.currentEvent.etablissementId._id = ''; // Reset only the _id, keep the type
+          }
+        },
+        error: (err: any) => {
+          this.showNotification('Erreur lors du chargement des établissements: ' + err.message, 'error');
+          this.etablissementsType = [];
+          this.currentEvent.etablissementId._id = '';
+        },
+      });
     }
-    this.isViewMode = false; // Assurez-vous que le mode visualisation est désactivé
+  
+    this.isViewMode = false;
     this.isModalOpen = true;
   }
 
   saveEvent(): void {
-    if (
-      !this.currentEvent.nom ||
-      !this.currentEvent.dateDebut ||
-      !this.currentEvent.dateFin ||
-      !this.currentEvent.heureDebut ||
-      !this.currentEvent.lieu ||
-      !this.currentEvent.ville ||
-      !this.currentEvent.capacite ||
-      !this.currentEvent.categorie ||
-      !this.currentEvent.typeEtablissement ||
-      !this.currentEvent.establishmentId ||
-      !this.currentEvent.statut ||
-      this.currentEvent.estPublic === undefined ||
-      (this.currentEvent.prix.estGratuit === false && (!this.currentEvent.prix.montant || this.currentEvent.prix.montant <= 0))
-    ) {
-      this.showNotification('Veuillez remplir tous les champs obligatoires, y compris un établissement valide, un prix valide si non gratuit, et la visibilité.', 'error');
-      return;
+    // Array to collect validation error messages
+    const errors: string[] = [];
+
+    // Validate each required field
+    if (!this.currentEvent.nom) errors.push("Le nom de l'événement est requis.");
+    if (!this.currentEvent.dateDebut) errors.push("La date de début est requise.");
+    if (!this.currentEvent.dateFin) errors.push("La date de fin est requise.");
+    if (!this.currentEvent.heureDebut) errors.push("L'heure de début est requise.");
+    if (!this.currentEvent.lieu) errors.push("Le lieu est requis.");
+    if (!this.currentEvent.ville) errors.push("La ville est requise.");
+    if (!this.currentEvent.capacite || this.currentEvent.capacite <= 0) errors.push("La capacité doit être un nombre positif.");
+    if (!this.currentEvent.categorie) errors.push("La catégorie est requise.");
+    if (!this.currentEvent.etablissementId.type) errors.push("Le type d'établissement est requis.");
+    if (!this.currentEvent.etablissementId) errors.push("Un établissement valide est requis.");
+    if (!this.currentEvent.statut) errors.push("Le statut est requis.");
+    if (this.currentEvent.estPublic === undefined || this.currentEvent.estPublic === null) {
+      errors.push("La visibilité (public/privé) doit être définie.");
+    }
+    if (this.currentEvent.prix.estGratuit === false) {
+      if (!this.currentEvent.prix.montant || this.currentEvent.prix.montant <= 0) {
+        errors.push("Un prix valide (supérieur à 0) est requis si l'événement n'est pas gratuit.");
+      }
     }
 
+    // Validate dates
     const startDate = new Date(this.currentEvent.dateDebut);
     const endDate = new Date(this.currentEvent.dateFin);
-    if (endDate < startDate) {
-      this.showNotification('La date de fin ne peut pas être antérieure à la date de début.', 'error');
+    if (this.currentEvent.dateDebut && this.currentEvent.dateFin && endDate < startDate) {
+      errors.push("La date de fin ne peut pas être antérieure à la date de début.");
+    }
+
+    // If there are validation errors, display them
+    if (errors.length > 0) {
+      this.showNotification(errors.join(' '), 'error');
       return;
     }
 
     console.log('Données de l\'événement avant envoi :', {
       nom: this.currentEvent.nom,
-      typeEtablissement: this.currentEvent.typeEtablissement,
-      establishmentId: this.currentEvent.establishmentId,
+      typeEtablissement: this.currentEvent.etablissementId.type,
+      etablissementId: this.currentEvent.etablissementId,
       prix: this.currentEvent.prix,
     });
 
     const formData = new FormData();
-    Object.keys(this.currentEvent).forEach(key => {
-      if (key !== 'photo' && key !== 'id' && key !== 'prix' && this.currentEvent[key as keyof Evenement] !== undefined) {
-        formData.append(key, this.currentEvent[key as keyof Evenement]!.toString());
-      }
-    });
-    formData.append('prix', JSON.stringify(this.currentEvent.prix));
-    if (this.selectedFile) {
-      formData.append('photo', this.selectedFile);
+  Object.keys(this.currentEvent).forEach(key => {
+    if (key !== 'photo' && key !== 'id' && key !== 'prix' && key !== 'typeEtablissement' && key !== 'etablissementId' && this.currentEvent[key as keyof Evenement] !== undefined) {
+      formData.append(key, this.currentEvent[key as keyof Evenement]!.toString());
     }
-
-    if (this.modalTitle === 'Ajouter un événement') {
-      this.evenementService.addEvenement(formData).subscribe({
-        next: (response: Evenement) => {
-          this.evenements.unshift({ ...response, selected: false });
-          this.evenements.sort((a, b) => this.getTimestampFromId(b.id) - this.getTimestampFromId(a.id));
-          this.closeModal();
-          this.updateStats();
-          this.filterEvents();
-          this.showNotification('Événement ajouté avec succès !', 'success');
-        },
-        error: (err: any) => {
-          this.showNotification('Erreur lors de l’ajout: ' + err.message, 'error');
-        }
-      });
-    } else if (this.currentEvent.id) {
-      this.evenementService.updateEvenement(this.currentEvent.id, formData).subscribe({
-        next: (response: Evenement) => {
-          const index = this.evenements.findIndex((e) => e.id === response.id);
-          if (index !== -1) this.evenements[index] = { ...response, selected: false };
-          this.evenements.sort((a, b) => this.getTimestampFromId(b.id) - this.getTimestampFromId(a.id));
-          this.closeModal();
-          this.updateStats();
-          this.filterEvents();
-          this.showNotification('Événement modifié avec succès !', 'success');
-        },
-        error: (err: any) => {
-          this.showNotification('Erreur lors de la mise à jour: ' + err.message, 'error');
-        }
-      });
-    }
+  });
+  formData.append('etablissementId', this.currentEvent.etablissementId._id);
+  formData.append('prix', JSON.stringify(this.currentEvent.prix));
+  if (this.selectedFile) {
+    formData.append('photo', this.selectedFile);
   }
+
+  if (this.modalTitle === 'Ajouter un événement') {
+    this.evenementService.addEvenement(formData).subscribe({
+      next: (response: Evenement) => {
+        // Fetch the establishment details after adding the event
+        this.evenementService.getEtablissementById(response.etablissementId._id).subscribe({
+          next: (etab) => {
+            const newEvent = {
+              ...response,
+              selected: false,
+              etablissementId: {
+                _id: etab._id,
+                nom: etab.nom,
+                type: response.etablissementId.type, // Type is already in the response
+              },
+            };
+            this.evenements.unshift(newEvent);
+            this.evenements.sort((a, b) => this.getTimestampFromId(b.id) - this.getTimestampFromId(a.id));
+            this.closeModal();
+            this.updateStats();
+            this.filterEvents();
+            this.showNotification('Événement ajouté avec succès !', 'success');
+          },
+          error: (err: any) => {
+            this.showNotification('Erreur lors de la récupération des détails de l\'établissement: ' + err.message, 'error');
+          },
+        });
+      },
+      error: (err: any) => {
+        this.showNotification('Erreur lors de l’ajout: ' + err.message, 'error');
+      },
+    });
+  } else if (this.currentEvent.id) {
+    this.evenementService.updateEvenement(this.currentEvent.id, formData).subscribe({
+      next: (response: Evenement) => {
+        // Fetch the establishment details after updating the event
+        this.evenementService.getEtablissementById(response.etablissementId._id).subscribe({
+          next: (etab) => {
+            const updatedEvent = {
+              ...response,
+              selected: false,
+              etablissementId: {
+                _id: etab._id,
+                nom: etab.nom,
+                type: response.etablissementId.type,
+              },
+            };
+            const index = this.evenements.findIndex((e) => e.id === response.id);
+            if (index !== -1) this.evenements[index] = updatedEvent;
+            this.evenements.sort((a, b) => this.getTimestampFromId(b.id) - this.getTimestampFromId(a.id));
+            this.closeModal();
+            this.updateStats();
+            this.filterEvents();
+            this.showNotification('Événement modifié avec succès !', 'success');
+          },
+          error: (err: any) => {
+            this.showNotification('Erreur lors de la récupération des détails de l\'établissement: ' + err.message, 'error');
+          },
+        });
+      },
+      error: (err: any) => {
+        this.showNotification('Erreur lors de la mise à jour: ' + err.message, 'error');
+      },
+    });
+  }
+}
 
   closeModal(): void {
     this.isModalOpen = false;
-    this.isViewMode = false; // Réinitialisez le mode visualisation
+    this.isViewMode = false;
     this.photoPreview = null;
     this.selectedFile = null;
     this.etablissementsType = [];
   }
+
   openArchiveModal(event: Evenement): void {
     this.eventToArchive = event;
     this.isArchiveModalOpen = true;
@@ -590,13 +666,12 @@ export class GestionDesEvenementsComponent implements OnInit, AfterViewInit {
       });
     }
   }
-  
 
+  getEstablishmentName(): string {
+    const establishment = this.etablissementsType.find((e) => e._id === this.currentEvent.etablissementId._id);
+    return establishment ? establishment.nom : 'Non spécifié';
+  }
 
-getEstablishmentName(): string {
-  const establishment = this.etablissementsType.find(e => e._id === this.currentEvent.establishmentId);
-  return establishment ? establishment.nom : 'Non spécifié';
-}
   onPhotoChange(event: Event): void {
     const input = event.target as HTMLInputElement;
     if (input.files && input.files.length > 0) {
@@ -639,25 +714,27 @@ getEstablishmentName(): string {
     this.selectedFile = null;
   }
 
+  
   onTypeChange(): void {
-    if (this.currentEvent.typeEtablissement) {
-      this.evenementService.getEtablissementsByType(this.currentEvent.typeEtablissement).subscribe({
+    if (this.currentEvent.etablissementId.type) {
+      this.evenementService.getEtablissementsByType(this.currentEvent.etablissementId.type).subscribe({
         next: (etabs) => {
           this.etablissementsType = etabs;
-          console.log('Établissements récupérés pour type', this.currentEvent.typeEtablissement, ':', etabs);
-          if (!etabs.some(e => e._id === this.currentEvent.establishmentId)) {
-            this.currentEvent.establishmentId = '';
+          console.log('Établissements récupérés pour type', this.currentEvent.etablissementId.type, ':', etabs);
+          // Only reset _id if the current establishment is not in the new list
+          if (!etabs.some((e) => e._id === this.currentEvent.etablissementId._id)) {
+            this.currentEvent.etablissementId._id = '';
           }
         },
         error: (err: any) => {
           this.showNotification('Erreur lors du chargement des établissements: ' + err.message, 'error');
           this.etablissementsType = [];
-          this.currentEvent.establishmentId = '';
-        }
+          this.currentEvent.etablissementId._id = '';
+        },
       });
     } else {
       this.etablissementsType = [];
-      this.currentEvent.establishmentId = '';
+      this.currentEvent.etablissementId._id = '';
     }
   }
 
@@ -668,18 +745,22 @@ getEstablishmentName(): string {
       organisateur: event.organisateur || '',
       description: event.description || '',
       photo: event.photo || '',
-      prix: { ...event.prix }
+      etablissementId: { ...event.etablissementId },
+      prix: { ...event.prix },
     };
     this.photoPreview = event.photo
-      ? (event.photo.startsWith('data:') || event.photo.startsWith('http'))
+      ? event.photo.startsWith('data:') || event.photo.startsWith('http')
         ? event.photo
         : `${this.API_BASE_URL}${event.photo}`
       : null;
     this.selectedFile = null;
-    if (this.currentEvent.typeEtablissement) {
+  
+    // Fetch establishments for the selected type
+    if (this.currentEvent.etablissementId.type) {
       this.onTypeChange();
     }
-    this.isViewMode = true; // Activez le mode visualisation
+  
+    this.isViewMode = true;
     this.isModalOpen = true;
     setTimeout(() => {
       const modalContent = document.querySelector('.modal-content');
@@ -688,9 +769,6 @@ getEstablishmentName(): string {
       }
     });
   }
-
-
-  
 
   toggleProfile(): void {
     this.isProfileMenuOpen = !this.isProfileMenuOpen;

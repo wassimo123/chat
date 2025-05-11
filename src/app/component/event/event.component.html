@@ -1,6 +1,6 @@
 <app-navbar></app-navbar>
 
-<main class="pt-24 pb-12 bg-gray-50 min-h-screen">
+<main class="pt-24 pb-12 bg-gray-50 min-h-screen" [@fadeAnimation]>
   <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
     <div class="flex flex-col md:flex-row justify-between items-start gap-8">
       <!-- Sidebar with Filters -->
@@ -153,9 +153,9 @@
               </div>
               <div
                 class="absolute top-3 right-3 text-white text-xs font-medium px-2 py-1 rounded-full"
-                [ngClass]="getTypeEtablissementClass(event.typeEtablissement)"
+                [ngClass]="getTypeEtablissementClass(event.etablissementId.type)"
               >
-                {{ event.typeEtablissement || 'Non spécifié' }}
+                {{ event.etablissementId.type || 'Non spécifié' }}
               </div>
             </div>
             <div class="p-4">
@@ -168,8 +168,8 @@
                 <div>
                   <h3 class="text-lg font-medium text-gray-900">{{ event.nom }}</h3>
                   <div class="text-xs text-gray-500 mb-1">{{ event.lieu }}</div>
-                  <div *ngIf="event.establishmentId && event.establishmentName !== 'Inconnu'" class="text-xs text-gray-500">
-                    Établissement: {{ event.establishmentName }}
+                  <div *ngIf="event.etablissementId && event.etablissementId.nom" class="text-xs text-gray-500">
+                    Établissement: {{ event.etablissementId.nom }}
                   </div>
                 </div>
               </div>
@@ -287,13 +287,13 @@
               </div>
               <div class="flex items-center">
                 <i class="ri-building-line text-primary mr-2"></i>
-                <span class="inline-block px-2 py-1 rounded-full" [ngClass]="getTypeEtablissementClass(selectedEvent?.typeEtablissement)">
-                  {{ selectedEvent?.typeEtablissement || 'Non spécifié' }}
+                <span class="inline-block px-2 py-1 rounded-full" [ngClass]="getTypeEtablissementClass(selectedEvent?.etablissementId?.type)">
+                  {{ selectedEvent?.etablissementId?.type || 'Non spécifié' }}
                 </span>
               </div>
-              <div *ngIf="selectedEvent?.establishmentId && selectedEvent?.establishmentName !== 'Inconnu'" class="flex items-center">
+              <div *ngIf="selectedEvent?.etablissementId && selectedEvent?.etablissementId?.nom !== 'Inconnu'" class="flex items-center">
                 <i class="ri-store-line text-primary mr-2"></i>
-                <span>Établissement: {{ selectedEvent?.establishmentName }}</span>
+                <span>Établissement: {{ selectedEvent?.etablissementId?.nom }}</span>
               </div>
               <div class="flex items-center">
                 <i class="ri-money-dollar-circle-line text-primary mr-2"></i>

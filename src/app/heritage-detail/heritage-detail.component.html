@@ -1,0 +1,151 @@
+<app-navbar></app-navbar>
+<main>
+    <ng-container *ngIf="heritageItem; else notFound">
+      <!-- Hero Section -->
+      <section class="relative h-[500px] flex items-center justify-center overflow-hidden" data-aos="fade-up" data-aos-duration="1200">
+        <img [src]="heritageItem.heroImage" [alt]="heritageItem.title + ' à Sfax'" class="absolute inset-0 w-full h-full object-cover image-hover" loading="lazy">
+        <div class="absolute inset-0 bg-gradient-to-r from-black/70 to-black/30"></div>
+        <div class="relative container mx-auto px-4 flex flex-col items-start text-white">
+            <a routerLink="/histoire" class="flex items-center mb-6 hover:text-primary transition-colors" data-aos="fade-right" data-aos-delay="100">
+              <i class="ri-arrow-left-line mr-2"></i>
+              <span>Retour à la page principale</span>
+            </a>
+          
+            <!-- 👇 Nouveau conteneur centré -->
+            <div class="text-center w-full flex flex-col items-center">
+              <h1 class="text-5xl font-bold mb-4" data-aos="fade-up" data-aos-delay="200">{{ heritageItem.title }}</h1>
+              <p class="text-xl max-w-2xl" data-aos="fade-up" data-aos-delay="300">{{ heritageItem.heroDescription }}</p>
+            </div>
+          </div>
+          
+      </section>
+    
+      <!-- Main Content Section -->
+      <section class="py-12">
+        <div class="container mx-auto px-4">
+          <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+            <!-- Main Content -->
+            <div class="lg:col-span-2">
+              <div class="bg-white rounded-lg shadow-sm p-8 mb-8" data-aos="fade-up" data-aos-delay="100">
+                <h2 class="text-3xl font-bold mb-6">{{ heritageItem.title }} : Un Trésor Culturel</h2>
+                <div class="prose max-w-none text-gray-700">
+                  <p class="mb-4" *ngFor="let paragraph of heritageItem.mainDescription">{{ paragraph }}</p>
+                </div>
+              </div>
+              <div class="bg-white rounded-lg shadow-sm p-8 mb-8" data-aos="fade-up" data-aos-delay="200">
+                <h2 class="text-3xl font-bold mb-6">Caractéristiques</h2>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+                  <div *ngFor="let char of heritageItem.characteristics" data-aos="zoom-in" data-aos-delay="300">
+                    <img [src]="char.image" [alt]="char.title + ' de ' + heritageItem.title" class="rounded-lg w-full h-48 object-cover mb-4 image-hover" loading="lazy">
+                    <h3 class="font-bold text-lg mb-2">{{ char.title }}</h3>
+                    <p class="text-gray-700 text-sm">{{ char.description }}</p>
+                  </div>
+                </div>
+              </div>
+              <div class="bg-white rounded-lg shadow-sm p-8" data-aos="fade-up" data-aos-delay="400">
+                <h2 class="text-3xl font-bold mb-6">Galerie Photos</h2>
+                <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
+                  <div class="gallery-item overflow-hidden rounded-lg" *ngFor="let photo of paginatedGallery" data-aos="zoom-in-up" data-aos-delay="500">
+                    <img [src]="photo.src" [alt]="photo.alt + ' à Sfax'" class="w-full h-40 object-cover image-hover" loading="lazy">
+                  </div>
+                </div>
+                <!-- Pagination Controls -->
+                <div class="flex justify-center mt-6 space-x-2">
+                  <button (click)="prevPage()" [disabled]="currentPage === 1" class="bg-gray-200 text-gray-700 px-4 py-2 rounded disabled:opacity-50" aria-label="Page précédente">
+                    <i class="ri-arrow-left-line"></i>
+                  </button>
+                  <button *ngFor="let page of pageNumbers" (click)="goToPage(page)" [class.bg-primary]="page === currentPage" [class.text-white]="page === currentPage" class="px-4 py-2 rounded" [class.bg-gray-200]="page !== currentPage" [class.text-gray-700]="page !== currentPage" [attr.aria-label]="'Aller à la page ' + page">
+                    {{ page }}
+                  </button>
+                  <button (click)="nextPage()" [disabled]="currentPage === totalPages" class="bg-gray-200 text-gray-700 px-4 py-2 rounded disabled:opacity-50" aria-label="Page suivante">
+                    <i class="ri-arrow-right-line"></i>
+                  </button>
+                </div>
+                <div class="text-center mt-6">
+                  <button (click)="openModal()" class="bg-primary text-white px-6 py-2 rounded whitespace-nowrap" data-aos="fade-up" data-aos-delay="600" [attr.aria-label]="'Voir toutes les photos de ' + heritageItem.title">
+                    Voir toutes les photos
+                  </button>
+                </div>
+              </div>
+            </div>
+            <!-- Sidebar -->
+            <div class="lg:col-span-1">
+                <div class="bg-white rounded-lg shadow-sm p-6 mb-8" data-aos="fade-up" data-aos-delay="700">
+                    <h3 class="text-xl font-bold mb-4">Carte</h3>
+                    <div class="relative h-64 w-full overflow-hidden rounded-lg mb-4">
+                      <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d94918.61647216792!2d10.65069685157286!3d34.7615077775954!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x13002cda1486c695%3A0x22dfe0a62c50ce6f!2sSfax!5e1!3m2!1sfr!2stn!4v1746815462694!5m2!1sfr!2stn" width="600" height="450" style="border:0;" allowfullscreen="" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>
+                    </div>
+                    <div class="text-center">
+                      <a href="https://www.google.com/maps/dir//La+M%C3%A9dina,+Sfax/@34.7361814,10.7554382,15z/data=!4m9!4m8!1m0!1m5!1m1!1s0x13002d2ca06f29af:0xf69095a5060a4063!2m2!1d10.7599157!2d34.7355796!3e0!5m1!1e1" target="_blank" class="inline-flex items-center bg-primary text-white px-4 py-2 rounded hover:bg-blue-600 transition-colors" [attr.aria-label]="'Obtenir des itinéraires vers ' + heritageItem.title">
+                        <i class="ri-map-pin-line mr-2"></i>
+                        Itinéraires
+                      </a>
+                    </div>
+                  </div>
+              <div class="bg-white rounded-lg shadow-sm p-6 mb-8" data-aos="fade-up" data-aos-delay="800">
+                <h3 class="text-xl font-bold mb-4">Statistiques des Visiteurs</h3>
+                <div id="visitorChart" style="height: 300px;"></div>
+              </div>
+              <div class="bg-white rounded-lg shadow-sm p-6 mb-8" data-aos="fade-up" data-aos-delay="900">
+                <h3 class="text-xl font-bold mb-4">Informations Pratiques</h3>
+                <div class="space-y-4">
+                  <div>
+                    <h4 class="font-semibold mb-2 flex items-center">
+                      <i class="ri-information-line text-primary mr-2"></i>
+                      Conseils de visite
+                    </h4>
+                    <ul class="text-sm text-gray-700 space-y-2 pl-6">
+                      <li>Porter des chaussures confortables pour marcher</li>
+                      <li>Prévoir une bouteille d'eau, surtout en été</li>
+                      <li>Respecter les coutumes locales et s'habiller modestement</li>
+                      <li>Les magasins peuvent fermer pendant les heures de prière</li>
+                    </ul>
+                  </div>
+                  <div>
+                    <h4 class="font-semibold mb-2 flex items-center">
+                      <i class="ri-calendar-line text-primary mr-2"></i>
+                      Meilleure période
+                    </h4>
+                    <p class="text-sm text-gray-700">
+                      Printemps (mars-mai) et automne (septembre-novembre) pour des températures agréables
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Modal for Fullscreen Gallery -->
+      <div *ngIf="isModalOpen" class="fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center z-50" (click)="closeModal()">
+        <div class="relative bg-white rounded-lg max-w-4xl w-full mx-4" (click)="$event.stopPropagation()">
+          <button class="absolute top-4 right-4 text-gray-600 hover:text-gray-800" (click)="closeModal()" aria-label="Fermer le modal">
+            <i class="ri-close-line text-2xl"></i>
+          </button>
+          <div class="p-6">
+            <img [src]="heritageItem.gallery[currentImageIndex].src" [alt]="heritageItem.gallery[currentImageIndex].alt + ' à Sfax'" class="w-full h-[500px] object-contain rounded-lg">
+            <div class="flex justify-between mt-4">
+              <button [disabled]="currentImageIndex === 0" (click)="prevImage()" class="bg-gray-200 text-gray-700 px-4 py-2 rounded disabled:opacity-50" aria-label="Image précédente">
+                <i class="ri-arrow-left-line"></i>
+              </button>
+              <span class="text-gray-700">{{ currentImageIndex + 1 }} / {{ heritageItem.gallery.length }}</span>
+              <button [disabled]="currentImageIndex === heritageItem.gallery.length - 1" (click)="nextImage()" class="bg-gray-200 text-gray-700 px-4 py-2 rounded disabled:opacity-50" aria-label="Image suivante">
+                <i class="ri-arrow-right-line"></i>
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </ng-container>
+    <ng-template #notFound>
+      <div class="container mx-auto px-4 py-12 text-center">
+        <h2 class="text-3xl font-bold mb-4">Patrimoine non trouvé</h2>
+        <p class="text-gray-600 mb-6">Désolé, l'élément demandé n'existe pas.</p>
+        <a routerLink="/histoire" class="inline-block bg-primary text-white px-4 py-2 rounded" [attr.aria-label]="'Retour à la page d\'accueil'">
+          Retour à l'accueil
+        </a>
+      </div>
+    </ng-template>
+</main>
+<app-footer></app-footer>

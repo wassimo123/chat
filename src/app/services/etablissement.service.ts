@@ -62,7 +62,10 @@ export class EtablissementService {
       id: raw._id,
     };
   }
-
+  //////houni bedel
+  getEtablissementByvaliderId(id: string): Observable<any> {
+    return this.http.get(`${this.apiUrl}/valider/${id}`);
+  }
   getHotels(): Observable<Etablissement[]> {
     return this.http.get<EtablissementRaw[]>(`${this.apiUrl}/type/Hôtel`, { headers: this.getHeaders() }).pipe(
       map(rawEtablissements => rawEtablissements.map(raw => this.mapToEtablissement(raw))),
@@ -104,7 +107,9 @@ export class EtablissementService {
       catchError(this.handleError)
     );
   }
-
+  addPublicite(data: any): Observable<any> {
+    return this.http.post(`http://localhost:5000/api/publicites`, data); // Adjust the endpoint if needed
+  }
   // Récupérer un établissement par ID
   getEtablissementById(id: string): Observable<Etablissement> {
     return this.http.get<EtablissementRaw>(`${this.apiUrl}/id/${id}`, { headers: this.getHeaders() }).pipe(
@@ -115,7 +120,7 @@ export class EtablissementService {
 
   addEtablissement(etablissement: Etablissement): Observable<Etablissement> {
     const formData = new FormData();
-  
+    //console.log("photos: ", etablissement.photos);
     // Add basic fields
     formData.append('nom', etablissement.nom);
     formData.append('adresse', etablissement.adresse);

@@ -1,0 +1,31 @@
+body {
+    font-family: 'Poppins', sans-serif;
+}
+
+.hero-title {
+    font-family: 'Playfair Display', serif;
+}
+
+.logo-text {
+    font-family: 'Pacifico', serif;
+    color: #1e3a8a;
+}
+
+.search-input:focus {
+    outline: none;
+}
+
+.search-input::placeholder {
+    color: #9ca3af;
+}
+
+[data-animate] {
+    opacity: 0;
+    transform: translateY(50px);
+    transition: opacity 0.6s ease-out, transform 0.6s ease-out;
+}
+
+[data-animate].animate__animated {
+    opacity: 1;
+    transform: translateY(0);
+}

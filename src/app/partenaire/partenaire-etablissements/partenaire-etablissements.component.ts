@@ -1,8 +1,10 @@
 import { Component, OnInit, ChangeDetectorRef, HostListener } from '@angular/core';
 import { FormBuilder, FormGroup, Validators, FormArray, FormControl } from '@angular/forms';
 import { Router } from '@angular/router';
-import { PubliciteService } from '../../services/publicite.service';
-import jsPDF from 'jspdf';
+import Swal from 'sweetalert2';
+import { EtablissementService } from '../../services/etablissement.service'; // Import the service
+import { Etablissement } from 'src/app/models/etablissement.model';
+
 
 interface PricingPlan {
   name: string;
@@ -18,7 +20,6 @@ interface PendingRequest {
   plan: PricingPlan;
   timestamp: Date;
 }
-
 @Component({
   selector: 'app-partenaire-etablissements',
   templateUrl: './partenaire-etablissements.component.html',
@@ -26,17 +27,20 @@ interface PendingRequest {
 })
 export class PartenaireEtablissementsComponent implements OnInit {
   establishmentForm: FormGroup;
+  selectedPlan: any;
   paymentForm: FormGroup;
   showPricingModal: boolean = false;
   showValidationDialog: boolean = false;
+  showConfirmationDialog: boolean = false;
   pendingConfirmation: boolean = false;
   pendingRequests: PendingRequest[] = [];
+  userId: string | null = null;
+
   pricingPlans: PricingPlan[] = [
     { name: 'Basique', duration: '1 Mois', price: 50, impressions: '1000 impressions', adsPerWeek: '1 annonce/semaine', support: 'Support par email' },
     { name: 'Standard', duration: '3 Mois', price: 120, impressions: '3000 impressions', adsPerWeek: '3 annonces/semaine', support: 'Support par email + chat' },
     { name: 'Premium', duration: '6 Mois', price: 200, impressions: '6000 impressions', adsPerWeek: '5 annonces/semaine', support: 'Support prioritaire 24/7' }
   ];
-  selectedPlan: PricingPlan | null = null;
   servicesOptions: string[] = [
     'WiFi gratuit', 'Parking', 'Terrasse', 'Livraison', 'À emporter', 'Réservation',
     'Accessibilité PMR', 'Climatisation', 'Piscine', 'Petit-déjeuner inclus',
@@ -50,25 +54,24 @@ export class PartenaireEtablissementsComponent implements OnInit {
   currentEtablissement: any;
 
   constructor(
-    private fb: FormBuilder, 
+    private fb: FormBuilder,
     private cdr: ChangeDetectorRef,
-    //private showErrorDialog: boolean = false, 
-    private publiciteService: PubliciteService, 
-    private router: Router
+    private router: Router,
+    private etablissementService: EtablissementService // Inject the service
   ) {
-    // Establishment Form (without openingHours and is24_7)
+    // Establishment Form with updated validators
     this.establishmentForm = this.fb.group({
       establishmentName: ['', Validators.required],
       establishmentType: ['', Validators.required],
       statut: ['En attente'], // Default to "En attente"
       visibility: ['public'], // Default to "public"
       address: ['', Validators.required],
-      postalCode: ['', Validators.pattern(/^\d{4}$/)],
-      city: [''],
+      postalCode: ['', [Validators.required, Validators.pattern(/^\d{4}$/)]],
+      city: ['', Validators.required],
       country: ['Tunisie'],
       showMap: [false],
-      phone: ['', Validators.pattern(/^\+?\d{8,}$/)],
-      email: ['', [Validators.email]],
+      phone: ['', [Validators.required, Validators.pattern(/^\+?\d{8,}$/)]],
+      email: ['', [Validators.required, Validators.email]],
       website: ['', Validators.pattern(/^https?:\/\/(www\.)?[a-zA-Z0-9-]+\.[a-zA-Z]{2,}(\/.*)?$/)],
       description: [''],
       services: this.fb.array(this.servicesOptions.map(() => this.fb.control(false))),
@@ -102,8 +105,8 @@ export class PartenaireEtablissementsComponent implements OnInit {
         vendredi: { open: '', close: '', closed: false },
         samedi: { open: '', close: '', closed: false },
         dimanche: { open: '', close: '', closed: false }
-      }
-    };
+      },
+        };
   }
 
   ngOnInit(): void {
@@ -113,8 +116,9 @@ export class PartenaireEtablissementsComponent implements OnInit {
       this.user = JSON.parse(storedUser);
     }
 
-    const storedId = localStorage.getItem('userId');
+    const storedId = localStorage.getItem('userid');
     if (storedId) {
+      console.log('ID partenaire trouvé:', storedId);
       this.partenaireId = storedId;
     } else {
       console.warn('Aucun ID partenaire trouvé.');
@@ -132,7 +136,7 @@ export class PartenaireEtablissementsComponent implements OnInit {
       this.isProfileMenuOpen = false;
     }
   }
-
+  
   logout() {
     localStorage.removeItem('token');
     localStorage.removeItem('user');
@@ -150,6 +154,9 @@ export class PartenaireEtablissementsComponent implements OnInit {
   }
 
   resetForm(): void {
+    this.establishmentForm.reset();
+    this.photosPreview = []; // Clear photo previews
+    this.currentEtablissement.photos = []; // Clear photos array
     this.establishmentForm.reset({
       establishmentName: '',
       establishmentType: '',
@@ -176,8 +183,6 @@ export class PartenaireEtablissementsComponent implements OnInit {
       this.photos.removeAt(0);
     }
     this.photosPreview = [];
-
-    // Reset currentEtablissement.horaires
     this.currentEtablissement.horaires = {
       is24_7: false,
       specialHours: '',
@@ -191,38 +196,58 @@ export class PartenaireEtablissementsComponent implements OnInit {
     };
   }
 
-  onImageUpload(event: Event): void {
+  handleFileInput(event: Event): void {
     const input = event.target as HTMLInputElement;
-    if (input.files && input.files.length > 0) {
-      Array.from(input.files).forEach(file => {
-        this.photos.push(this.fb.control(file));
+  
+    if (input.files && input.files.length) {
+      const files = Array.from(input.files);
+  
+      // Ensure photosPreview array exists
+      if (!this.photosPreview) {
+        this.photosPreview = [];
+      }
+  
+      // Read the file and convert it to base64
+      files.forEach(file => {
         const reader = new FileReader();
         reader.onload = (e) => {
           if (e.target && e.target.result) {
-            this.photosPreview.push(e.target.result as string);
+            // Push the base64 string into the photosPreview array
+            this.photosPreview.push(e.target.result as string); // Ensure it's a base64 string
           }
-          this.cdr.detectChanges();
         };
-        reader.readAsDataURL(file);
+        reader.readAsDataURL(file); // Converts the file to a base64 string
       });
     }
   }
-
-  removePhoto(index: number): void {
-    this.photos.removeAt(index);
-    this.photosPreview.splice(index, 1);
-    this.cdr.detectChanges();
-  }
-    onSubmitEstablishmentForm(event: Event): void {
-      event.preventDefault();
-      if (this.establishmentForm.valid) {
-        this.showPricingModal = true;
-      } else {
-        this.establishmentForm.markAllAsTouched();
-        this.showValidationDialog = true;
-        this.cdr.detectChanges();
-      }
+  
+  
+  
+  
+  removePhoto(photo: string): void {
+    const photoIndex = this.photosPreview.indexOf(photo);
+    if (photoIndex !== -1) {
+      this.photosPreview.splice(photoIndex, 1); // Remove from photosPreview array
     }
+  
+    // Also remove it from the FormArray if necessary
+    const formPhotoIndex = this.currentEtablissement.photos.indexOf(photo);
+    if (formPhotoIndex !== -1) {
+      this.currentEtablissement.photos.splice(formPhotoIndex, 1); // Remove from form photos array
+    }
+  }
+  
+  
+  onSubmitEstablishmentForm(event: Event): void {
+    event.preventDefault();
+    if (this.establishmentForm.valid) {
+      this.showPricingModal = true;
+    } else {
+      this.establishmentForm.markAllAsTouched();
+      this.showValidationDialog = true;
+      this.cdr.detectChanges();
+    }
+  }
 
   closeValidationDialog(): void {
     this.showValidationDialog = false;
@@ -231,65 +256,163 @@ export class PartenaireEtablissementsComponent implements OnInit {
 
   closePricingModal(): void {
     this.showPricingModal = false;
-    this.selectedPlan = null;
+    // Do not reset selectedPlan here to preserve it until submission is complete
+  }
+
+  closeConfirmationDialog(): void {
+    this.showConfirmationDialog = false;
+    this.resetForm();
+    this.selectedPlan = null; // Reset selectedPlan only after submission
+    this.cdr.detectChanges();
   }
 
   selectPlan(plan: PricingPlan): void {
     this.selectedPlan = plan;
-    this.generateInvoicePDF(plan);
-    this.submitFinal();
+    this.cdr.detectChanges(); // Ensure UI updates
+  }
+
+  confirmSelection(): void {
+    if (!this.selectedPlan) {
+      this.selectedPlan = this.pricingPlans[0]; // Default to 'Basique' if not selected
+    }
+
+    Swal.fire({
+      title: 'Confirmer la sélection',
+      text: `Vous avez sélectionné le pack ${this.selectedPlan.name} pour ${this.selectedPlan.price} TND. Voulez-vous confirmer ?`,
+      icon: 'question',
+      showCancelButton: true,
+      confirmButtonText: 'Oui, confirmer',
+      cancelButtonText: 'Non, annuler',
+      confirmButtonColor: '#3085d6',
+      cancelButtonColor: '#d33'
+    }).then((result) => {
+      if (result.isConfirmed) {
+        this.showConfirmationDialog = false;
+        this.closePricingModal();
+        this.submitFinal();
+      }
+    });
   }
 
   submitFinal(): void {
     if (!this.selectedPlan) {
-      alert("Veuillez sélectionner un pack avant de continuer.");
+      Swal.fire({
+        icon: 'error',
+        title: 'Erreur',
+        text: 'Veuillez sélectionner un pack avant de continuer.',
+        confirmButtonText: 'OK',
+        confirmButtonColor: '#3085d6'
+      });
       return;
     }
-
+  
     const infos = {
-      description: this.establishmentForm.value.description,
+      description: this.establishmentForm.value.description || '',
       services: this.servicesOptions.filter((_, i) => this.establishmentForm.value.services[i]),
-      socialMedia: this.establishmentForm.value.socialMedia,
+      socialMedia: {
+        facebook: this.establishmentForm.value.socialMedia.facebook || '',
+        instagram: this.establishmentForm.value.socialMedia.instagram || '',
+        twitter: this.establishmentForm.value.socialMedia.twitter || '',
+        linkedin: this.establishmentForm.value.socialMedia.linkedin || ''
+      },
       horaires: this.currentEtablissement.horaires,
+      telephone: this.establishmentForm.value.phone || '',
+      email: this.establishmentForm.value.email || '',
+      siteWeb: this.establishmentForm.value.website || '',
+      ville: this.establishmentForm.value.city || '',
+      pays: this.establishmentForm.value.country || 'Tunisie',
+      codePostal: this.establishmentForm.value.postalCode || '',
+      showMap: this.establishmentForm.value.showMap || false,
+      photos: this.photosPreview // Ensure base64 photos are included here
+    };
+  
+    const data = {
+      partenaireId:this.partenaireId, // Hardcoded partenaireId
+      nom: this.establishmentForm.value.establishmentName,
+      adresse: this.establishmentForm.value.address,
+      type: this.establishmentForm.value.establishmentType,
+      statut: this.establishmentForm.value.statut || 'En attente',
+      visibility: this.establishmentForm.value.visibility || 'public',
+      pack: this.selectedPlan.name,
+      informations: infos,
+      reseauxSociaux: {
+        facebook: this.establishmentForm.value.socialMedia.facebook || '',
+        instagram: this.establishmentForm.value.socialMedia.instagram || '',
+        twitter: this.establishmentForm.value.socialMedia.twitter || '',
+        linkedin: this.establishmentForm.value.socialMedia.linkedin || ''
+      },
+      description: this.establishmentForm.value.description || '',
+      services: this.servicesOptions.filter((_, i) => this.establishmentForm.value.services[i]),
+      horaires: this.currentEtablissement.horaires,
+      photos: this.photosPreview, // Ensure photos are correctly passed
+      showMap: this.establishmentForm.value.showMap,
       telephone: this.establishmentForm.value.phone,
       email: this.establishmentForm.value.email,
       siteWeb: this.establishmentForm.value.website,
       ville: this.establishmentForm.value.city,
       pays: this.establishmentForm.value.country,
-      codePostal: this.establishmentForm.value.postalCode,
-      showMap: this.establishmentForm.value.showMap,
-      photos: this.establishmentForm.value.photos
+      codePostal: this.establishmentForm.value.postalCode
     };
-
-    const data = {
-      partenaireId: this.partenaireId,
-      nom: this.establishmentForm.value.establishmentName,
-      adresse: this.establishmentForm.value.address,
-      type: this.establishmentForm.value.establishmentType,
-      statut: this.establishmentForm.value.statut,
-      visibility: this.establishmentForm.value.visibility,
-      pack: this.selectedPlan.name,
-      informations: infos
-    };
-
-    this.publiciteService.submitPublicite(data).subscribe({
-      next: () => {
-        this.pendingConfirmation = true;
-        this.pendingRequests.push({
-          establishment: this.establishmentForm.value,
-          plan: this.selectedPlan!,
-          timestamp: new Date()
+  
+    // First, call the Etablissement API to add the establishment
+    this.etablissementService.addEtablissement(data).subscribe({
+      next: (response) => {
+        console.log("data",data);
+        // Show success for establishment creation
+        Swal.fire({
+          icon: 'success',
+          title: 'Établissement ajouté',
+          text: 'Votre établissement a été ajouté avec succès.',
+          confirmButtonText: 'OK',
+          confirmButtonColor: '#3085d6'
+        }).then(() => {
+          this.resetForm();
         });
-        this.closePricingModal();
-        this.resetForm();
+  
+        // Now call the Publicite API to add the advertisement
+        const publicitéData = {
+          etablissementId: response.id, // The new establishment's ID from the response
+          utilisateurId: this.partenaireId, // The partenaire's ID
+          description: this.establishmentForm.value.description || 'Publicité pour l\'établissement',
+          pack: this.selectedPlan.name // The selected pack for the establishment
+        };
+  
+        this.etablissementService.addPublicite(publicitéData).subscribe({
+          next: (pubResponse) => {
+            Swal.fire({
+              icon: 'success',
+              title: 'Publicité ajoutée',
+              text: 'La publicité pour votre établissement a été ajoutée avec succès.',
+              confirmButtonText: 'OK',
+              confirmButtonColor: '#3085d6'
+            });
+          },
+          error: (pubError) => {
+            Swal.fire({
+              icon: 'error',
+              title: 'Erreur',
+              text: 'Une erreur est survenue lors de l\'ajout de la publicité.',
+              confirmButtonText: 'OK',
+              confirmButtonColor: '#d33'
+            });
+          }
+        });
+  
       },
-      error: err => {
-        console.error('Erreur d\'envoi:', err);
-        alert("Erreur lors de la soumission.");
+      error: (err) => {
+        Swal.fire({
+          icon: 'error',
+          title: 'Erreur',
+          text: 'Une erreur est survenue lors de l\'ajout de l\'établissement.',
+          confirmButtonText: 'OK',
+          confirmButtonColor: '#d33'
+        });
       }
     });
   }
-
+  
+  
+  
   onSubmitPaymentForm(event: Event): void {
     event.preventDefault();
     if (this.paymentForm.valid || this.paymentForm.get('paymentMethod')?.value !== 'card') {
@@ -299,56 +422,33 @@ export class PartenaireEtablissementsComponent implements OnInit {
     }
   }
 
-  generateInvoicePDF(plan: PricingPlan): void {
-    const doc = new jsPDF();
-    const data = this.establishmentForm.value;
-
-    // Couleurs
-    const primaryColor = '#1e1b4b';
-    const secondaryColor = '#f43f5e';
-
-    // Header: logo fictif + titre
-    doc.setFillColor(primaryColor);
-    doc.rect(0, 0, 210, 30, 'F');
-    doc.setFontSize(20);
-    doc.setTextColor(255, 255, 255);
-    doc.text('Sfax - Facture Publicitaire', 105, 18, { align: 'center' });
-
-    // Cadre client
-    doc.setTextColor(0, 0, 0);
-    doc.setFontSize(12);
-    doc.setDrawColor(200);
-    doc.rect(10, 40, 190, 40);
-    doc.text(`Date : ${new Date().toLocaleDateString()}`, 15, 48);
-    doc.text(`Établissement : ${data.establishmentName}`, 15, 56);
-    doc.text(`Adresse : ${data.address}, ${data.postalCode}, ${data.city}, ${data.country}`, 15, 64);
-    doc.text(`Téléphone : ${data.phone}`, 15, 72);
-    doc.text(`Email : ${data.email}`, 115, 72);
-
-    // Ligne de séparation
-    doc.setDrawColor(100);
-    doc.line(10, 90, 200, 90);
-
-    // Détails du pack
-    doc.setFontSize(14);
-    doc.setTextColor(primaryColor);
-    doc.text('Détails du Pack Choisi', 15, 100);
-    doc.setFontSize(12);
-    doc.setTextColor(0, 0, 0);
-    doc.text(`Pack : ${plan.name}`, 15, 110);
-    doc.text(`Durée : ${plan.duration}`, 15, 118);
-    doc.text(`Prix : ${plan.price} TND`, 15, 126);
-    doc.text(`Impressions : ${plan.impressions}`, 15, 134);
-    doc.text(`Annonces : ${plan.adsPerWeek}`, 15, 142);
-    doc.text(`Support : ${plan.support}`, 15, 150);
-
-    // Footer
-    doc.setFontSize(10);
-    doc.setTextColor(100);
-    doc.text('Merci pour votre confiance !', 105, 280, { align: 'center' });
-
-    const safeName = data.establishmentName.replace(/\s+/g, '_');
-    const filename = `facture_${safeName}_${plan.name}.pdf`;
-    doc.save(filename);
+  onPhotoSelected(event: Event): void {
+    const input = event.target as HTMLInputElement;
+  
+    if (input.files && input.files.length) {
+      const files = Array.from(input.files);
+  
+      if (!this.currentEtablissement.photos) {
+        this.currentEtablissement.photos = [];
+      }
+  
+      files.forEach(file => {
+        this.currentEtablissement.photos.push(file); // Garde le fichier brut
+      });
+    }
   }
+  
+    resolvePhotoUrl(photo: string | File): string {
+      if (photo instanceof File) {
+        return URL.createObjectURL(photo);
+      }
+      return photo;
+    }
+
+    deletePhoto(photo: string | File): void {
+      const index = this.currentEtablissement.photos.indexOf(photo);
+      if (index !== -1) {
+        this.currentEtablissement.photos.splice(index, 1);
+      }
+    }
 }

@@ -84,6 +84,7 @@ export class HotelsComponent implements OnInit {
             siteWeb: hotel.siteWeb
           };
         });
+        this.hotels.reverse(); ////wasssimmmmm
         this.filteredHotels = this.hotels; // Directly show all hotels
         this.isLoading = false;
       },

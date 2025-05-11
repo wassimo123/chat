@@ -5,6 +5,7 @@
 @import url('https://cdn.jsdelivr.net/npm/remixicon@4.5.0/fonts/remixicon.css');
 @import url('https://fonts.googleapis.com/css2?family=Pacifico&display=swap');
 @import 'ngx-toastr/toastr';
+@import '~aos/dist/aos.css';
 :where([class^="ri-"])::before {
     content: "\f3c2";
   }

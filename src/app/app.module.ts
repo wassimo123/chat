@@ -34,10 +34,13 @@ import { PartenaireComponent } from './partenaire/partenaire/partenaire.componen
 import { MapModalComponent } from './components/map-modal/map-modal.component';
 import { ProfilePartenaireComponent } from './partenaire/profile-partenaire/profile-partenaire.component';
 import { PartenaireEtablissementsComponent } from './partenaire/partenaire-etablissements/partenaire-etablissements.component';
-import { PartenaireEvenementsComponent } from './partenaire/partenaire-evenements/partenaire-evenements.component';
-import { PartenairePromotionsComponent } from './partenaire/partenaire-promotions/partenaire-promotions.component';
+// import { PartenaireEvenementsComponent } from './partenaire/partenaire-evenements/partenaire-evenements.component';
+// import { PartenairePromotionsComponent } from './partenaire/partenaire-promotions/partenaire-promotions.component';
 import { GestionDesPublicitesComponent } from './admin/gestion-des-publicites/gestion-des-publicites.component';
-
+import { HistoireComponent } from './histoire/histoire.component';
+import { HeritageDetailComponent } from './heritage-detail/heritage-detail.component';
+import { TemoignagesComponent } from './components/temoignages/temoignages.component';
+import { DecouvrirSfaxComponent } from './decouvrir-sfax/decouvrir-sfax.component';
 
 
 
@@ -64,8 +67,8 @@ import { GestionDesPublicitesComponent } from './admin/gestion-des-publicites/ge
     MapModalComponent,
    ProfilePartenaireComponent,
    PartenaireEtablissementsComponent,
-   PartenaireEvenementsComponent,
-   PartenairePromotionsComponent,
+  //  PartenaireEvenementsComponent,
+  //  PartenairePromotionsComponent,
    GestionDesPublicitesComponent
   
     
@@ -95,6 +98,10 @@ import { GestionDesPublicitesComponent } from './admin/gestion-des-publicites/ge
     RestaurantComponent,
     CafeComponent ,
     ReactiveFormsModule,
+    HistoireComponent,
+    HeritageDetailComponent,
+    TemoignagesComponent,
+    DecouvrirSfaxComponent,
     
 ],
   providers: [],

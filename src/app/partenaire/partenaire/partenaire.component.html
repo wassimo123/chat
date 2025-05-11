@@ -13,7 +13,7 @@
         <i class="ri-building-line mr-3"></i>
         <span>Établissements</span>
       </a>
-      <a routerLink="/partenaire-promotions" routerLinkActive="bg-gray-50 text-primary" class="flex items-center px-6 py-3 text-gray-600 hover:bg-gray-50 hover:text-primary">
+      <!-- <a routerLink="/partenaire-promotions" routerLinkActive="bg-gray-50 text-primary" class="flex items-center px-6 py-3 text-gray-600 hover:bg-gray-50 hover:text-primary">
         <i class="ri-price-tag-3-line mr-3"></i>
         <span>Promotions</span>
       </a>
@@ -24,7 +24,7 @@
       <a routerLink="/profile-partenaire" routerLinkActive="bg-gray-50 text-primary" class="flex items-center px-6 py-3 text-gray-600 hover:bg-gray-50 hover:text-primary">
         <i class="ri-user-line mr-3"></i>
         <span>Mon profil</span>
-      </a>
+      </a> -->
     </nav>
   </aside>
 
@@ -69,7 +69,7 @@
           <div class="absolute inset-0 bg-black opacity-10"></div>
           <div class="relative p-8 md:p-12">
             <h1 class="text-3xl md:text-4xl font-bold mb-3 tracking-tight">Bienvenue,  {{ user?.nom || 'Partenaire' }} !</h1>
-            <p class="text-lg md:text-xl mb-6 opacity-90">Gérez vos établissements, promotions et événements en toute simplicité.</p>
+            <p class="text-lg md:text-xl mb-6 opacity-90">Gérez vos établissements en toute simplicité.</p>
             <button
               (click)="openDialog()"
               class="inline-block bg-white text-indigo-600 font-semibold px-6 py-3 rounded-lg hover:bg-indigo-50 hover:shadow-md transition-all duration-200"
@@ -82,11 +82,11 @@
         <!-- Quick Actions -->
         <section class="mb-8">
           <h2 class="text-2xl font-semibold text-gray-800 mb-6">Actions Rapides</h2>
-          <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+          <div class="flex justify-center">
             <!-- Établissements Card -->
             <a
               routerLink="/partenaire-etablissements"
-              class="bg-white rounded-xl p-6 flex items-center space-x-4 shadow-md hover:shadow-lg hover:-translate-y-1 transition-all duration-200"
+              class="bg-white rounded-xl p-6 flex items-center space-x-4 shadow-md hover:shadow-lg hover:-translate-y-1 transition-all duration-200 w-full max-w-md"
             >
               <div class="w-12 h-12 bg-indigo-50 rounded-full flex items-center justify-center">
                 <i class="ri-building-4-line text-indigo-600 text-2xl"></i>
@@ -96,56 +96,18 @@
                 <p class="text-sm text-gray-500">Gérer vos établissements</p>
               </div>
             </a>
-            <!-- Promotions Card -->
-            <a
-              routerLink="/partenaire-promotions"
-              class="bg-white rounded-xl p-6 flex items-center space-x-4 shadow-md hover:shadow-lg hover:-translate-y-1 transition-all duration-200"
-            >
-              <div class="w-12 h-12 bg-indigo-50 rounded-full flex items-center justify-center">
-                <i class="ri-coupon-3-line text-indigo-600 text-2xl"></i>
-              </div>
-              <div>
-                <h3 class="text-lg font-semibold text-gray-800">Promotions</h3>
-                <p class="text-sm text-gray-500">Créer et gérer vos promotions</p>
-              </div>
-            </a>
-            <!-- Événements Card -->
-            <a
-              routerLink="/partenaire-evenements"
-              class="bg-white rounded-xl p-6 flex items-center space-x-4 shadow-md hover:shadow-lg hover:-translate-y-1 transition-all duration-200"
-            >
-              <div class="w-12 h-12 bg-indigo-50 rounded-full flex items-center justify-center">
-                <i class="ri-calendar-event-line text-indigo-600 text-2xl"></i>
-              </div>
-              <div>
-                <h3 class="text-lg font-semibold text-gray-800">Événements</h3>
-                <p class="text-sm text-gray-500">Planifier vos événements</p>
-              </div>
-            </a>
           </div>
         </section>
     
         <!-- Statistics Overview -->
         <section>
           <h2 class="text-2xl font-semibold text-gray-800 mb-6">Aperçu des Statistiques</h2>
-          <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+          <div class="flex justify-center">
             <!-- Établissements Stat -->
-            <div class="bg-white rounded-xl p-6 text-center shadow-md hover:shadow-lg hover:-translate-y-1 transition-all duration-200">
+            <div class="bg-white rounded-xl p-6 text-center shadow-md hover:shadow-lg hover:-translate-y-1 transition-all duration-200 w-full max-w-md">
               <i class="ri-building-4-line text-indigo-600 text-3xl mb-4"></i>
               <h3 class="text-2xl font-bold text-gray-800">3</h3>
               <p class="text-sm text-gray-500">Établissements</p>
-            </div>
-            <!-- Promotions Stat -->
-            <div class="bg-white rounded-xl p-6 text-center shadow-md hover:shadow-lg hover:-translate-y-1 transition-all duration-200">
-              <i class="ri-coupon-3-line text-indigo-600 text-3xl mb-4"></i>
-              <h3 class="text-2xl font-bold text-gray-800">5</h3>
-              <p class="text-sm text-gray-500">Promotions Actives</p>
-            </div>
-            <!-- Événements Stat -->
-            <div class="bg-white rounded-xl p-6 text-center shadow-md hover:shadow-lg hover:-translate-y-1 transition-all duration-200">
-              <i class="ri-calendar-event-line text-indigo-600 text-3xl mb-4"></i>
-              <h3 class="text-2xl font-bold text-gray-800">2</h3>
-              <p class="text-sm text-gray-500">Événements à venir</p>
             </div>
           </div>
         </section>
@@ -170,7 +132,7 @@
                 <i class="ri-information-line text-indigo-500 text-lg"></i>
               </div>
               <p class="text-sm text-gray-600 leading-relaxed">
-                Vous devez choisir un type via les actions rapides ci-dessous ou cliquer sur un type dans la barre latérale (par exemple, Établissements, Promotions ou Événements).
+                Vous devez choisir le type via les actions rapides ci-dessous ou cliquer sur le type dans la barre latérale ( Établissements).
               </p>
             </div>
             <!-- Modal Footer -->

@@ -726,30 +726,22 @@ if (!this.isValidEmail(this.currentEtablissement.email)) {
         return "bg-gray-100 text-gray-800";
     }
   }
-  onPhotoSelected(event: Event): void {
-    const input = event.target as HTMLInputElement;
-  
-    if (input.files && input.files.length) {
-      const files = Array.from(input.files);
-  
-      // Initialiser le tableau photos s'il n'existe pas
-      if (!this.currentEtablissement.photos) {
-        this.currentEtablissement.photos = [];
-      }
-  
-      // Convertir chaque fichier en URL et ajouter au tableau
-      files.forEach((file) => {
-        const reader = new FileReader();
-        reader.onload = (e) => {
-          if (e.target && e.target.result) {
-            this.currentEtablissement.photos.push(e.target.result as string); // Ajouter l'URL générée
-          }
-        };
-        reader.readAsDataURL(file); // Lire le fichier comme une URL de données
-      });
+onPhotoSelected(event: Event): void {
+  const input = event.target as HTMLInputElement;
+
+  if (input.files && input.files.length) {
+    const files = Array.from(input.files);
+
+    if (!this.currentEtablissement.photos) {
+      this.currentEtablissement.photos = [];
     }
+
+    files.forEach(file => {
+      this.currentEtablissement.photos.push(file); // Garde le fichier brut
+    });
   }
-  
+}
+
   resolvePhotoUrl(photo: string | File): string {
     if (photo instanceof File) {
       return URL.createObjectURL(photo);

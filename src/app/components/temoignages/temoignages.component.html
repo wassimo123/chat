@@ -1,0 +1,119 @@
+<app-navbar></app-navbar>
+
+<!-- Section Titre avec bouton retour -->
+<section class="bg-blue-50 pt-28 pb-12 relative">
+  <div class="container mx-auto px-6">
+    <div class="flex flex-col md:flex-row items-center justify-between">
+      <!-- Bouton Retour -->
+      <button
+        (click)="goToHome()"
+        class="absolute top-6 left-6 md:static md:top-auto md:left-auto bg-white text-blue-600 px-5 py-3 rounded-full shadow hover:bg-blue-100 transition inline-flex items-center text-sm font-medium" [@fadeAnimation]>
+        <i class="ri-arrow-left-line mr-2" [@fadeAnimation]></i>
+        Retour à l'accueil
+      </button>
+
+      <!-- Titre centré -->
+      <div class="text-center w-full">
+        <h1 class="text-2xl md:text-3xl font-semibold text-gray-800 mb-2">
+          Témoignages de nos visiteurs
+        </h1>
+        <p class="text-gray-600 max-w-2xl mx-auto text-base">
+          Découvrez les expériences authentiques vécues par nos visiteurs à Sfax
+          et laissez-vous inspirer pour votre prochaine aventure.
+        </p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Filtres -->
+<section class="py-4 bg-gray-50">
+  <div class="container mx-auto px-6">
+    <div class="flex flex-col sm:flex-row gap-4 justify-start items-center">
+      <!-- Filtre par Note -->
+      <div class="relative">
+        <select 
+          [(ngModel)]="selectedNoteFilter" 
+          (change)="applyFilters()"
+          class="appearance-none border border-gray-300 rounded-lg px-4 py-2 pr-8 bg-white text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500">
+          <option value="all">Tous Notes</option>
+          <option value="1">1 étoile</option>
+          <option value="2">2 étoiles</option>
+          <option value="3">3 étoiles</option>
+          <option value="4">4 étoiles</option>
+          <option value="5">5 étoiles</option>
+        </select>
+        <i class="ri-arrow-down-s-line absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500"></i>
+      </div>
+    </div>
+  </div>
+</section>
+<!-- Ligne de séparation -->
+<hr class="border-t border-gray-300 my-6">
+
+<!-- Liste des Avis avec Animation -->
+<section class="py-16 bg-gray-50">
+  <div class="container mx-auto px-6">
+    <div class="grid gap-8 grid-cols-1 md:grid-cols-2 lg:grid-cols-3"
+         [@fadeAnimation]>
+      <div *ngFor="let avis of paginatedAvis()" 
+           class="bg-white rounded-xl p-6 shadow hover:shadow-lg transition-all duration-300">
+        <div class="flex items-center gap-4 mb-4">
+          <img [src]="'https://i.pravatar.cc/100?u=' + avis.utilisateur" 
+               class="w-12 h-12 rounded-full" alt="avatar" />
+          <div class="text-left">
+            <h3 class="font-semibold text-lg">{{ avis.utilisateur || 'Anonyme' }}</h3>
+            <div class="flex text-yellow-400 text-sm">
+              <ng-container *ngFor="let star of [1,2,3,4,5]">
+                <i class="ri-star-fill" 
+                   [ngClass]="star <= avis.note ? 'text-yellow-400' : 'text-gray-300'"></i>
+              </ng-container>
+            </div>
+          </div>
+        </div>
+        <p class="text-sm text-gray-500 mb-2">Visite guidée de la Médina</p>
+        <p class="text-gray-700 text-base leading-relaxed mb-2">
+          "{{ avis.commentaire }}"
+        </p>
+        <p class="text-xs text-gray-400 italic">
+          Déposé le {{ avis.dateSoumission | date:'dd/MM/yyyy à HH:mm' }}
+        </p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Pagination -->
+<div class="flex justify-center mt-10 mb-24" [@fadeAnimation]>
+  <nav class="flex items-center space-x-2" [@fadeAnimation]>
+    <button
+      (click)="previousPage()"
+      [disabled]="currentPage === 1"
+      class="w-10 h-10 flex items-center justify-center rounded-full border border-gray-300 text-gray-600 hover:bg-gray-100" [@fadeAnimation]
+    >
+      <i class="ri-arrow-left-s-line"></i>
+    </button>
+
+    <button
+      *ngFor="let page of totalPagesArray"
+      (click)="goToPage(page)"
+      class="w-10 h-10 flex items-center justify-center rounded-full border text-sm font-medium transition" [@fadeAnimation]
+      [ngClass]="{
+        'bg-blue-500 text-white': currentPage === page,
+        'border-gray-300 text-gray-600 hover:bg-gray-100': currentPage !== page
+      }"
+    >
+      {{ page }}
+    </button>
+
+    <button
+      (click)="nextPage()"
+      [disabled]="currentPage === totalPages"
+      class="w-10 h-10 flex items-center justify-center rounded-full border border-gray-300 text-gray-600 hover:bg-gray-100" [@fadeAnimation]
+    >
+      <i class="ri-arrow-right-s-line"></i>
+    </button>
+  </nav>
+</div>
+
+<app-footer></app-footer>

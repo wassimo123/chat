@@ -144,3 +144,5 @@ input:focus, select:focus, textarea:focus {
 .bg-yellow-500 { background-color: #fbbf24; }
 .hover\:bg-yellow-600:hover { background-color: #f59e0b; }
 .focus\:ring-yellow-500:focus { box-shadow: 0 0 0 3px rgba(251, 191, 36, 0.5); }
+
+

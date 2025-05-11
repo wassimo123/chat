@@ -28,7 +28,9 @@ export class GestionDesPromotionsComponent implements OnInit, AfterViewInit {
 
   typeChart: Chart | null = null;
   statusChart: Chart | null = null;
-
+  isDetailModalOpen: boolean = false;
+  promotionDetails: Promotion | null = null;
+  
   promotions: Promotion[] = [];
   notifications: any[] = [];
   etablissementsType: any[] = []; // Dynamic establishments based on type
@@ -665,15 +667,27 @@ export class GestionDesPromotionsComponent implements OnInit, AfterViewInit {
       this.showNotification('ID de la promotion manquant.', 'error');
       return;
     }
+  
     this.promotionService.getPromotion(promotion.id).subscribe({
       next: (promo) => {
-        console.log('Détails de la promotion:', promo);
+        this.promotionDetails = {
+          ...promo,
+          id: promo._id,
+          startDate: new Date(promo.startDate).toISOString(),
+          endDate: new Date(promo.endDate).toISOString()
+        };
+        this.isDetailModalOpen = true;
       },
       error: (err: Error) => {
         this.showNotification(err.message, 'error');
       }
     });
   }
+  closeDetailModal(): void {
+    this.isDetailModalOpen = false;
+    this.promotionDetails = null;
+  }
+    
 
   getEstablishmentName(id: string): string {
     return this.etablissementsType.find(e => e._id === id)?.nom || 'Inconnu';

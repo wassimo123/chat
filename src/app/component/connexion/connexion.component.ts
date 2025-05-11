@@ -60,7 +60,7 @@ export class ConnexionComponent implements OnInit {
             }
 
             localStorage.setItem('user', JSON.stringify(userResponse));
-
+            localStorage.setItem('userid', userResponse._id); ///////////zed houni 
             Swal.fire({
               icon: 'success',
               title: 'Connexion réussie !',

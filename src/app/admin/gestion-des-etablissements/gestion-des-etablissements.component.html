@@ -25,6 +25,9 @@
         <i class="ri-calendar-line mr-3"></i>
         <span>Événements</span>
       </a>
+      <a routerLink="/publicites" routerLinkActive="bg-gray-50 text-primary" class="flex items-center px-6 py-3 text-gray-600 hover:bg-gray-50 hover:text-primary">
+        <i class="ri-advertisement-line mr-3"></i> <span>Publicités</span>
+      </a>
       <a routerLink="/notifications" routerLinkActive="bg-gray-50 text-primary" class="flex items-center px-6 py-3 text-gray-600 hover:bg-gray-50 hover:text-primary">
         <i class="ri-notification-line mr-3"></i>
         <span>Notifications</span>
@@ -77,7 +80,7 @@
     <!-- Main -->
     <main class="flex-1 overflow-auto p-6">
       <!-- Modal pour les messages d'erreur ou de succès -->
-      <div *ngIf="showMessageModal" class="fixed inset-0 flex items-center justify-center z-50">
+      <div *ngIf="showMessageModal" class="fixed inset-0 flex items-center justify-center z-[9999]">
         <div class="bg-white rounded-lg shadow-xl p-6 max-w-sm w-full mx-4">
           <div class="flex items-center mb-4" [ngClass]="messageModalType === 'error' ? 'text-red-600' : 'text-green-600'">
             <i [ngClass]="messageModalType === 'error' ? 'ri-error-warning-line' : 'ri-checkbox-circle-line'" class="text-2xl mr-2"></i>
@@ -435,449 +438,482 @@
     </div>
   </ng-template>
 
-<!-- Modal for adding/editing/viewing -->
-<div class="fixed inset-0 bg-gray-900 bg-opacity-50 flex items-center justify-center z-50 overflow-y-auto" [class.hidden]="!isModalOpen">
-  <div class="bg-white rounded-lg shadow-xl w-full max-w-4xl m-4">
-    <div class="p-6 modal-content overflow-y-auto max-h-[90vh]">
-      <h2 class="text-xl font-semibold text-gray-900 mb-6">{{ modalTitle }}</h2>
-      
-      <!-- Mode Ajout/Modification -->
-      <form *ngIf="modalTitle !== 'Détails de l\'établissement'" (ngSubmit)="saveEtablissement()">
-        <!-- Informations de base -->
-        <div class="bg-white rounded-lg shadow-sm p-6 mb-6">
-          <h2 class="text-lg font-medium text-gray-900 mb-4">Informations de base</h2>
-          <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <div>
-              <label for="nom" class="block text-sm font-medium text-gray-700 mb-1">Nom de l'établissement <span class="text-red-500">*</span></label>
-              <input id="nom" type="text" [(ngModel)]="currentEtablissement.nom" name="nom" class="mt-1 block w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-primary" placeholder="Saisissez le nom" required>
+  <!-- Modal for adding/editing/viewing -->
+  <div class="fixed inset-0 bg-gray-900 bg-opacity-50 flex items-center justify-center z-50 overflow-y-auto" [class.hidden]="!isModalOpen">
+    <div class="bg-white rounded-lg shadow-xl w-full max-w-4xl m-4">
+      <div class="p-6 modal-content overflow-y-auto max-h-[90vh]">
+        <h2 class="text-xl font-semibold text-gray-900 mb-6">{{ modalTitle }}</h2>
+        
+        <!-- Mode Ajout/Modification -->
+        <form *ngIf="modalTitle !== 'Détails de l\'établissement'" (ngSubmit)="saveEtablissement()">
+          <!-- Informations de base -->
+          <div class="bg-white rounded-lg shadow-sm p-6 mb-6">
+            <h2 class="text-lg font-medium text-gray-900 mb-4">Informations de base</h2>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div>
+                <label for="nom" class="block text-sm font-medium text-gray-700 mb-1">Nom de l'établissement <span class="text-red-500">*</span></label>
+                <input id="nom" type="text" [(ngModel)]="currentEtablissement.nom" name="nom" class="mt-1 block w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-primary" placeholder="Saisissez le nom" required>
+              </div>
+              <div>
+                <label for="type" class="block text-sm font-medium text-gray-700 mb-1">Type d'établissement <span class="text-red-500">*</span></label>
+                <select id="type" [(ngModel)]="currentEtablissement.type" name="type" class="mt-1 block w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-primary" required>
+                  <option value="" disabled>Sélectionnez un type</option>
+                  <option value="Restaurant">Restaurant</option>
+                  <option value="Hôtel">Hôtel</option>
+                  <option value="Café">Café</option>
+                </select>
+              </div>
+              <div>
+                <label for="statut" class="block text-sm font-medium text-gray-700 mb-1">Statut <span class="text-red-500">*</span></label>
+                <select id="statut" [(ngModel)]="currentEtablissement.statut" name="statut" class="mt-1 block w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-primary" required>
+                  <option value="" disabled>Sélectionnez un statut</option>
+                  <option value="Actif">Actif</option>
+                  <option value="En attente">En attente</option>
+                  <option value="Inactif">Inactif</option>
+                </select>
+              </div>
+              <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">Visibilité</label>
+                <div class="flex items-center space-x-4">
+                  <label class="inline-flex items-center">
+                    <input type="radio" [(ngModel)]="currentEtablissement.visibility" name="visibility" value="public" class="form-radio">
+                    <span class="ml-2 text-sm text-gray-700">Public</span>
+                  </label>
+                </div>
+              </div>
             </div>
-            <div>
-              <label for="type" class="block text-sm font-medium text-gray-700 mb-1">Type d'établissement <span class="text-red-500">*</span></label>
-              <select id="type" [(ngModel)]="currentEtablissement.type" name="type" class="mt-1 block w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-primary" required>
-                <option value="" disabled>Sélectionnez un type</option>
-                <option value="Restaurant">Restaurant</option>
-                <option value="Hôtel">Hôtel</option>
-                <option value="Café">Café</option>
-              </select>
-            </div>
-            <div>
-              <label for="statut" class="block text-sm font-medium text-gray-700 mb-1">Statut <span class="text-red-500">*</span></label>
-              <select id="statut" [(ngModel)]="currentEtablissement.statut" name="statut" class="mt-1 block w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-primary" required>
-                <option value="" disabled>Sélectionnez un statut</option>
-                <option value="Actif">Actif</option>
-                <option value="En attente">En attente</option>
-                <option value="Inactif">Inactif</option>
-              </select>
-            </div>
-            <div>
-              <label class="block text-sm font-medium text-gray-700 mb-1">Visibilité</label>
-              <div class="flex items-center space-x-4">
-                <label class="inline-flex items-center">
-                  <input type="radio" [(ngModel)]="currentEtablissement.visibility" name="visibility" value="public" class="form-radio">
-                  <span class="ml-2 text-sm text-gray-700">Public</span>
+          </div>
+
+          <!-- Localisation -->
+          <div class="bg-white rounded-lg shadow-sm p-6 mb-6">
+            <h2 class="text-lg font-medium text-gray-900 mb-4">Localisation</h2>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div class="md:col-span-2">
+                <label for="adresse" class="block text-sm font-medium text-gray-700 mb-1">Adresse complète <span class="text-red-500">*</span></label>
+                <input id="adresse" type="text" [(ngModel)]="currentEtablissement.adresse" name="adresse" class="mt-1 block w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-primary" placeholder="Numéro et nom de rue" required>
+              </div>
+              <div>
+                <label for="codePostal" class="block text-sm font-medium text-gray-700 mb-1">Code postal</label>
+                <input id="codePostal" type="text" [(ngModel)]="currentEtablissement.codePostal" name="codePostal" class="mt-1 block w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-primary" placeholder="Code postal">
+              </div>
+              <div>
+                <label for="ville" class="block text-sm font-medium text-gray-700 mb-1">Ville</label>
+                <input id="ville" type="text" [(ngModel)]="currentEtablissement.ville" name="ville" class="mt-1 block w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-primary" placeholder="Ville">
+              </div>
+              <div>
+                <label for="pays" class="block text-sm font-medium text-gray-700 mb-1">Pays</label>
+                <select id="pays" [(ngModel)]="currentEtablissement.pays" name="pays" class="mt-1 block w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-primary">
+                  <option value="Tunisie">Tunisie</option>
+                  <option value=""></option>
+                </select>
+              </div>
+              <div>
+                <label class="flex items-center">
+                  <input type="checkbox" [(ngModel)]="currentEtablissement.showMap" name="showMap" class="form-checkbox">
+                  <span class="ml-2 text-sm text-gray-700">Afficher sur la carte</span>
                 </label>
               </div>
             </div>
           </div>
-        </div>
 
-        <!-- Localisation -->
-        <div class="bg-white rounded-lg shadow-sm p-6 mb-6">
-          <h2 class="text-lg font-medium text-gray-900 mb-4">Localisation</h2>
-          <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <div class="md:col-span-2">
-              <label for="adresse" class="block text-sm font-medium text-gray-700 mb-1">Adresse complète <span class="text-red-500">*</span></label>
-              <input id="adresse" type="text" [(ngModel)]="currentEtablissement.adresse" name="adresse" class="mt-1 block w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-primary" placeholder="Numéro et nom de rue" required>
+          <!-- Coordonnées -->
+          <div class="bg-white rounded-lg shadow-sm p-6 mb-6">
+            <h2 class="text-lg font-medium text-gray-900 mb-4">Coordonnées</h2>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div>
+                <label for="telephone" class="block text-sm font-medium text-gray-700 mb-1">Téléphone</label>
+                <input id="telephone" type="tel" [(ngModel)]="currentEtablissement.telephone" name="telephone" class="mt-1 block w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-primary" placeholder="+216 ">
+              </div>
+              <div>
+                <label for="email" class="block text-sm font-medium text-gray-700 mb-1">Email <span class="text-red-500">*</span></label>
+                <input 
+                  id="email" 
+                  type="email" 
+                  [(ngModel)]="currentEtablissement.email" 
+                  name="email" 
+                  class="mt-1 block w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-primary" 
+                  placeholder="contact@etablissement.com"
+                  pattern="[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$"
+                  required
+                  #emailField="ngModel"
+                  [ngClass]="{'border-red-500': emailField.invalid && emailField.touched}"
+                >
+                <div *ngIf="emailField.invalid && emailField.touched" class="text-red-500 text-sm mt-1">
+                  <span *ngIf="emailField.errors?.['required']">L'email est requis.</span>
+                  <span *ngIf="emailField.errors?.['pattern']">Veuillez entrer une adresse email valide.</span>
+                </div>
+              </div>
+              <div class="md:col-span-2">
+                <label for="siteWeb" class="block text-sm font-medium text-gray-700 mb-1">Site web</label>
+                <input id="siteWeb" type="url" [(ngModel)]="currentEtablissement.siteWeb" name="siteWeb" class="mt-1 block w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-primary" placeholder="https://www.etablissement.com">
+              </div>
             </div>
-            <div>
-              <label for="codePostal" class="block text-sm font-medium text-gray-700 mb-1">Code postal</label>
-              <input id="codePostal" type="text" [(ngModel)]="currentEtablissement.codePostal" name="codePostal" class="mt-1 block w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-primary" placeholder="Code postal">
+          </div>
+
+          <!-- Description et services -->
+          <div class="bg-white rounded-lg shadow-sm p-6 mb-6">
+            <h2 class="text-lg font-medium text-gray-900 mb-4">Description et services</h2>
+            <div class="grid grid-cols-1 gap-6">
+              <div>
+                <label for="description" class="block text-sm font-medium text-gray-700 mb-1">Description</label>
+                <textarea id="description" [(ngModel)]="currentEtablissement.description" name="description" rows="4" class="mt-1 block w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-primary" placeholder="Décrivez l'établissement..."></textarea>
+              </div>
+              <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">Services proposés</label>
+                <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+                  <label class="flex items-center">
+                    <input type="checkbox" (change)="toggleService('WiFi gratuit', $event)" [checked]="currentEtablissement.services.includes('WiFi gratuit')" class="form-checkbox">
+                    <span class="ml-2 text-sm text-gray-700">WiFi gratuit</span>
+                  </label>
+                  <label class="flex items-center">
+                    <input type="checkbox" (change)="toggleService('Parking', $event)" [checked]="currentEtablissement.services.includes('Parking')" class="form-checkbox">
+                    <span class="ml-2 text-sm text-gray-700">Parking</span>
+                  </label>
+                  <label class="flex items-center">
+                    <input type="checkbox" (change)="toggleService('Terrasse', $event)" [checked]="currentEtablissement.services.includes('Terrasse')" class="form-checkbox">
+                    <span class="ml-2 text-sm text-gray-700">Terrasse</span>
+                  </label>
+                  <label class="flex items-center">
+                    <input type="checkbox" (change)="toggleService('Livraison', $event)" [checked]="currentEtablissement.services.includes('Livraison')" class="form-checkbox">
+                    <span class="ml-2 text-sm text-gray-700">Livraison</span>
+                  </label>
+                  <label class="flex items-center">
+                    <input type="checkbox" (change)="toggleService('À emporter', $event)" [checked]="currentEtablissement.services.includes('À emporter')" class="form-checkbox">
+                    <span class="ml-2 text-sm text-gray-700">À emporter</span>
+                  </label>
+                  <label class="flex items-center">
+                    <input type="checkbox" (change)="toggleService('Réservation', $event)" [checked]="currentEtablissement.services.includes('Réservation')" class="form-checkbox">
+                    <span class="ml-2 text-sm text-gray-700">Réservation</span>
+                  </label>
+                  <label class="flex items-center">
+                    <input type="checkbox" (change)="toggleService('Accessibilité PMR', $event)" [checked]="currentEtablissement.services.includes('Accessibilité PMR')" class="form-checkbox">
+                    <span class="ml-2 text-sm text-gray-700">Accessibilité PMR</span>
+                  </label>
+                  <label class="flex items-center">
+                    <input type="checkbox" (change)="toggleService('Climatisation', $event)" [checked]="currentEtablissement.services.includes('Climatisation')" class="form-checkbox">
+                    <span class="ml-2 text-sm text-gray-700">Climatisation</span>
+                  </label>
+                  <label class="flex items-center">
+                    <input type="checkbox" (change)="toggleService('Piscine', $event)" [checked]="currentEtablissement.services.includes('Piscine')" class="form-checkbox">
+                    <span class="ml-2 text-sm text-gray-700">Piscine</span>
+                  </label>
+                  <label class="flex items-center">
+                    <input type="checkbox" (change)="toggleService('Petit-déjeuner inclus', $event)" [checked]="currentEtablissement.services.includes('Petit-déjeuner inclus')" class="form-checkbox">
+                    <span class="ml-2 text-sm text-gray-700">Petit-déjeuner inclus</span>
+                  </label>
+                  <label class="flex items-center">
+                    <input type="checkbox" (change)="toggleService('Paiement par carte', $event)" [checked]="currentEtablissement.services.includes('Paiement par carte')" class="form-checkbox">
+                    <span class="ml-2 text-sm text-gray-700">Paiement par carte</span>
+                  </label>
+                  <label class="flex items-center">
+                    <input type="checkbox" (change)="toggleService('Service de chambre', $event)" [checked]="currentEtablissement.services.includes('Service de chambre')" class="form-checkbox">
+                    <span class="ml-2 text-sm text-gray-700">Service de chambre</span>
+                  </label>
+                </div>
+              </div>
             </div>
-            <div>
-              <label for="ville" class="block text-sm font-medium text-gray-700 mb-1">Ville</label>
-              <input id="ville" type="text" [(ngModel)]="currentEtablissement.ville" name="ville" class="mt-1 block w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-primary" placeholder="Ville">
-            </div>
-            <div>
-              <label for="pays" class="block text-sm font-medium text-gray-700 mb-1">Pays</label>
-              <select id="pays" [(ngModel)]="currentEtablissement.pays" name="pays" class="mt-1 block w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-primary">
-                <option value="Tunisie">Tunisie</option>
-                <option value=""></option>
-              </select>
-            </div>
-            <div>
+          </div>
+
+          <!-- Horaires d'ouverture -->
+          <div class="bg-white rounded-lg shadow-sm p-6 mb-6">
+            <h2 class="text-lg font-medium text-gray-900 mb-4">Horaires d'ouverture</h2>
+            <div class="mb-4">
               <label class="flex items-center">
-                <input type="checkbox" [(ngModel)]="currentEtablissement.showMap" name="showMap" class="form-checkbox">
-                <span class="ml-2 text-sm text-gray-700">Afficher sur la carte</span>
+                <input type="checkbox" [(ngModel)]="currentEtablissement.horaires.is24_7" name="is24_7" class="form-checkbox">
+                <span class="ml-2 text-sm text-gray-700">Ouvert 24h/24, 7j/7</span>
               </label>
             </div>
-          </div>
-        </div>
-
-        <!-- Coordonnées -->
-        <div class="bg-white rounded-lg shadow-sm p-6 mb-6">
-          <h2 class="text-lg font-medium text-gray-900 mb-4">Coordonnées</h2>
-          <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <div>
-              <label for="telephone" class="block text-sm font-medium text-gray-700 mb-1">Téléphone</label>
-              <input id="telephone" type="tel" [(ngModel)]="currentEtablissement.telephone" name="telephone" class="mt-1 block w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-primary" placeholder="+216 ">
-            </div>
-            <div>
-              <label for="email" class="block text-sm font-medium text-gray-700 mb-1">Email <span class="text-red-500">*</span></label>
-              <input 
-                id="email" 
-                type="email" 
-                [(ngModel)]="currentEtablissement.email" 
-                name="email" 
-                class="mt-1 block w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-primary" 
-                placeholder="contact@etablissement.com"
-                pattern="[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$"
-                required
-                #emailField="ngModel"
-                [ngClass]="{'border-red-500': emailField.invalid && emailField.touched}"
-              >
-              <div *ngIf="emailField.invalid && emailField.touched" class="text-red-500 text-sm mt-1">
-                <span *ngIf="emailField.errors?.['required']">L'email est requis.</span>
-                <span *ngIf="emailField.errors?.['pattern']">Veuillez entrer une adresse email valide.</span>
-              </div>
-            </div>
-            <div class="md:col-span-2">
-              <label for="siteWeb" class="block text-sm font-medium text-gray-700 mb-1">Site web</label>
-              <input id="siteWeb" type="url" [(ngModel)]="currentEtablissement.siteWeb" name="siteWeb" class="mt-1 block w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-primary" placeholder="https://www.etablissement.com">
-            </div>
-          </div>
-        </div>
-
-        <!-- Description et services -->
-        <div class="bg-white rounded-lg shadow-sm p-6 mb-6">
-          <h2 class="text-lg font-medium text-gray-900 mb-4">Description et services</h2>
-          <div class="grid grid-cols-1 gap-6">
-            <div>
-              <label for="description" class="block text-sm font-medium text-gray-700 mb-1">Description</label>
-              <textarea id="description" [(ngModel)]="currentEtablissement.description" name="description" rows="4" class="mt-1 block w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-primary" placeholder="Décrivez l'établissement..."></textarea>
-            </div>
-            <div>
-              <label class="block text-sm font-medium text-gray-700 mb-1">Services proposés</label>
-              <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+            <div class="grid grid-cols-1 gap-4" [class.opacity-50]="currentEtablissement.horaires.is24_7" [class.pointer-events-none]="currentEtablissement.horaires.is24_7">
+              <div *ngFor="let day of jours" class="flex items-center space-x-4">
+                <div class="w-24 text-sm font-medium text-gray-700 capitalize">{{ day }}</div>
                 <label class="flex items-center">
-                  <input type="checkbox" (change)="toggleService('WiFi gratuit', $event)" [checked]="currentEtablissement.services.includes('WiFi gratuit')" class="form-checkbox">
-                  <span class="ml-2 text-sm text-gray-700">WiFi gratuit</span>
+                  <input type="checkbox" [(ngModel)]="currentEtablissement.horaires[day].closed" [name]="day + 'Closed'" class="form-checkbox">
+                  <span class="ml-2 text-sm text-gray-700">Fermé</span>
                 </label>
-                <label class="flex items-center">
-                  <input type="checkbox" (change)="toggleService('Parking', $event)" [checked]="currentEtablissement.services.includes('Parking')" class="form-checkbox">
-                  <span class="ml-2 text-sm text-gray-700">Parking</span>
-                </label>
-                <label class="flex items-center">
-                  <input type="checkbox" (change)="toggleService('Terrasse', $event)" [checked]="currentEtablissement.services.includes('Terrasse')" class="form-checkbox">
-                  <span class="ml-2 text-sm text-gray-700">Terrasse</span>
-                </label>
-                <label class="flex items-center">
-                  <input type="checkbox" (change)="toggleService('Livraison', $event)" [checked]="currentEtablissement.services.includes('Livraison')" class="form-checkbox">
-                  <span class="ml-2 text-sm text-gray-700">Livraison</span>
-                </label>
-                <label class="flex items-center">
-                  <input type="checkbox" (change)="toggleService('À emporter', $event)" [checked]="currentEtablissement.services.includes('À emporter')" class="form-checkbox">
-                  <span class="ml-2 text-sm text-gray-700">À emporter</span>
-                </label>
-                <label class="flex items-center">
-                  <input type="checkbox" (change)="toggleService('Réservation', $event)" [checked]="currentEtablissement.services.includes('Réservation')" class="form-checkbox">
-                  <span class="ml-2 text-sm text-gray-700">Réservation</span>
-                </label>
-                <label class="flex items-center">
-                  <input type="checkbox" (change)="toggleService('Accessibilité PMR', $event)" [checked]="currentEtablissement.services.includes('Accessibilité PMR')" class="form-checkbox">
-                  <span class="ml-2 text-sm text-gray-700">Accessibilité PMR</span>
-                </label>
-                <label class="flex items-center">
-                  <input type="checkbox" (change)="toggleService('Climatisation', $event)" [checked]="currentEtablissement.services.includes('Climatisation')" class="form-checkbox">
-                  <span class="ml-2 text-sm text-gray-700">Climatisation</span>
-                </label>
-                <label class="flex items-center">
-                  <input type="checkbox" (change)="toggleService('Piscine', $event)" [checked]="currentEtablissement.services.includes('Piscine')" class="form-checkbox">
-                  <span class="ml-2 text-sm text-gray-700">Piscine</span>
-                </label>
-                <label class="flex items-center">
-                  <input type="checkbox" (change)="toggleService('Petit-déjeuner inclus', $event)" [checked]="currentEtablissement.services.includes('Petit-déjeuner inclus')" class="form-checkbox">
-                  <span class="ml-2 text-sm text-gray-700">Petit-déjeuner inclus</span>
-                </label>
-                <label class="flex items-center">
-                  <input type="checkbox" (change)="toggleService('Paiement par carte', $event)" [checked]="currentEtablissement.services.includes('Paiement par carte')" class="form-checkbox">
-                  <span class="ml-2 text-sm text-gray-700">Paiement par carte</span>
-                </label>
-                <label class="flex items-center">
-                  <input type="checkbox" (change)="toggleService('Service de chambre', $event)" [checked]="currentEtablissement.services.includes('Service de chambre')" class="form-checkbox">
-                  <span class="ml-2 text-sm text-gray-700">Service de chambre</span>
-                </label>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <!-- Horaires d'ouverture -->
-        <div class="bg-white rounded-lg shadow-sm p-6 mb-6">
-          <h2 class="text-lg font-medium text-gray-900 mb-4">Horaires d'ouverture</h2>
-          <div class="mb-4">
-            <label class="flex items-center">
-              <input type="checkbox" [(ngModel)]="currentEtablissement.horaires.is24_7" name="is24_7" class="form-checkbox">
-              <span class="ml-2 text-sm text-gray-700">Ouvert 24h/24, 7j/7</span>
-            </label>
-          </div>
-          <div class="grid grid-cols-1 gap-4" [class.opacity-50]="currentEtablissement.horaires.is24_7" [class.pointer-events-none]="currentEtablissement.horaires.is24_7">
-            <div *ngFor="let day of jours" class="flex items-center space-x-4">
-              <div class="w-24 text-sm font-medium text-gray-700 capitalize">{{ day }}</div>
-              <label class="flex items-center">
-                <input type="checkbox" [(ngModel)]="currentEtablissement.horaires[day].closed" [name]="day + 'Closed'" class="form-checkbox">
-                <span class="ml-2 text-sm text-gray-700">Fermé</span>
-              </label>
-              <div class="flex-1 flex space-x-2" [class.opacity-50]="currentEtablissement.horaires[day].closed" [class.pointer-events-none]="currentEtablissement.horaires[day].closed">
-                <input type="time" [(ngModel)]="currentEtablissement.horaires[day].open" [name]="day + 'Open'" class="w-1/2 border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-primary">
-                <input type="time" [(ngModel)]="currentEtablissement.horaires[day].close" [name]="day + 'Close'" class="w-1/2 border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-primary">
-              </div>
-            </div>
-            <div>
-              <label for="specialHours" class="block text-sm font-medium text-gray-700 mb-1">Horaires spéciaux</label>
-              <input id="specialHours" type="text" [(ngModel)]="currentEtablissement.horaires.specialHours" name="specialHours" class="mt-1 block w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-primary" placeholder="Ex: Fermé le 1er janvier">
-            </div>
-          </div>
-        </div>
-
-        <!-- Réseaux sociaux -->
-        <div class="bg-white rounded-lg shadow-sm p-6 mb-6">
-          <h2 class="text-lg font-medium text-gray-900 mb-4">Réseaux sociaux</h2>
-          <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <div>
-              <label for="facebook" class="block text-sm font-medium text-gray-700 mb-1">Facebook</label>
-              <div class="relative">
-                <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                  <i class="ri-facebook-fill text-gray-400"></i>
+                <div class="flex-1 flex space-x-2" [class.opacity-50]="currentEtablissement.horaires[day].closed" [class.pointer-events-none]="currentEtablissement.horaires[day].closed">
+                  <input type="time" [(ngModel)]="currentEtablissement.horaires[day].open" [name]="day + 'Open'" class="w-1/2 border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-primary">
+                  <input type="time" [(ngModel)]="currentEtablissement.horaires[day].close" [name]="day + 'Close'" class="w-1/2 border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-primary">
                 </div>
-                <input id="facebook" type="url" [(ngModel)]="currentEtablissement.reseauxSociaux.facebook" name="facebook" class="mt-1 block w-full border border-gray-300 rounded-lg pl-10 pr-3 py-2 focus:outline-none focus:ring-2 focus:ring-primary" placeholder="https://facebook.com/...">
+              </div>
+              <div>
+                <label for="specialHours" class="block text-sm font-medium text-gray-700 mb-1">Horaires spéciaux</label>
+                <input id="specialHours" type="text" [(ngModel)]="currentEtablissement.horaires.specialHours" name="specialHours" class="mt-1 block w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-primary" placeholder="Ex: Fermé le 1er janvier">
               </div>
             </div>
-            <div>
-              <label for="instagram" class="block text-sm font-medium text-gray-700 mb-1">Instagram</label>
-              <div class="relative">
-                <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                  <i class="ri-instagram-fill text-gray-400"></i>
+          </div>
+
+          <!-- Réseaux sociaux -->
+          <div class="bg-white rounded-lg shadow-sm p-6 mb-6">
+            <h2 class="text-lg font-medium text-gray-900 mb-4">Réseaux sociaux</h2>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div>
+                <label for="facebook" class="block text-sm font-medium text-gray-700 mb-1">Facebook</label>
+                <div class="relative">
+                  <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                    <i class="ri-facebook-fill text-gray-400"></i>
+                  </div>
+                  <input id="facebook" type="url" [(ngModel)]="currentEtablissement.reseauxSociaux.facebook" name="facebook" class="mt-1 block w-full border border-gray-300 rounded-lg pl-10 pr-3 py-2 focus:outline-none focus:ring-2 focus:ring-primary" placeholder="https://facebook.com/...">
                 </div>
-                <input id="instagram" type="url" [(ngModel)]="currentEtablissement.reseauxSociaux.instagram" name="instagram" class="mt-1 block w-full border border-gray-300 rounded-lg pl-10 pr-3 py-2 focus:outline-none focus:ring-2 focus:ring-primary" placeholder="https://instagram.com/...">
               </div>
-            </div>
-            <div>
-              <label for="twitter" class="block text-sm font-medium text-gray-700 mb-1">Twitter</label>
-              <div class="relative">
-                <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                  <i class="ri-twitter-fill text-gray-400"></i>
+              <div>
+                <label for="instagram" class="block text-sm font-medium text-gray-700 mb-1">Instagram</label>
+                <div class="relative">
+                  <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                    <i class="ri-instagram-fill text-gray-400"></i>
+                  </div>
+                  <input id="instagram" type="url" [(ngModel)]="currentEtablissement.reseauxSociaux.instagram" name="instagram" class="mt-1 block w-full border border-gray-300 rounded-lg pl-10 pr-3 py-2 focus:outline-none focus:ring-2 focus:ring-primary" placeholder="https://instagram.com/...">
                 </div>
-                <input id="twitter" type="url" [(ngModel)]="currentEtablissement.reseauxSociaux.twitter" name="twitter" class="mt-1 block w-full border border-gray-300 rounded-lg pl-10 pr-3 py-2 focus:outline-none focus:ring-2 focus:ring-primary" placeholder="https://twitter.com/...">
               </div>
-            </div>
-            <div>
-              <label for="linkedin" class="block text-sm font-medium text-gray-700 mb-1">LinkedIn</label>
-              <div class="relative">
-                <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                  <i class="ri-linkedin-fill text-gray-400"></i>
+              <div>
+                <label for="twitter" class="block text-sm font-medium text-gray-700 mb-1">Twitter</label>
+                <div class="relative">
+                  <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                    <i class="ri-twitter-fill text-gray-400"></i>
+                  </div>
+                  <input id="twitter" type="url" [(ngModel)]="currentEtablissement.reseauxSociaux.twitter" name="twitter" class="mt-1 block w-full border border-gray-300 rounded-lg pl-10 pr-3 py-2 focus:outline-none focus:ring-2 focus:ring-primary" placeholder="https://twitter.com/...">
                 </div>
-                <input id="linkedin" type="url" [(ngModel)]="currentEtablissement.reseauxSociaux.linkedin" name="linkedin" class="mt-1 block w-full border border-gray-300 rounded-lg pl-10 pr-3 py-2 focus:outline-none focus:ring-2 focus:ring-primary" placeholder="https://linkedin.com/...">
+              </div>
+              <div>
+                <label for="linkedin" class="block text-sm font-medium text-gray-700 mb-1">LinkedIn</label>
+                <div class="relative">
+                  <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                    <i class="ri-linkedin-fill text-gray-400"></i>
+                  </div>
+                  <input id="linkedin" type="url" [(ngModel)]="currentEtablissement.reseauxSociaux.linkedin" name="linkedin" class="mt-1 block w-full border border-gray-300 rounded-lg pl-10 pr-3 py-2 focus:outline-none focus:ring-2 focus:ring-primary" placeholder="https://linkedin.com/...">
+                </div>
               </div>
             </div>
           </div>
-        </div>
 
-        <!-- Photos -->
-        <div class="bg-white rounded-lg shadow-sm p-6 mb-6">
-          <h2 class="text-lg font-medium text-gray-900 mb-4">Photos</h2>
-          <div class="mb-4">
-            <input type="file" multiple (change)="onPhotoSelected($event)">
-          </div>
-          <div *ngFor="let photo of currentEtablissement.photos; let i = index" class="relative inline-block mr-4">
-            <img [src]="resolvePhotoUrl(photo)" width="100" height="100" class="rounded-lg" />
-            <button 
-              type="button" 
-              (click)="deletePhoto(photo)" 
-              class="absolute top-0 right-0 bg-red-500 text-white rounded-full w-6 h-6 flex items-center justify-center">
-              <span class="text-xs">X</span>
-            </button>
-          </div>
-        </div>
-
-        <!-- Actions -->
-        <div class="bg-white border-t border-gray-200 p-6 sticky bottom-0 left-0 right-0 shadow-md">
-          <div class="flex justify-end space-x-3">
-            <button type="button" class="px-4 py-2 border border-gray-300 rounded-lg text-gray-700" (click)="closeModal()">Annuler</button>
-            <button type="submit" class="px-4 py-2 bg-primary text-white rounded-lg">Enregistrer</button>
-          </div>
-        </div>
-      </form>
-
-      <!-- Mode Affichage des détails -->
-      <div *ngIf="modalTitle === 'Détails de l\'établissement'" class="space-y-6">
-        <!-- Informations de base -->
-        <div class="bg-white rounded-lg shadow-sm p-6">
-          <h2 class="text-lg font-medium text-gray-900 mb-4">Informations de base</h2>
-          <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <div>
-              <label class="block text-sm font-medium text-gray-700 mb-1">Nom de l'établissement</label>
-              <p class="mt-1 text-sm text-gray-900">{{ currentEtablissement.nom }}</p>
+          <!-- Photos -->
+          <div class="bg-white rounded-lg shadow-sm p-6 mb-6">
+            <h2 class="text-lg font-medium text-gray-900 mb-4">Photos</h2>
+            <div class="mb-4">
+              <input type="file" multiple (change)="onPhotoSelected($event)">
             </div>
-            <div>
-              <label class="block text-sm font-medium text-gray-700 mb-1">Type d'établissement</label>
-              <p class="mt-1 text-sm text-gray-900">{{ currentEtablissement.type }}</p>
-            </div>
-            <div>
-              <label class="block text-sm font-medium text-gray-700 mb-1">Statut</label>
-              <p class="mt-1 text-sm text-gray-900">{{ currentEtablissement.statut }}</p>
-            </div>
-            <div>
-              <label class="block text-sm font-medium text-gray-700 mb-1">Visibilité</label>
-              <p class="mt-1 text-sm text-gray-900">{{ currentEtablissement.visibility }}</p>
-            </div>
-          </div>
-        </div>
-
-        <!-- Localisation -->
-        <div class="bg-white rounded-lg shadow-sm p-6">
-          <h2 class="text-lg font-medium text-gray-900 mb-4">Localisation</h2>
-          <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <div class="md:col-span-2">
-              <label class="block text-sm font-medium text-gray-700 mb-1">Adresse complète</label>
-              <p class="mt-1 text-sm text-gray-900">{{ currentEtablissement.adresse }}</p>
-            </div>
-            <div>
-              <label class="block text-sm font-medium text-gray-700 mb-1">Code postal</label>
-              <p class="mt-1 text-sm text-gray-900">{{ currentEtablissement.codePostal || '-' }}</p>
-            </div>
-            <div>
-              <label class="block text-sm font-medium text-gray-700 mb-1">Ville</label>
-              <p class="mt-1 text-sm text-gray-900">{{ currentEtablissement.ville || '-' }}</p>
-            </div>
-            <div>
-              <label class="block text-sm font-medium text-gray-700 mb-1">Pays</label>
-              <p class="mt-1 text-sm text-gray-900">{{ currentEtablissement.pays || '-' }}</p>
-            </div>
-            <div>
-              <label class="block text-sm font-medium text-gray-700 mb-1">Afficher sur la carte</label>
-              <p class="mt-1 text-sm text-gray-900">{{ currentEtablissement.showMap ? 'Oui' : 'Non' }}</p>
-            </div>
-          </div>
-        </div>
-
-        <!-- Coordonnées -->
-        <div class="bg-white rounded-lg shadow-sm p-6">
-          <h2 class="text-lg font-medium text-gray-900 mb-4">Coordonnées</h2>
-          <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <div>
-              <label class="block text-sm font-medium text-gray-700 mb-1">Téléphone</label>
-              <p class="mt-1 text-sm text-gray-900">{{ currentEtablissement.telephone || '-' }}</p>
-            </div>
-            <div>
-              <label class="block text-sm font-medium text-gray-700 mb-1">Email</label>
-              <p class="mt-1 text-sm text-gray-900">{{ currentEtablissement.email }}</p>
-            </div>
-            <div class="md:col-span-2">
-              <label class="block text-sm font-medium text-gray-700 mb-1">Site web</label>
-              <p class="mt-1 text-sm text-gray-900">{{ currentEtablissement.siteWeb || '-' }}</p>
-            </div>
-          </div>
-        </div>
-
-        <!-- Description et services -->
-        <div class="bg-white rounded-lg shadow-sm p-6">
-          <h2 class="text-lg font-medium text-gray-900 mb-4">Description et services</h2>
-          <div class="grid grid-cols-1 gap-6">
-            <div>
-              <label class="block text-sm font-medium text-gray-700 mb-1">Description</label>
-              <p class="mt-1 text-sm text-gray-900">{{ currentEtablissement.description || '-' }}</p>
-            </div>
-            <div>
-              <label class="block text-sm font-medium text-gray-700 mb-1">Services proposés</label>
-              <p class="mt-1 text-sm text-gray-900">{{ currentEtablissement.services.length ? currentEtablissement.services.join(', ') : '-' }}</p>
-            </div>
-          </div>
-        </div>
-
-        <!-- Horaires d'ouverture -->
-        <div class="bg-white rounded-lg shadow-sm p-6">
-          <h2 class="text-lg font-medium text-gray-900 mb-4">Horaires d'ouverture</h2>
-          <div class="mb-4">
-            <label class="block text-sm font-medium text-gray-700 mb-1">Ouvert 24h/24, 7j/7</label>
-            <p class="mt-1 text-sm text-gray-900">{{ currentEtablissement.horaires.is24_7 ? 'Oui' : 'Non' }}</p>
-          </div>
-          <div class="grid grid-cols-1 gap-4" *ngIf="!currentEtablissement.horaires.is24_7">
-            <div *ngFor="let day of jours" class="flex items-center space-x-4">
-              <div class="w-24 text-sm font-medium text-gray-700 capitalize">{{ day }}</div>
-              <p class="text-sm text-gray-900">
-                {{ currentEtablissement.horaires[day].closed ? 'Fermé' : (currentEtablissement.horaires[day].open + ' - ' + currentEtablissement.horaires[day].close) }}
-              </p>
-            </div>
-            <div>
-              <label class="block text-sm font-medium text-gray-700 mb-1">Horaires spéciaux</label>
-              <p class="mt-1 text-sm text-gray-900">{{ currentEtablissement.horaires.specialHours || '-' }}</p>
-            </div>
-          </div>
-        </div>
-
-        <!-- Réseaux sociaux -->
-        <div class="bg-white rounded-lg shadow-sm p-6">
-          <h2 class="text-lg font-medium text-gray-900 mb-4">Réseaux sociaux</h2>
-          <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <div>
-              <label class="block text-sm font-medium text-gray-700 mb-1">Facebook</label>
-              <p class="mt-1 text-sm text-gray-900">{{ currentEtablissement.reseauxSociaux.facebook || '-' }}</p>
-            </div>
-            <div>
-              <label class="block text-sm font-medium text-gray-700 mb-1">Instagram</label>
-              <p class="mt-1 text-sm text-gray-900">{{ currentEtablissement.reseauxSociaux.instagram || '-' }}</p>
-            </div>
-            <div>
-              <label class="block text-sm font-medium text-gray-700 mb-1">Twitter</label>
-              <p class="mt-1 text-sm text-gray-900">{{ currentEtablissement.reseauxSociaux.twitter || '-' }}</p>
-            </div>
-            <div>
-              <label class="block text-sm font-medium text-gray-700 mb-1">LinkedIn</label>
-              <p class="mt-1 text-sm text-gray-900">{{ currentEtablissement.reseauxSociaux.linkedin || '-' }}</p>
-            </div>
-          </div>
-        </div>
-
-        <!-- Photos -->
-        <div class="bg-white rounded-lg shadow-sm p-6">
-          <h2 class="text-lg font-medium text-gray-900 mb-4">Photos</h2>
-          <div *ngIf="currentEtablissement.photos.length; else noPhotos">
-            <div *ngFor="let photo of currentEtablissement.photos" class="inline-block mr-4">
+            <div *ngFor="let photo of currentEtablissement.photos; let i = index" class="relative inline-block mr-4">
               <img [src]="resolvePhotoUrl(photo)" width="100" height="100" class="rounded-lg" />
+              <button 
+                type="button" 
+                (click)="deletePhoto(photo)" 
+                class="absolute top-0 right-0 bg-red-500 text-white rounded-full w-6 h-6 flex items-center justify-center">
+                <span class="text-xs">X</span>
+              </button>
             </div>
           </div>
-          <ng-template #noPhotos>
-            <p class="text-sm text-gray-900">Aucune photo disponible.</p>
-          </ng-template>
-        </div>
 
-        <!-- Actions -->
-        <div class="bg-white border-t border-gray-200 p-6 sticky bottom-0 left-0 right-0 shadow-md">
-          <div class="flex justify-end">
-            <button type="button" class="px-4 py-2 border border-gray-300 rounded-lg text-gray-700" (click)="closeModal()">Fermer</button>
+          <!-- Actions -->
+          <div class="mt-6 flex justify-end space-x-3">
+            
+            <div class="flex justify-end space-x-3">
+              <button type="button" class="px-4 py-2 border border-gray-300 rounded-lg text-gray-700" (click)="closeModal()">Annuler</button>
+              <button type="submit" class="px-4 py-2 bg-primary text-white rounded-lg">Enregistrer</button>
+            </div>
+          </div>
+        </form>
+
+        <!-- Mode Affichage des détails -->
+        <div *ngIf="modalTitle === 'Détails de l\'établissement'" class="space-y-6">
+          <!-- Informations de base -->
+          <div class="fixed inset-0 z-50 bg-black bg-opacity-60 flex items-center justify-center p-4 transition-all duration-300">
+            <div class="bg-white rounded-2xl shadow-2xl max-w-5xl w-full p-8 relative overflow-y-auto max-h-[90vh] transform transition-all duration-300 scale-100 hover:scale-[1.01]">
+              <!-- Close Button -->
+              <button class="absolute top-4 right-4 text-gray-500 hover:text-red-600 transition-colors duration-200" (click)="closeModal()">
+                <i class="ri-close-line text-3xl"></i>
+              </button>
+
+              <!-- Modal Header -->
+              <div class="flex items-center space-x-4 border-b border-gray-200 pb-4 mb-6">
+                <div class="w-16 h-16 rounded-full bg-blue-100 flex items-center justify-center">
+                  <i class="ri-building-line text-3xl text-blue-600"></i>
+                </div>
+                <div>
+                  <h2 class="text-2xl font-bold text-gray-800">{{ currentEtablissement.nom }}</h2>
+                  <p class="text-sm text-gray-500">Type d’établissement : {{ currentEtablissement.type }}</p>
+                </div>
+              </div>
+
+              <!-- Basic Info Section -->
+              <div class="mb-8">
+                <h3 class="text-lg font-semibold text-gray-700 mb-4">Informations Générales</h3>
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 text-gray-600">
+                  <div class="bg-gray-50 p-4 rounded-lg shadow-sm hover:shadow-md transition-shadow duration-200">
+                    <p class="text-sm"><strong>Nom de l'établissement :</strong> {{ currentEtablissement.nom }}</p>
+                  </div>
+                  <div class="bg-gray-50 p-4 rounded-lg shadow-sm hover:shadow-md transition-shadow duration-200">
+                    <p class="text-sm"><strong>Type d'établissement :</strong> {{ currentEtablissement.type }}</p>
+                  </div>
+                  <div class="bg-gray-50 p-4 rounded-lg shadow-sm hover:shadow-md transition-shadow duration-200">
+                    <p class="text-sm"><strong>Statut :</strong> 
+                      <span class="inline-block px-3 py-1 rounded-full text-xs font-medium" 
+                            [ngClass]="{'bg-green-100 text-green-800': currentEtablissement.statut === 'Actif', 
+                                        'bg-yellow-100 text-yellow-800': currentEtablissement.statut === 'En attente',
+                                        'bg-red-100 text-red-800': currentEtablissement.statut === 'Inactif'}">
+                        {{ currentEtablissement.statut }}
+                      </span>
+                    </p>
+                  </div>
+                  <div class="bg-gray-50 p-4 rounded-lg shadow-sm hover:shadow-md transition-shadow duration-200">
+                    <p class="text-sm"><strong>Visibilité :</strong> {{ currentEtablissement.visibility }}</p>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Localisation Section -->
+              <div class="mb-8">
+                <h3 class="text-lg font-semibold text-gray-700 mb-4">Localisation</h3>
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 text-gray-600">
+                  <div class="bg-gray-50 p-4 rounded-lg shadow-sm hover:shadow-md transition-shadow duration-200">
+                    <p class="text-sm"><strong>Adresse complète :</strong> {{ currentEtablissement.adresse }}</p>
+                  </div>
+                  <div class="bg-gray-50 p-4 rounded-lg shadow-sm hover:shadow-md transition-shadow duration-200">
+                    <p class="text-sm"><strong>Code postal :</strong> {{ currentEtablissement.codePostal || '-' }}</p>
+                  </div>
+                  <div class="bg-gray-50 p-4 rounded-lg shadow-sm hover:shadow-md transition-shadow duration-200">
+                    <p class="text-sm"><strong>Ville :</strong> {{ currentEtablissement.ville || '-' }}</p>
+                  </div>
+                  <div class="bg-gray-50 p-4 rounded-lg shadow-sm hover:shadow-md transition-shadow duration-200">
+                    <p class="text-sm"><strong>Pays :</strong> {{ currentEtablissement.pays || '-' }}</p>
+                  </div>
+                  <div class="bg-gray-50 p-4 rounded-lg shadow-sm hover:shadow-md transition-shadow duration-200">
+                    <p class="text-sm"><strong>Afficher sur la carte :</strong> {{ currentEtablissement.showMap ? 'Oui' : 'Non' }}</p>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Coordonnées Section -->
+              <div class="mb-8">
+                <h3 class="text-lg font-semibold text-gray-700 mb-4">Coordonnées</h3>
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 text-gray-600">
+                  <div class="bg-gray-50 p-4 rounded-lg shadow-sm hover:shadow-md transition-shadow duration-200">
+                    <p class="text-sm"><strong>Téléphone :</strong> {{ currentEtablissement.telephone || '-' }}</p>
+                  </div>
+                  <div class="bg-gray-50 p-4 rounded-lg shadow-sm hover:shadow-md transition-shadow duration-200">
+                    <p class="text-sm"><strong>Email :</strong> {{ currentEtablissement.email }}</p>
+                  </div>
+                  <div class="bg-gray-50 p-4 rounded-lg shadow-sm hover:shadow-md transition-shadow duration-200">
+                    <p class="text-sm"><strong>Site web :</strong> {{ currentEtablissement.siteWeb || '-' }}</p>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Description et services Section -->
+              <div class="mb-8">
+                <h3 class="text-lg font-semibold text-gray-700 mb-4">Description et Services</h3>
+                <div class="bg-gray-50 p-4 rounded-lg shadow-sm hover:shadow-md transition-shadow duration-200">
+                  <p class="text-sm text-gray-600"><strong>Description :</strong> {{ currentEtablissement.description || '-' }}</p>
+                </div>
+                <div *ngIf="currentEtablissement.services.length" class="bg-gray-50 p-4 rounded-lg shadow-sm hover:shadow-md transition-shadow duration-200 mt-4">
+                  <p class="text-sm text-gray-600"><strong>Services proposés :</strong></p>
+                  <ul class="grid grid-cols-1 sm:grid-cols-2 gap-2 text-sm text-gray-600 mt-2">
+                    <li *ngFor="let service of currentEtablissement.services" class="flex items-center">
+                      <i class="ri-check-line text-green-500 mr-2"></i> {{ service }}
+                    </li>
+                  </ul>
+                </div>
+              </div>
+
+              <!-- Horaires d'ouverture Section -->
+              <div *ngIf="currentEtablissement.horaires" class="mb-8">
+                <h3 class="text-lg font-semibold text-gray-700 mb-4">Horaires d'ouverture</h3>
+                <div class="bg-gray-50 p-4 rounded-lg shadow-sm hover:shadow-md transition-shadow duration-200">
+                  <div class="mb-4">
+                    <p class="text-sm text-gray-600"><strong>Ouvert 24h/24, 7j/7 :</strong> {{ currentEtablissement.horaires.is24_7 ? 'Oui' : 'Non' }}</p>
+                  </div>
+                  <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 text-sm text-gray-600" *ngIf="!currentEtablissement.horaires.is24_7">
+                    <ng-container *ngFor="let day of jours">
+                      <div *ngIf="currentEtablissement.horaires[day]" class="flex items-center space-x-2">
+                        <i class="ri-calendar-line text-gray-400"></i>
+                        <div>
+                          <strong>{{ day | titlecase }} :</strong>
+                          <span *ngIf="!currentEtablissement.horaires[day].closed">
+                            {{ currentEtablissement.horaires[day].open }} - {{ currentEtablissement.horaires[day].close }}
+                          </span>
+                          <span *ngIf="currentEtablissement.horaires[day].closed" class="text-red-500">
+                            Fermé
+                          </span>
+                        </div>
+                      </div>
+                    </ng-container>
+                  </div>
+                  <p class="mt-4 text-sm text-gray-600" *ngIf="currentEtablissement.horaires.specialHours">
+                    <strong>Horaires spéciaux :</strong> {{ currentEtablissement.horaires.specialHours || '-' }}
+                  </p>
+                </div>
+              </div>
+
+              <!-- Réseaux sociaux Section -->
+              <div *ngIf="currentEtablissement.reseauxSociaux" class="mb-8">
+                <h3 class="text-lg font-semibold text-gray-700 mb-4">Réseaux Sociaux</h3>
+                <div class="bg-gray-50 p-4 rounded-lg shadow-sm hover:shadow-md transition-shadow duration-200">
+                  <ul class="space-y-2 text-sm">
+                    <li *ngIf="currentEtablissement.reseauxSociaux.facebook">
+                      <a [href]="currentEtablissement.reseauxSociaux.facebook" target="_blank" class="flex items-center text-blue-600 hover:underline">
+                        <i class="ri-facebook-circle-fill mr-2"></i> Facebook
+                      </a>
+                    </li>
+                    <li *ngIf="currentEtablissement.reseauxSociaux.instagram">
+                      <a [href]="currentEtablissement.reseauxSociaux.instagram" target="_blank" class="flex items-center text-pink-500 hover:underline">
+                        <i class="ri-instagram-line mr-2"></i> Instagram
+                      </a>
+                    </li>
+                    <li *ngIf="currentEtablissement.reseauxSociaux.twitter">
+                      <a [href]="currentEtablissement.reseauxSociaux.twitter" target="_blank" class="flex items-center text-blue-400 hover:underline">
+                        <i class="ri-twitter-line mr-2"></i> Twitter
+                      </a>
+                    </li>
+                    <li *ngIf="currentEtablissement.reseauxSociaux.linkedin">
+                      <a [href]="currentEtablissement.reseauxSociaux.linkedin" target="_blank" class="flex items-center text-blue-700 hover:underline">
+                        <i class="ri-linkedin-box-fill mr-2"></i> LinkedIn
+                      </a>
+                    </li>
+                  </ul>
+                </div>
+              </div>
+
+              <!-- Photos Section -->
+              <div *ngIf="currentEtablissement.photos.length" class="mb-8">
+                <h3 class="text-lg font-semibold text-gray-700 mb-4">Photos</h3>
+                <div class="bg-gray-50 p-4 rounded-lg shadow-sm hover:shadow-md transition-shadow duration-200">
+                  <div class="grid grid-cols-2 sm:grid-cols-3 gap-4">
+                    <img *ngFor="let photo of currentEtablissement.photos" 
+                         [src]="resolvePhotoUrl(photo)" 
+                         alt="photo" 
+                         class="w-full h-40 object-cover rounded-lg border border-gray-200 hover:scale-105 transition-transform duration-200">
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Actions -->
+          <div class="bg-white border-t border-gray-200 p-6 sticky bottom-0 left-0 right-0 shadow-md">
+            <div class="flex justify-end">
+              <button type="button" class="px-4 py-2 border border-gray-300 rounded-lg text-gray-700" (click)="closeModal()">Fermer</button>
+            </div>
           </div>
         </div>
       </div>
     </div>
-  </div>
 
-  <!-- Archive modal -->
-  <div class="fixed inset-0 bg-gray-900 bg-opacity-50 flex items-center justify-center z-50" [class.hidden]="!isArchiveModalOpen">
-    <div class="bg-white rounded-lg shadow-lg max-w-md w-full p-6">
-      <div class="text-center mb-6">
-        <div class="w-16 h-16 rounded-full bg-red-100 flex items-center justify-center mx-auto mb-4">
-          <div class="w-8 h-8 flex items-center justify-center text-red-500">
-            <i class="ri-archive-line"></i>
+    <!-- Archive modal -->
+    <div class="fixed inset-0 bg-gray-900 bg-opacity-50 flex items-center justify-center z-50" [class.hidden]="!isArchiveModalOpen">
+      <div class="bg-white rounded-lg shadow-lg max-w-md w-full p-6">
+        <div class="text-center mb-6">
+          <div class="w-16 h-16 rounded-full bg-red-100 flex items-center justify-center mx-auto mb-4">
+            <div class="w-8 h-8 flex items-center justify-center text-red-500">
+              <i class="ri-archive-line"></i>
+            </div>
           </div>
+          <h3 class="text-lg font-medium text-gray-900 mb-2">Confirmer l'archivage</h3>
+          <p class="text-sm text-gray-500">Êtes-vous sûr de vouloir archiver cet établissement ? Cette action peut être annulée ultérieurement.</p>
         </div>
-        <h3 class="text-lg font-medium text-gray-900 mb-2">Confirmer l'archivage</h3>
-        <p class="text-sm text-gray-500">Êtes-vous sûr de vouloir archiver cet établissement ? Cette action peut être annulée ultérieurement.</p>
-      </div>
-      <div class="flex items-center justify-end space-x-3">
-        <button class="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-200 rounded-lg hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-primary whitespace-nowrap" (click)="closeArchiveModal()">Annuler</button>
-        <button class="px-4 py-2 text-sm font-medium text-white bg-red-500 rounded-lg hover:bg-red-600 focus:outline-none focus:ring-2 focus:ring-red-500 whitespace-nowrap" (click)="archiveEtablissement()">Archiver</button>
+        <div class="flex items-center justify-end space-x-3">
+          <button class="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-200 rounded-lg hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-primary whitespace-nowrap" (click)="closeArchiveModal()">Annuler</button>
+          <button class="px-4 py-2 text-sm font-medium text-white bg-red-500 rounded-lg hover:bg-red-600 focus:outline-none focus:ring-2 focus:ring-red-500 whitespace-nowrap" (click)="archiveEtablissement()">Archiver</button>
+        </div>
       </div>
     </div>
+    <app-map-modal *ngIf="showMapPopup" [fullAddress]="selectedAddressForMap || ''" (click)="showMapPopup = false"></app-map-modal>
   </div>
-  <app-map-modal *ngIf="showMapPopup" [fullAddress]="selectedAddressForMap || ''"    (click)="showMapPopup = false"></app-map-modal>
 </div>

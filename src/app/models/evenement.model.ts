@@ -14,7 +14,11 @@ export interface Evenement {
   estPublic: boolean;
   statut: '' | 'À venir' | 'En cours' | 'Terminé';
   typeEtablissement: '' | 'Restaurant' | 'Hôtel' | 'Café' | 'Sfax';
-  establishmentId: string;
+  etablissementId: {
+    _id: string;
+    nom: string;
+    type: string;
+  };
   selected?: boolean;
   photo: string;
   prix: {
@@ -29,3 +33,4 @@ export interface Stats {
   inProgress: number;   
   completed: number;  
 }
+

@@ -101,6 +101,7 @@ export class CafeComponent implements OnInit {
             siteWeb: cafe.siteWeb
           };
         });
+        this.Cafe.reverse(); ////wasssimmmmm
         this.filteredCafe = this.Cafe; // Directly show all cafes
         this.isLoading = false;
       },

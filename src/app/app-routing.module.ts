@@ -27,9 +27,15 @@ import { AuthGuard } from './auth.guard'; // Changement du chemin d'importation
 import { PartenaireComponent } from './partenaire/partenaire/partenaire.component';
 import { ProfilePartenaireComponent } from './partenaire/profile-partenaire/profile-partenaire.component';
 import { PartenaireEtablissementsComponent } from './partenaire/partenaire-etablissements/partenaire-etablissements.component';
-import { PartenaireEvenementsComponent } from './partenaire/partenaire-evenements/partenaire-evenements.component';
-import { PartenairePromotionsComponent } from './partenaire/partenaire-promotions/partenaire-promotions.component';
+// import { PartenaireEvenementsComponent } from './partenaire/partenaire-evenements/partenaire-evenements.component';
+// import { PartenairePromotionsComponent } from './partenaire/partenaire-promotions/partenaire-promotions.component';
 import { GestionDesPublicitesComponent } from './admin/gestion-des-publicites/gestion-des-publicites.component';
+import { HistoireComponent } from './histoire/histoire.component';
+import { HeritageDetailComponent } from './heritage-detail/heritage-detail.component';
+import { TemoignagesComponent } from './components/temoignages/temoignages.component';
+import { DecouvrirSfaxComponent } from './decouvrir-sfax/decouvrir-sfax.component';
+
+
 
 
 const routes: Routes = [
@@ -46,6 +52,13 @@ const routes: Routes = [
   { path: 'connexion', component: ConnexionComponent }, 
   { path: 'inscription', component: InscriptionComponent }, 
   { path: 'home', component: HomeComponent }, 
+  { path: 'histoire', component: HistoireComponent }, 
+  { path: 'heritage/:id', component: HeritageDetailComponent },
+  { path: 'temoignages', component: TemoignagesComponent }, 
+  { path: 'decouvrire', component: DecouvrirSfaxComponent },
+
+
+  
   { path: 'navbar', component: NavbarComponent },
   { path: 'footer', component: FooterComponent },
   { path: '', redirectTo: '/home', pathMatch: 'full' },
@@ -60,8 +73,8 @@ const routes: Routes = [
   { path: 'partenaire', component: PartenaireComponent, canActivate: [AuthGuard] },
   { path: 'profile-partenaire', component: ProfilePartenaireComponent , canActivate: [AuthGuard]},
   { path: 'partenaire-etablissements', component: PartenaireEtablissementsComponent , canActivate: [AuthGuard]},
-  { path: 'partenaire-evenements', component: PartenaireEvenementsComponent , canActivate: [AuthGuard]},
-  { path: 'partenaire-promotions', component: PartenairePromotionsComponent , canActivate: [AuthGuard]},
+  // { path: 'partenaire-evenements', component: PartenaireEvenementsComponent , canActivate: [AuthGuard]},
+  // { path: 'partenaire-promotions', component: PartenairePromotionsComponent , canActivate: [AuthGuard]},
   { path: 'publicites', component: GestionDesPublicitesComponent , canActivate: [AuthGuard]},
 
   

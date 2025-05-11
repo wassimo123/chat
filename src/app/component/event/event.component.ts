@@ -7,6 +7,7 @@ import { EvenementService } from '../../services/evenement.service';
 import { Evenement } from '../../models/evenement.model';
 import { forkJoin, Observable } from 'rxjs';
 import { HttpClient } from '@angular/common/http';
+import { trigger, transition, style, animate } from '@angular/animations';
 
 interface FilterOption {
   name: string;
@@ -23,6 +24,17 @@ interface EvenementWithName extends Evenement {
   imports: [CommonModule, FormsModule, NavbarComponent, FooterComponent],
   templateUrl: './event.component.html',
   styleUrls: ['./event.component.css'],
+  animations: [
+    trigger('fadeAnimation', [
+      transition(':enter', [
+        style({ opacity: 0, transform: 'translateY(10px)' }),
+        animate('400ms ease-out', style({ opacity: 1, transform: 'translateY(0)' }))
+      ]),
+      transition(':leave', [
+        animate('200ms ease-in', style({ opacity: 0 }))
+      ])
+    ])
+  ]
 })
 export class EventComponent implements OnInit {
   events: EvenementWithName[] = [];
@@ -94,11 +106,11 @@ export class EventComponent implements OnInit {
             : 'https://via.placeholder.com/400x250',
         })) as EvenementWithName[];
 
-        const establishmentIds = [...new Set(this.events.map(e => e.establishmentId).filter(id => id))];
+        const establishmentIds = [...new Set(this.events.map(e => e.etablissementId).filter(id => id))];
         console.log('IDs des établissements à récupérer :', establishmentIds);
 
         const requests: Observable<{ _id: string; nom: string }>[] = establishmentIds.map(id =>
-          this.evenementService.getEtablissementById(id)
+          this.evenementService.getEtablissementById(id._id)
         );
 
         if (requests.length > 0) {
@@ -111,10 +123,9 @@ export class EventComponent implements OnInit {
 
               this.events = this.events.map(event => ({
                 ...event,
-                establishmentName: this.establishmentNames.get(event.establishmentId) || 'Inconnu',
-              }));
+                establishmentName: this.establishmentNames.get(event.etablissementId._id) || 'Inconnu',
+              }));  
 
-              // Filter out events with status "Terminé" or "En cours"
               this.filteredEvents = this.events.filter(e => e.statut === 'À venir');
               this.sortEvents();
               this.updatePagination();
@@ -125,7 +136,6 @@ export class EventComponent implements OnInit {
                 ...event,
                 establishmentName: 'Inconnu',
               }));
-              // Filter out events with status "Terminé" or "En cours"
               this.filteredEvents = this.events.filter(e => e.statut === 'À venir');
               this.sortEvents();
               this.updatePagination();
@@ -137,7 +147,6 @@ export class EventComponent implements OnInit {
             ...event,
             establishmentName: 'Inconnu',
           }));
-          // Filter out events with status "Terminé" or "En cours"
           this.filteredEvents = this.events.filter(e => e.statut === 'À venir');
           this.sortEvents();
           this.updatePagination();
@@ -157,7 +166,6 @@ export class EventComponent implements OnInit {
 
   filterEvents() {
     this.filteredEvents = this.events.filter((event) => {
-      // Only include events with status "À venir"
       if (event.statut !== 'À venir') {
         return false;
       }
@@ -244,6 +252,7 @@ export class EventComponent implements OnInit {
     if (this.currentPage > 1) {
       this.currentPage--;
       this.updatePagination();
+      window.scrollTo({ top: 0, behavior: 'smooth' });
     }
   }
 
@@ -251,12 +260,14 @@ export class EventComponent implements OnInit {
     if (this.currentPage < this.totalPages) {
       this.currentPage++;
       this.updatePagination();
+      window.scrollTo({ top: 0, behavior: 'smooth' });
     }
   }
 
   goToPage(page: number): void {
     this.currentPage = page;
     this.updatePagination();
+    window.scrollTo({ top: 0, behavior: 'smooth' });
   }
 
   getPages(): number[] {
