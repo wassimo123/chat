@@ -34,6 +34,10 @@ module.exports = {
       colors: {
         primary: "#4F46E5",
         secondary: "#6B7280",
+        cafe: {
+          light: "#d5b185", // fond
+          dark: "#6d4c41"   // texte
+        }
       },
       borderRadius: {
         none: "0px",

@@ -1,4 +1,3 @@
-<!-- promotions.component.html -->
 <app-navbar></app-navbar>
 
 <main class="pt-24 pb-12">
@@ -13,7 +12,7 @@
             [(ngModel)]="searchQuery"
             (ngModelChange)="filterPromotions()"
             placeholder="Rechercher une promotion..."
-            class="w-full pl-10 pr-4 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent text-sm"
+            class="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-full focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent text-sm"
           />
           <div
             class="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 flex items-center justify-center text-gray-400"
@@ -21,14 +20,15 @@
             <i class="ri-search-line"></i>
           </div>
         </div>
-
+        
+        <!-- Categories -->
         <div class="mb-6">
-          <h4 class="font-medium mb-3">Catégories</h4>
+          <h4 class="text-sm font-medium text-gray-700 uppercase tracking-wider mb-3">Catégories</h4>
           <div class="space-y-2">
             <label class="flex items-center" *ngFor="let category of categories">
               <input
                 type="checkbox"
-                class="custom-checkbox mr-2"
+                class="checkbox-custom mr-2"
                 [(ngModel)]="category.selected"
                 (ngModelChange)="filterPromotions()"
               />
@@ -37,29 +37,47 @@
           </div>
         </div>
 
+        <!-- Price -->
         <div class="mb-6">
-          <h4 class="font-medium mb-3">Prix</h4>
-          <input
-            type="range"
-            min="0"
-            max="500"
-            [(ngModel)]="priceRange"
-            (ngModelChange)="filterPromotions()"
-            class="custom-range"
-          />
-          <div class="flex justify-between text-sm text-gray-600">
-            <span>0 €</span>
-            <span>500 €</span>
+          <h4 class="text-sm font-medium text-gray-700 uppercase tracking-wider mb-3">Prix (DT)</h4>
+          <div class="flex items-center space-x-3">
+            <div class="flex-1">
+              <label class="block text-sm text-gray-600 mb-1">Min</label>
+              <div class="relative">
+                <input
+                  type="number"
+                  [(ngModel)]="priceMin"
+                  (ngModelChange)="filterPromotions()"
+                  placeholder="0"
+                  class="w-full px-3 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent text-sm pr-10"
+                />
+                <span class="absolute inset-y-0 right-3 flex items-center text-gray-500">DT</span>
+              </div>
+            </div>
+            <div class="flex-1">
+              <label class="block text-sm text-gray-600 mb-1">Max</label>
+              <div class="relative">
+                <input
+                  type="number"
+                  [(ngModel)]="priceMax"
+                  (ngModelChange)="filterPromotions()"
+                  placeholder="500"
+                  class="w-full px-3 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent text-sm pr-10"
+                />
+                <span class="absolute inset-y-0 right-3 flex items-center text-gray-500">DT</span>
+              </div>
+            </div>
           </div>
         </div>
 
+        <!-- Promotion Types -->
         <div class="mb-6">
-          <h4 class="font-medium mb-3">Type de promotion</h4>
+          <h4 class="text-sm font-medium text-gray-700 uppercase tracking-wider mb-3">Type de promotion</h4>
           <div class="space-y-2">
             <label class="flex items-center" *ngFor="let type of promotionTypes">
               <input
                 type="checkbox"
-                class="custom-checkbox mr-2"
+                class="checkbox-custom mr-2"
                 [(ngModel)]="type.selected"
                 (ngModelChange)="filterPromotions()"
               />
@@ -68,213 +86,209 @@
           </div>
         </div>
 
+        <!-- Agenda -->
         <div class="mb-6">
-          <h4 class="font-medium mb-3">Validité</h4>
-          <div class="space-y-3">
-            <div>
-              <label class="block text-sm mb-1">Du</label>
-              <input
-                type="date"
-                [(ngModel)]="startDate"
-                (ngModelChange)="filterPromotions()"
-                class="w-full p-2 border border-gray-300 rounded text-sm"
-              />
+          <h4 class="text-sm font-medium text-gray-700 uppercase tracking-wider mb-3">Agenda</h4>
+          <div class="space-y-4">
+            <div class="agenda-field">
+              <label class="block text-sm font-medium text-gray-700 mb-1">Du</label>
+              <div class="relative">
+                <input
+                  type="date"
+                  [(ngModel)]="startDate"
+                  (ngModelChange)="filterPromotions()"
+                  class="w-full pl-3 pr-5 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary text-sm transition-all duration-300"
+                />
+              </div>
             </div>
-            <div>
-              <label class="block text-sm mb-1">Au</label>
-              <input
-                type="date"
-                [(ngModel)]="endDate"
-                (ngModelChange)="filterPromotions()"
-                class="w-full p-2 border border-gray-300 rounded text-sm"
-              />
+            <div class="agenda-field">
+              <label class="block text-sm font-medium text-gray-700 mb-1">Au</label>
+              <div class="relative">
+                <input
+                  type="date"
+                  [(ngModel)]="endDate"
+                  (ngModelChange)="filterPromotions()"
+                  class="w-full pl-3 pr-5 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary text-sm transition-all duration-300"
+                />
+              </div>
             </div>
           </div>
         </div>
-
-        <div class="mb-6">
-          <h4 class="font-medium mb-3">Options</h4>
-          <div class="space-y-3">
-            <label class="flex items-center justify-between">
-              <span>Nouvelles offres uniquement</span>
-              <label class="custom-switch">
-                <input
-                  type="checkbox"
-                  [(ngModel)]="newOffersOnly"
-                  (ngModelChange)="filterPromotions()"
-                />
-                <span class="switch-slider"></span>
-              </label>
-            </label>
-            <label class="flex items-center justify-between">
-              <span>Offres qui expirent bientôt</span>
-              <label class="custom-switch">
-                <input
-                  type="checkbox"
-                  [(ngModel)]="expiringSoon"
-                  (ngModelChange)="filterPromotions()"
-                />
-                <span class="switch-slider"></span>
-              </label>
-            </label>
-          </div>
-        </div>
-
-        <button
-          class="w-full bg-primary text-white py-2 rounded-button"
-          (click)="filterPromotions()"
-        >
-          Appliquer les filtres
-        </button>
       </aside>
 
       <!-- Main Content -->
       <section class="w-full md:w-3/4">
-        <div class="flex flex-col md:flex-row justify-between items-center mb-6">
+        <div class="flex flex-col md:flex-row justify-between md:items-center mb-6">
           <h1 class="text-3xl font-bold text-gray-900 mb-4 md:mb-0">
             Promotions et offres spéciales
           </h1>
-          <div class="flex items-center space-x-4">
-            <span class="text-sm text-gray-600">Trier par :</span>
-            <div class="relative">
-              <select
-                [(ngModel)]="sortOption"
-                (ngModelChange)="sortPromotions()"
-                class="bg-white px-4 py-2 rounded-button border appearance-none pr-8 hover:border-primary"
-              >
-                <option value="recent">Les plus récentes</option>
-                <option value="expiry">Fin de validité</option>
-                <option value="discountAsc">Réduction (croissant)</option>
-                <option value="discountDesc">Réduction (décroissant)</option>
-              </select>
-              <i
-                class="ri-arrow-down-s-line absolute right-3 top-3 text-gray-400"
-              ></i>
+          <div class="w-full md:w-auto flex justify-end">
+            <div class="flex items-center space-x-3">
+              <span class="text-sm text-gray-600">Trier par :</span>
+              <div class="relative">
+                <select
+                  [(ngModel)]="sortOption"
+                  (ngModelChange)="sortPromotions()"
+                  class="bg-white px-4 py-2 rounded-full border border-gray-300 pl-4 pr-8 focus:outline-none focus:ring-2 focus:ring-primary"
+                >
+                  <option value="recent">Les plus récentes</option>
+                  <option value="dateAsc">Date plus proche</option>
+                  <option value="dateDesc">Date plus éloignée</option>
+                  <option value="discountAsc">Réduction croissante</option>
+                  <option value="discountDesc">Réduction décroissante</option>
+                </select>
+                <i class="ri-arrow-down-s-line absolute right-3 top-3 text-gray-400"></i>
+              </div>
             </div>
           </div>
         </div>
 
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
           <div
-            *ngFor="let promotion of filteredPromotions"
+            *ngFor="let promotion of paginatedPromotions"
             class="bg-white rounded-lg shadow-lg overflow-hidden promotion-card"
           >
             <div class="relative">
+              <!--saghari-->
               <img
-                [src]="promotion.image"
-                [alt]="promotion.title"
-                class="w-full h-48 object-cover"
-              />
+              [src]="'http://localhost:5000' + promotion.photo"
+              [alt]="promotion.name"
+              class="w-full h-48 object-cover"
+              (error)="promotion.photo = 'https://via.placeholder.com/300'"
+            />
+            
               <div
                 class="absolute top-4 left-4 bg-red-500 text-white px-3 py-1 rounded-full text-sm font-semibold"
                 *ngIf="promotion.discount"
               >
                 {{ promotion.discount }}
               </div>
-              <div
+              <!-- <div
                 class="absolute top-4 right-4 bg-primary text-white px-3 py-1 rounded-full text-sm font-semibold"
                 *ngIf="promotion.isNew"
               >
                 Nouveau
-              </div>
-              <div
-                class="absolute top-4 right-4 bg-yellow-500 text-white px-3 py-1 rounded-full text-sm font-semibold"
-                *ngIf="promotion.expiringSoon"
-              >
-                Expire bientôt
-              </div>
+              </div> -->
+              <!-- Nouveau badge TYPE d'établissement (ex: Café, Hôtel...) -->
+                  <div
+                  class="absolute top-4 right-4 px-3 py-1 rounded-full text-sm font-semibold shadow-sm"
+                  [ngClass]="getCategoryBadgeClass(promotion.category)"
+                  >
+                  {{ promotion.category }}
+                  </div>
             </div>
             <div class="p-6">
               <div class="flex items-center justify-between mb-4">
                 <span class="text-sm text-primary"
-                  >Valable jusqu'au
-                  {{ promotion.expiry | date : "dd MMMM yyyy" }}</span
+                  >Valable jusqu'au {{ promotion.endDate | date: "dd MMMM yyyy" }}</span
                 >
-                <span class="bg-blue-100 text-primary px-3 py-1 rounded-full text-sm"
-                  >{{ promotion.category }}</span
-                >
+                <!-- <span
+                class="px-3 py-1 rounded-full text-sm font-semibold"
+                [ngClass]="getBadgeClass(promotion.category)"
+              >
+                {{ promotion.category }}
+              </span> -->
+              
+                
               </div>
-              <h3 class="text-xl font-semibold mb-2">{{ promotion.title }}</h3>
+
+              <!-- Nouvelle structure de titre + icône -->
+              <div class="flex items-center space-x-3 mb-1">
+                <div
+                  class="w-10 h-10 rounded-full flex items-center justify-center"
+                  [ngClass]="[getCategoryIconData(promotion.category).bgClass, getCategoryIconData(promotion.category).colorClass]"
+                >
+                  <i [ngClass]="getCategoryIconData(promotion.category).icon" class="text-xl"></i>
+                </div>
+                <h3 class="text-xl font-semibold text-gray-800">{{ promotion.title }}</h3>
+              </div>
+
+              <p class="text-base text-gray-800 leading-normal mb-2">
+                Établissement: {{ promotion.etablissementName }}
+              </p>
+              
+              
+
+              <div class="flex items-center mb-2">
+                <i class="ri-calendar-line text-gray-600 mr-2"></i>
+                <p class="text-sm text-gray-600">
+                  {{ promotion.startDate | date: "dd/MM/yyyy" }} -
+                  {{ promotion.endDate | date: "dd/MM/yyyy" }}
+                </p>
+              </div>
+
               <p class="text-gray-600 mb-4">{{ promotion.description }}</p>
+
               <div class="flex items-center justify-between mb-4">
                 <div class="flex items-center space-x-2">
-                  <span class="text-2xl font-bold text-primary">{{
-                    promotion.price
-                  }}</span>
-                  <span class="text-gray-400 line-through">{{
-                    promotion.originalPrice
-                  }}</span>
+                  <span class="text-2xl font-bold text-primary">
+                    {{ promotion.price === 'N/A' ? 'N/A' : promotion.price + ' DT' }}
+                  </span>
+                  <span class="text-gray-400 line-through">
+                    {{ promotion.originalPrice === 'N/A' ? 'N/A' : promotion.originalPrice + ' DT' }}
+                  </span>
                 </div>
-                <span class="text-sm font-medium text-primary">{{
-                  promotion.code
-                }}</span>
+                <div class="text-center mt-4">
+                  <div class="flex items-center justify-center space-x-2 mb-1">
+                    <span class="text-lg">🎟️</span>
+                    <span class="text-sm font-bold text-gray-700">Code promo</span>
+                  </div>
+                  <span class="inline-block bg-purple-100 text-primary font-semibold px-3 py-1 rounded-full text-sm">
+                    {{ promotion.code }}
+                  </span>
+                </div>
+                
+                
               </div>
+
               <div class="flex justify-between items-center">
                 <button
-                  class="bg-primary text-white px-4 py-2 rounded-button hover:bg-blue-700"
-                  (click)="redirectToBookingSite(promotion.bookingUrl)"
+                  class="bg-primary text-white px-4 py-1.5 rounded-lg text-sm hover:bg-indigo-600 focus:outline-none focus:ring-2 focus:ring-primary info-button"
+                  (click)="openPromotionModal(promotion)"
                 >
-                  Réserver
+                  Plus d'infos
                 </button>
                 <div class="flex space-x-2">
                   <div
-                    class="w-8 h-8 flex items-center justify-center rounded-full bg-gray-100 text-gray-600 hover:bg-gray-200 cursor-pointer"
-                    (click)="toggleBookmark(promotion)"
+                    class="w-8 h-8 flex items-center justify-center rounded-full bg-gray-100 text-gray-600 hover:bg-gray-200 cursor-pointer notify-icon"
+                    (click)="openNotifyModal(promotion)"
                   >
-                    <i
-                      [class]="
-                        promotion.bookmarked
-                          ? 'ri-bookmark-fill text-primary'
-                          : 'ri-bookmark-line'
-                      "
-                    ></i>
-                  </div>
-                  <div
-                    class="w-8 h-8 flex items-center justify-center rounded-full bg-gray-100 text-gray-600 hover:bg-gray-200 cursor-pointer"
-                  >
-                    <i class="ri-share-line"></i>
+                    <i class="ri-notification-line"></i>
                   </div>
                 </div>
               </div>
             </div>
           </div>
         </div>
-
         <!-- Pagination -->
-        <div class="mt-8 flex justify-center">
-          <nav class="flex items-center space-x-1">
-            <a
-              href="#"
-              class="px-3 py-2 rounded-md text-gray-500 hover:bg-gray-100"
-              ><i class="ri-arrow-left-s-line"></i
-            ></a>
-            <a
-              href="#"
-              class="px-3 py-2 rounded-md bg-primary text-white"
-              >1</a
-            >
-            <a
-              href="#"
-              class="px-3 py-2 rounded-md text-gray-700 hover:bg-gray-100"
-              >2</a
-            >
-            <a
-              href="#"
-              class="px-3 py-2 rounded-md text-gray-700 hover:bg-gray-100"
-              >3</a
-            >
-            <span class="px-3 py-2 text-gray-500">...</span>
-            <a
-              href="#"
-              class="px-3 py-2 rounded-md text-gray-700 hover:bg-gray-100"
-              >8</a
-            >
-            <a
-              href="#"
-              class="px-3 py-2 rounded-md text-gray-500 hover:bg-gray-100"
-              ><i class="ri-arrow-right-s-line"></i
-            ></a>
-          </nav>
+        <div class="mt-10 flex justify-center items-center space-x-3">
+          <button
+            class="w-10 h-10 flex items-center justify-center rounded-full border border-gray-300 text-gray-600 hover:bg-gray-100"
+            [disabled]="currentPage === 1"
+            (click)="goToPage(currentPage - 1)"
+          >
+            <i class="ri-arrow-left-s-line text-xl"></i>
+          </button>
+
+          <button
+            *ngFor="let page of totalPagesArray"
+            (click)="goToPage(page)"
+            class="w-10 h-10 flex items-center justify-center rounded-full border text-sm font-medium"
+            [ngClass]="{
+              'bg-[#5B5BD6] text-white border-[#5B5BD6]': currentPage === page,
+              'text-gray-700 border-gray-300 hover:bg-gray-100': currentPage !== page
+            }"
+          >
+            {{ page }}
+          </button>
+
+          <button
+            class="w-10 h-10 flex items-center justify-center rounded-full border border-gray-300 text-gray-600 hover:bg-gray-100"
+            [disabled]="currentPage === totalPages"
+            (click)="goToPage(currentPage + 1)"
+          >
+            <i class="ri-arrow-right-s-line text-xl"></i>
+          </button>
         </div>
       </section>
     </div>
@@ -285,38 +299,147 @@
 <section class="bg-gray-50 py-12">
   <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
     <div class="max-w-3xl mx-auto text-center">
-      <h3 class="text-2xl font-bold mb-4">
-        Restez informé des meilleures offres
-      </h3>
+      <h3 class="text-2xl font-bold mb-4">Restez informé des meilleures offres</h3>
       <p class="text-gray-600 mb-6">
-        Inscrivez-vous à notre newsletter pour recevoir en avant-première les
-        promotions exclusives et les nouvelles offres de la ville de Sfax.
+        Inscrivez-vous à notre newsletter pour recevoir en avant-première les promotions exclusives et les nouvelles offres de la ville de Sfax.
       </p>
-      <div class="flex flex-col sm:flex-row gap-3 max-w-md mx-auto">
+
+      <form (ngSubmit)="subscribe()" class="flex flex-col sm:flex-row justify-center items-center gap-3 max-w-xl mx-auto">
         <input
           type="email"
+          [(ngModel)]="newsletterEmail"
+          name="newsletterEmail"
+          required
           placeholder="Votre adresse email"
-          class="flex-grow px-4 py-3 rounded-md border border-gray-300 focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
+          class="w-full sm:w-auto flex-grow px-5 py-3 text-sm border border-gray-300 rounded-full focus:outline-none focus:ring-2 focus:ring-primary"
+          [ngClass]="{
+            'bg-blue-50': isDuplicate,
+            'border-red-500': emailError || isDuplicate
+          }"
         />
         <button
-          class="bg-primary text-white px-6 py-3 rounded-button hover:bg-blue-700"
+          type="submit"
+          class="bg-[#5B5BD6] text-white px-6 py-3 rounded-full text-sm font-semibold hover:bg-[#4747c5] transition"
         >
           S'abonner
         </button>
-      </div>
-      <div class="mt-4 flex items-center justify-center">
-        <input
-          type="checkbox"
-          class="custom-checkbox mr-2"
-          [(ngModel)]="personalizedAlerts"
-        />
-        <span class="text-sm text-gray-600"
-          >Je souhaite recevoir des alertes personnalisées selon mes
-          préférences</span
-        >
-      </div>
+      </form>
+
+      <p *ngIf="newsletterSuccess" class="mt-3 text-sm text-green-600 text-center">
+        Inscription réussie à la newsletter !
+      </p>
+      <p *ngIf="isDuplicate" class="mt-3 text-sm text-red-600 text-center">
+        Cet email est déjà inscrit à la newsletter.
+      </p>
+      <p *ngIf="emailError" class="mt-3 text-sm text-red-600 text-center">
+        Veuillez saisir une adresse email valide.
+      </p>
     </div>
   </div>
 </section>
 
 <app-footer></app-footer>
+
+<!-- Promotion Detail Modal -->
+<div
+  class="fixed inset-0 z-50 bg-black bg-opacity-60 flex items-center justify-center p-4 transition-all duration-300"
+  [class.hidden]="!showNotifyModal"
+>
+  <div
+    class="bg-white rounded-2xl shadow-2xl max-w-lg w-full p-8 relative overflow-y-auto max-h-[90vh] transform transition-all duration-300 scale-100 hover:scale-[1.01]"
+  >
+    <!-- Close Button -->
+    <button
+      class="absolute top-4 right-4 text-gray-500 hover:text-red-600 transition-colors duration-200"
+      (click)="closeModal()"
+    >
+      <i class="ri-close-line text-3xl"></i>
+    </button>
+
+    <!-- Modal Header -->
+    <div class="flex items-center space-x-4 border-b border-gray-200 pb-4 mb-6">
+      <div class="w-16 h-16 rounded-full bg-blue-100 flex items-center justify-center">
+        <i class="ri-price-tag-3-line text-3xl text-blue-600"></i>
+      </div>
+      <div>
+        <h2 class="text-2xl font-bold text-gray-800">Détails de la promotion</h2>
+        <p class="text-sm text-gray-500">{{ selectedPromotion?.title }}</p>
+      </div>
+    </div>
+
+    <!-- Modal Content -->
+    <div *ngIf="selectedPromotion as promo" class="space-y-6 text-sm text-gray-700">
+      <div class="bg-gray-50 p-4 rounded-lg shadow-sm">
+        <p><strong class="font-semibold">Nom de la promotion :</strong> {{ promo.title }}</p>
+      </div>
+      <div class="bg-gray-50 p-4 rounded-lg shadow-sm">
+        <p><strong class="font-semibold">Type d’établissement :</strong> {{ promo.category }}</p>
+      </div>
+      <div class="bg-gray-50 p-4 rounded-lg shadow-sm">
+        <p><strong class="font-semibold">Nom de l’établissement :</strong> {{ promo.etablissementName }}</p>
+      </div>
+      <div class="bg-gray-50 p-4 rounded-lg shadow-sm">
+        <p><strong class="font-semibold">Type de promotion :</strong> {{ promo.type || 'Non spécifié' }}</p>
+      </div>
+      <div class="bg-gray-50 p-4 rounded-lg shadow-sm">
+        <p><strong class="font-semibold">Valeur de la promotion :</strong> {{ promo.discount || 'N/A' }}</p>
+      </div>
+      <div class="bg-gray-50 p-4 rounded-lg shadow-sm text-center">
+        <p class="text-sm font-semibold text-gray-700 mb-2">Code promo</p>
+        <span class="inline-block bg-purple-100 text-primary font-semibold px-3 py-1 rounded-full">
+          {{ promo.code }}
+        </span>
+      </div>
+      <div class="bg-gray-50 p-4 rounded-lg shadow-sm">
+        <p><strong class="font-semibold">Date de début :</strong> {{ promo.startDate | date: 'dd MMMM yyyy' }}</p>
+      </div>
+      <div class="bg-gray-50 p-4 rounded-lg shadow-sm">
+        <p><strong class="font-semibold">Date de fin :</strong> {{ promo.endDate | date: 'dd MMMM yyyy' }}</p>
+      </div>
+      <div class="bg-gray-50 p-4 rounded-lg shadow-sm">
+        <p><strong class="font-semibold">Limite d’utilisation :</strong> {{ promo.limit || 'Illimité' }}</p>
+      </div>
+      <div class="bg-gray-50 p-4 rounded-lg shadow-sm">
+        <p><strong class="font-semibold">Prix avant réduction :</strong> {{ promo.originalPrice || 'N/A' }} DT</p>
+      </div>
+      <div class="bg-gray-50 p-4 rounded-lg shadow-sm">
+        <p><strong class="font-semibold">Prix après réduction :</strong> {{ promo.price || 'N/A' }} DT</p>
+      </div>
+      <div class="bg-gray-50 p-4 rounded-lg shadow-sm">
+        <p><strong class="font-semibold">Description :</strong> {{ promo.description || 'Aucune description.' }}</p>
+      </div>
+      <div *ngIf="promo.conditions" class="bg-gray-50 p-4 rounded-lg shadow-sm">
+        <p class="font-semibold mb-2">Conditions :</p>
+        <ul class="list-disc ml-6 space-y-1">
+          <li *ngIf="promo.conditions.minPurchase">
+            Montant minimum d’achat :
+            {{ promo.conditions.minPurchaseAmount || 'Non précisé' }} DT
+          </li>
+          <li *ngIf="promo.conditions.newCustomers">
+            Réservée aux nouveaux clients
+          </li>
+          <li *ngIf="promo.conditions.specificItems && promo.conditions.specificItems.length > 0">
+            Produits spécifiques :
+            {{ promo.conditions.specificItems.join(', ') }}
+          </li>
+          <li *ngIf="promo.conditions.specificDays && promo.conditions.specificDays.length > 0">
+            Jours valides :
+            {{ promo.conditions.specificDays.join(', ') }}
+          </li>
+        </ul>
+      </div>
+      
+    </div>
+    
+
+    <!-- Modal Actions -->
+    <div class="mt-6 flex justify-end">
+      <button
+        (click)="closeModal()"
+        class="px-4 py-2 bg-primary text-white rounded-lg hover:bg-blue-600 transition-colors duration-200"
+      >
+        Fermer
+      </button>
+    </div>
+  </div>
+</div>

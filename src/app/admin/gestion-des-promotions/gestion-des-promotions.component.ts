@@ -1,10 +1,11 @@
 import { Component, OnInit, AfterViewInit, ElementRef, ViewChild } from '@angular/core';
 import { Chart } from 'chart.js';
 import { registerables } from 'chart.js';
-import { PromotionService, Promotion } from '../../services/promotion.service';
+import { PromotionService, Etablissement } from '../../services/promotion.service';
 import { NotificationService } from 'src/app/services/notification.service';
 import { UserService } from '../../services/user.service';
 import { Router } from '@angular/router';
+import { Promotion } from '../../models/promotion.model';
 
 Chart.register(...registerables);
 
@@ -20,7 +21,7 @@ interface PromoStats {
 @Component({
   selector: 'app-gestion-des-promotions',
   templateUrl: './gestion-des-promotions.component.html',
-  styleUrls: ['./gestion-des-promotions.component.css']
+  styleUrls: ['./gestion-des-promotions.component.css'],
 })
 export class GestionDesPromotionsComponent implements OnInit, AfterViewInit {
   @ViewChild('typeChart') typeChartRef!: ElementRef<HTMLCanvasElement>;
@@ -30,11 +31,18 @@ export class GestionDesPromotionsComponent implements OnInit, AfterViewInit {
   statusChart: Chart | null = null;
   isDetailModalOpen: boolean = false;
   promotionDetails: Promotion | null = null;
-  
+
+  selectedEstablishmentType: string = '';
+  showEstablishmentFilter: boolean = false;
+  showEstablishmentListFilter: boolean = false;
+
+
   promotions: Promotion[] = [];
   notifications: any[] = [];
-  etablissementsType: any[] = []; // Dynamic establishments based on type
-  availableTypes: string[] = ['Hôtel', 'Restaurant', 'Café', 'Sfax']; // Added Sfax
+  etablissements: Etablissement[] = [];
+  filteredEtablissements: Etablissement[] = [];
+  etablissementsType: Etablissement[] = [];
+  availableTypes: string[] = ['Hôtel', 'Restaurant', 'Café', 'Sfax'];
   selectedType: string = '';
 
   stats: PromoStats = { total: 0, percentage: 0, fixed: 0, freeitem: 0, bundle: 0, special: 0 };
@@ -54,7 +62,6 @@ export class GestionDesPromotionsComponent implements OnInit, AfterViewInit {
   selectedStatus: string = '';
   selectedEstablishment: string = '';
   showStatusFilter: boolean = false;
-  showEstablishmentFilter: boolean = false;
   days: string[] = ['lundi', 'mardi', 'mercredi', 'jeudi', 'vendredi', 'samedi', 'dimanche'];
   isAuthenticated: boolean = false;
   isProfileMenuOpen: boolean = false;
@@ -65,7 +72,7 @@ export class GestionDesPromotionsComponent implements OnInit, AfterViewInit {
   sortDirection: 'asc' | 'desc' = 'asc';
   selectAll: boolean = false;
 
-  selectedFiles: File[] = [];
+  selectedFile: File | null = null;
 
   constructor(
     private promotionService: PromotionService,
@@ -75,7 +82,6 @@ export class GestionDesPromotionsComponent implements OnInit, AfterViewInit {
   ) {}
 
   ngOnInit() {
-    // Vérification de l'authentification
     const token = localStorage.getItem('token');
     const userData = localStorage.getItem('user');
     if (!token || !userData) {
@@ -83,7 +89,7 @@ export class GestionDesPromotionsComponent implements OnInit, AfterViewInit {
       this.router.navigate(['/connexion'], { queryParams: { error: 'unauthorized' } });
       return;
     }
-
+  
     const user = JSON.parse(userData);
     if (!user || !user.email) {
       this.isAuthenticated = false;
@@ -92,35 +98,47 @@ export class GestionDesPromotionsComponent implements OnInit, AfterViewInit {
       this.router.navigate(['/connexion'], { queryParams: { error: 'unauthorized' } });
       return;
     }
-
+  
     this.isAuthenticated = true;
-
-    this.loadPromotions();
-    this.notificationService.notifications$.subscribe(notifications => {
-      let unreadNotifications = notifications.filter(notif => !notif.read);
-      const updatedNotifications: any[] = [];
-      const checkPromises = unreadNotifications.map(notif => {
+    
+    this.promotionService.getEtablissements().subscribe({
+      next: (etabs) => {
+        this.etablissements = etabs;
+        this.filteredEtablissements = [...etabs];
+        this.loadPromotions();
+      },
+      error: (err) => {
+        this.showNotification(err.message, 'error');
+      },
+    });
+  
+    this.notificationService.notifications$.subscribe((notifications) => {
+      let unreadNotifications = notifications.filter((notif) => !notif.read);
+      const checkPromises = unreadNotifications.map((notif) => {
         if (!notif.email) {
           return Promise.resolve(null);
         }
-        return this.userService.checkUserExists(notif.email).toPromise().then(
-          (response) => {
-            if (response && response.exists) {
-              return notif;
-            } else {
-              console.log(`Utilisateur avec email ${notif.email} n'existe plus, suppression de la notification.`);
+        return this.userService
+          .checkUserExists(notif.email)
+          .toPromise()
+          .then(
+            (response) => {
+              if (response && response.exists) {
+                return notif;
+              } else {
+                console.log(`Utilisateur avec email ${notif.email} n'existe plus, suppression de la notification.`);
+                return null;
+              }
+            },
+            (error) => {
+              console.error(`Erreur lors de la vérification de l'utilisateur ${notif.email}:`, error);
               return null;
             }
-          },
-          error => {
-            console.error(`Erreur lors de la vérification de l'utilisateur ${notif.email}:`, error);
-            return null;
-          }
-        );
+          );
       });
-
-      Promise.all(checkPromises).then(results => {
-        this.notifications = results.filter(notif => notif !== null);
+  
+      Promise.all(checkPromises).then((results) => {
+        this.notifications = results.filter((notif) => notif !== null) as any[];
       });
     });
   }
@@ -131,37 +149,61 @@ export class GestionDesPromotionsComponent implements OnInit, AfterViewInit {
     }
   }
 
-  onTypeChange(): void {
-    if (this.selectedType) {
-      this.promotionService.getEtablissementsByType(this.selectedType).subscribe({
-        next: (etabs) => {
-          this.etablissementsType = etabs;
-          // Reset establishmentId if it's not in the new list
-          if (!etabs.some(e => e._id === this.currentPromotion.establishmentId)) {
-            this.currentPromotion.establishmentId = '';
-          }
-        },
-        error: () => {
-          this.showNotification('Erreur lors du chargement des établissements', 'error');
-        }
-      });
-    } else {
-      this.etablissementsType = [];
-      this.currentPromotion.establishmentId = '';
-    }
+  loadAllEtablissements(): void {
+    this.promotionService.getEtablissements().subscribe({
+      next: (etabs) => {
+        this.etablissements = etabs;
+        this.filteredEtablissements = [...etabs]; // Initialize with all establishments
+      },
+      error: (err) => {
+        this.showNotification(err.message, 'error');
+      },
+    });
   }
+
+  // Select a type and filter establishments
+selectEstablishmentType(type: string): void {
+  this.selectedEstablishmentType = type === '' ? '' : type; // Reset to empty string for "Tous"
+  this.showEstablishmentFilter = false;
+  this.currentPage = 1;
+
+  if (type) {
+    this.promotionService.getEtablissementsByType(type).subscribe({
+      next: (etabs) => {
+        this.filteredEtablissements = etabs;
+        this.selectedEstablishment = ''; // Reset establishment filter when type changes
+        this.filterPromotions();
+      },
+      error: () => {
+        this.showNotification('Erreur lors du chargement des établissements', 'error');
+      },
+    });
+  } else {
+    this.filteredEtablissements = [...this.etablissements]; // Reset to all establishments
+    this.selectedEstablishment = '';
+    this.filterPromotions();
+  }
+}
 
   loadPromotions(): void {
     this.promotionService.getPromotions().subscribe({
       next: (promotions) => {
-        this.promotions = promotions.map(p => ({
-          ...p,
-          id: p._id,
-          selected: false,
-          establishmentId: p.establishmentId.toString(), // Convert to string
-          startDate: new Date(p.startDate).toISOString().split('T')[0],
-          endDate: new Date(p.endDate).toISOString().split('T')[0]
-        }));
+        this.promotions = promotions.map((p: any) => {
+          const etab = this.etablissements.find((e) => e._id === p.etablissementId);
+          return {
+            ...p,
+            id: p._id,
+            selected: false,
+            etablissementId: {
+              _id: p.etablissementId,
+              nom: etab ? etab.nom : 'Inconnu',
+              type: etab ? etab.type : '',
+            },
+            startDate: new Date(p.startDate).toISOString().split('T')[0],
+            endDate: new Date(p.endDate).toISOString().split('T')[0],
+            establishmentName: etab ? etab.nom : 'Inconnu',
+          };
+        });
         this.filteredPromotions = [...this.promotions];
         this.updateStats();
         this.updatePagination();
@@ -169,8 +211,26 @@ export class GestionDesPromotionsComponent implements OnInit, AfterViewInit {
       },
       error: (err: Error) => {
         this.showNotification(err.message, 'error');
-      }
+      },
     });
+  }
+
+  onTypeChange(): void {
+    this.etablissementsType = [];
+    this.currentPromotion.etablissementId = { _id: '', nom: '', type: '' };
+    if (this.selectedType) {
+      this.promotionService.getEtablissementsByType(this.selectedType).subscribe({
+        next: (etabs) => {
+          this.etablissementsType = etabs;
+          if (!etabs.some((e) => e._id === this.currentPromotion.etablissementId._id)) {
+            this.currentPromotion.etablissementId = { _id: '', nom: '', type: '' };
+          }
+        },
+        error: () => {
+          this.showNotification('Erreur lors du chargement des établissements', 'error');
+        },
+      });
+    }
   }
 
   initCharts(): void {
@@ -230,15 +290,14 @@ export class GestionDesPromotionsComponent implements OnInit, AfterViewInit {
       if (ctx) {
         const statusCounts = [
           this.promotions.filter((p) => p.status === 'active').length,
-          this.promotions.filter((p) => p.status === 'scheduled').length,
-          this.promotions.filter((p) => p.status === 'expired').length,
           this.promotions.filter((p) => p.status === 'pending').length,
+          this.promotions.filter((p) => p.status === 'expired').length,
         ];
 
         this.statusChart = new Chart(ctx, {
           type: 'bar',
           data: {
-            labels: ['Actif', 'Programmé', 'Expiré', 'En Attente'],
+            labels: ['Actif', 'En Attente', 'Expiré'],
             datasets: [
               {
                 data: statusCounts,
@@ -246,7 +305,6 @@ export class GestionDesPromotionsComponent implements OnInit, AfterViewInit {
                   'rgba(87, 181, 231, 1)',
                   'rgba(141, 211, 199, 1)',
                   'rgba(251, 191, 114, 1)',
-                  'rgba(252, 141, 98, 1)',
                 ],
                 borderRadius: 8,
                 borderWidth: 0,
@@ -301,9 +359,8 @@ export class GestionDesPromotionsComponent implements OnInit, AfterViewInit {
 
       const statusCounts = [
         this.promotions.filter((p) => p.status === 'active').length,
-        this.promotions.filter((p) => p.status === 'scheduled').length,
-        this.promotions.filter((p) => p.status === 'expired').length,
         this.promotions.filter((p) => p.status === 'pending').length,
+        this.promotions.filter((p) => p.status === 'expired').length,
       ];
       this.statusChart.data.datasets[0].data = statusCounts;
       this.statusChart.update();
@@ -312,64 +369,72 @@ export class GestionDesPromotionsComponent implements OnInit, AfterViewInit {
 
   createEmptyPromotion(): Promotion {
     return {
+      id: '',
       name: '',
-      establishmentId: '',
-      establishmentName: '',
       discount: '',
       startDate: '',
       endDate: '',
-      status: 'pending',
+      status: '',
       type: '',
       code: '',
-      limit: undefined,
+      limit: null,
       description: '',
-      photos: [],
+      photo: null, // Updated to allow null or string/array
+      prixAvant: null,
+      prixApres: null,
       conditions: {
         minPurchase: false,
-        minPurchaseAmount: undefined,
+        minPurchaseAmount: null,
         newCustomers: false,
         specificItems: false,
         specificDays: false,
-        days: {}
+        days: {},
       },
-      selected: false
+      etablissementId: {
+        _id: '',
+        nom: '',
+        type: '',
+      },
+      selected: false,
     };
   }
+//saghari
+photoPreviewUrl: string | null = null; // Pour prévisualiser
 
-  onPhotosChange(event: any): void {
-    this.selectedFiles = Array.from(event.target.files);
-    const previewPhotos = this.currentPromotion.photos ? [...this.currentPromotion.photos] : [];
+onPhotoChange(event: any): void {
+  const file = event.target.files[0];
+  if (file) {
+    this.selectedFile = file;
 
-    for (let file of this.selectedFiles) {
-      const reader = new FileReader();
-      reader.onload = (e: any) => {
-        if (!previewPhotos.includes(e.target.result)) {
-          previewPhotos.push(e.target.result);
-        }
-        this.currentPromotion.photos = [...previewPhotos];
-      };
-      reader.readAsDataURL(file);
-    }
+    const reader = new FileReader();
+    reader.onload = () => {
+      this.photoPreviewUrl = reader.result as string; // ✅ uniquement pour affichage
+    };
+    reader.readAsDataURL(file);
   }
+}
 
-  removePhoto(photo: string): void {
-    this.currentPromotion.photos = this.currentPromotion.photos?.filter(p => p !== photo) || [];
-    this.selectedFiles = this.selectedFiles.filter(file => {
-      const reader = new FileReader();
-      reader.readAsDataURL(file);
-      reader.onload = (e: any) => {
-        return e.target.result !== photo;
-      };
-      return true;
-    });
+removePhoto(): void {
+  this.selectedFile = null;
+  this.photoPreviewUrl = null;
+  this.currentPromotion.photo = null; // annule photo existante
+}
+getPhotoUrl(photo: string | string[]|null|undefined): string {
+  if (Array.isArray(photo)) {
+    return photo.length > 0 ? `http://localhost:5000${photo[0]}` : 'https://via.placeholder.com/300';
   }
+  return photo ? `http://localhost:5000${photo}` : 'https://via.placeholder.com/300';
+}
+
+  
 
   openAddPromotionModal(): void {
     this.modalTitle = 'Ajouter une promotion';
     this.currentPromotion = this.createEmptyPromotion();
     this.selectedType = '';
     this.etablissementsType = [];
-    this.selectedFiles = [];
+    this.selectedFile = null;
+    this.photoPreviewUrl = null;
     this.isModalOpen = true;
     setTimeout(() => {
       const modalContent = document.querySelector('.modal-content');
@@ -393,37 +458,45 @@ export class GestionDesPromotionsComponent implements OnInit, AfterViewInit {
       return;
     }
     this.promotionService.getPromotion(promotion.id).subscribe({
-      next: (updatedPromotion) => {
+      next: (updatedPromotion: any) => {
+        const etab = this.etablissements.find((e) => e._id === updatedPromotion.etablissementId);
         this.currentPromotion = {
           ...updatedPromotion,
           id: updatedPromotion._id,
-          establishmentId: updatedPromotion.establishmentId.toString(),
+          etablissementId: {
+            _id: updatedPromotion.etablissementId,
+            nom: etab ? etab.nom : 'Inconnu',
+            type: etab ? etab.type : '',
+          },
           startDate: new Date(updatedPromotion.startDate).toISOString().split('T')[0],
           endDate: new Date(updatedPromotion.endDate).toISOString().split('T')[0],
-          selected: false
+          selected: false,
+          establishmentName: etab ? etab.nom : 'Inconnu',
         };
-        // Load the establishment type and list
-        this.promotionService.getEtablissementsByType(this.currentPromotion.establishmentId).subscribe({
-          next: (etabs) => {
-            this.etablissementsType = etabs;
-            this.selectedType = etabs.find(e => e._id === this.currentPromotion.establishmentId)?.type || '';
-          },
-          error: () => {
-            this.showNotification('Erreur lors du chargement des établissements', 'error');
-          }
-        });
-        this.selectedFiles = [];
+        this.selectedType = this.currentPromotion.etablissementId.type;
+        this.etablissementsType = [];
+        if (this.selectedType) {
+          this.promotionService.getEtablissementsByType(this.selectedType).subscribe({
+            next: (etabs) => {
+              this.etablissementsType = etabs;
+            },
+            error: () => {
+              this.showNotification('Erreur lors du chargement des établissements', 'error');
+            },
+          });
+        }
+        this.selectedFile = null;
         this.isModalOpen = true;
       },
       error: (err: Error) => {
         this.showNotification(err.message, 'error');
-      }
+      },
     });
   }
 
   closeModal(): void {
     this.isModalOpen = false;
-    this.selectedFiles = [];
+    this.selectedFile = null;
     this.selectedType = '';
     this.etablissementsType = [];
   }
@@ -439,14 +512,31 @@ export class GestionDesPromotionsComponent implements OnInit, AfterViewInit {
   }
 
   savePromotion(): void {
-    if (!this.currentPromotion.name || !this.currentPromotion.establishmentId || !this.currentPromotion.type ||
-        !this.currentPromotion.discount || !this.currentPromotion.startDate || !this.currentPromotion.endDate ||
-        !this.currentPromotion.status) {
-      this.showNotification('Veuillez remplir tous les champs obligatoires.', 'error');
+    if (
+      !this.currentPromotion.name ||
+      !this.currentPromotion.etablissementId._id ||
+      !this.currentPromotion.type ||
+      !this.currentPromotion.discount ||
+      !this.currentPromotion.startDate ||
+      !this.currentPromotion.endDate ||
+      !this.currentPromotion.status
+    ) {
+      this.showNotification('Veuillez remplir tous les champs obligatoires, y compris le type et le statut.', 'error');
       return;
     }
 
-    // Validate dates
+    const validTypes: string[] = ['percentage', 'fixed', 'freeitem', 'bundle', 'special'];
+    if (!validTypes.includes(this.currentPromotion.type)) {
+      this.showNotification('Veuillez sélectionner un type valide.', 'error');
+      return;
+    }
+
+    const validStatuses: string[] = ['active', 'pending', 'expired'];
+    if (!validStatuses.includes(this.currentPromotion.status)) {
+      this.showNotification('Veuillez sélectionner un statut valide.', 'error');
+      return;
+    }
+
     const startDate = new Date(this.currentPromotion.startDate);
     const endDate = new Date(this.currentPromotion.endDate);
     if (isNaN(startDate.getTime()) || isNaN(endDate.getTime())) {
@@ -459,27 +549,30 @@ export class GestionDesPromotionsComponent implements OnInit, AfterViewInit {
     }
 
     if (!this.currentPromotion.id) {
-      this.promotionService.addPromotion(this.currentPromotion, this.selectedFiles).subscribe({
-        next: (promotion) => {
+      this.promotionService.addPromotion(this.currentPromotion, this.selectedFile || undefined).subscribe({
+        next: () => {
           this.closeModal();
           this.loadPromotions();
           this.showNotification('Promotion ajoutée avec succès !', 'success');
         },
         error: (err: Error) => {
           this.showNotification(err.message, 'error');
-        }
+        },
       });
     } else {
-      this.promotionService.updatePromotion(this.currentPromotion.id, this.currentPromotion, this.selectedFiles).subscribe({
-        next: (promotion) => {
-          this.closeModal();
-          this.loadPromotions();
-          this.showNotification('Promotion modifiée avec succès !', 'success');
-        },
-        error: (err: Error) => {
-          this.showNotification(err.message, 'error');
-        }
-      });
+      this.promotionService
+      .updatePromotion(this.currentPromotion.id, this.currentPromotion, this.selectedFile ? [this.selectedFile] : undefined)
+    
+        .subscribe({
+          next: () => {
+            this.closeModal();
+            this.loadPromotions();
+            this.showNotification('Promotion modifiée avec succès !', 'success');
+          },
+          error: (err: Error) => {
+            this.showNotification(err.message, 'error');
+          },
+        });
     }
   }
 
@@ -493,7 +586,7 @@ export class GestionDesPromotionsComponent implements OnInit, AfterViewInit {
         },
         error: (err: Error) => {
           this.showNotification(err.message, 'error');
-        }
+        },
       });
     }
   }
@@ -524,10 +617,18 @@ export class GestionDesPromotionsComponent implements OnInit, AfterViewInit {
     this.showEstablishmentFilter = false;
   }
 
-  toggleEstablishmentFilter(): void {
-    this.showEstablishmentFilter = !this.showEstablishmentFilter;
-    this.showStatusFilter = false;
-  }
+  // Toggle the type filter dropdown
+toggleEstablishmentFilter(): void {
+  this.showEstablishmentFilter = !this.showEstablishmentFilter;
+  this.showStatusFilter = false;
+  this.showEstablishmentListFilter = false; // Close other dropdowns
+}
+// Toggle the establishment filter dropdown (for the optional second dropdown)
+toggleEstablishmentListFilter(): void {
+  this.showEstablishmentListFilter = !this.showEstablishmentListFilter;
+  this.showStatusFilter = false;
+  this.showEstablishmentFilter = false; // Close other dropdowns
+}
 
   selectStatus(status: string): void {
     this.selectedStatus = status;
@@ -538,26 +639,27 @@ export class GestionDesPromotionsComponent implements OnInit, AfterViewInit {
 
   selectEstablishment(establishmentId: string): void {
     this.selectedEstablishment = establishmentId;
-    this.showEstablishmentFilter = false;
+    this.showEstablishmentListFilter = false;
     this.currentPage = 1;
     this.filterPromotions();
   }
 
   filterPromotions(): void {
-    this.filteredPromotions = this.promotions.filter(promotion => {
+    this.filteredPromotions = this.promotions.filter((promotion) => {
       const matchesSearch = this.tableSearchQuery
         ? promotion.name.toLowerCase().includes(this.tableSearchQuery.toLowerCase())
         : true;
-      const matchesStatus = this.selectedStatus
-        ? promotion.status === this.selectedStatus
+      const matchesStatus = this.selectedStatus ? promotion.status === this.selectedStatus : true;
+      const matchesEstablishmentType = this.selectedEstablishmentType
+        ? promotion.etablissementId.type === this.selectedEstablishmentType
         : true;
       const matchesEstablishment = this.selectedEstablishment
-        ? promotion.establishmentId === this.selectedEstablishment
+        ? promotion.etablissementId._id === this.selectedEstablishment
         : true;
-
-      return matchesSearch && matchesStatus && matchesEstablishment;
+  
+      return matchesSearch && matchesStatus && matchesEstablishmentType && matchesEstablishment;
     });
-
+  
     this.sortPromotions();
     this.updatePagination();
     this.updateCharts();
@@ -583,9 +685,9 @@ export class GestionDesPromotionsComponent implements OnInit, AfterViewInit {
           valueA = a.name;
           valueB = b.name;
           break;
-        case 'establishmentId':
-          valueA = this.getEstablishmentName(a.establishmentId);
-          valueB = this.getEstablishmentName(b.establishmentId);
+        case 'establishmentName':
+          valueA = a.etablissementId.nom;
+          valueB = b.etablissementId.nom;
           break;
         case 'discount':
           valueA = a.discount;
@@ -654,12 +756,12 @@ export class GestionDesPromotionsComponent implements OnInit, AfterViewInit {
 
   toggleSelectAll(): void {
     this.selectAll = !this.selectAll;
-    this.paginatedPromotions.forEach(promotion => (promotion.selected = this.selectAll));
+    this.paginatedPromotions.forEach((promotion) => (promotion.selected = this.selectAll));
   }
 
   toggleSelection(promotion: Promotion): void {
     promotion.selected = !promotion.selected;
-    this.selectAll = this.paginatedPromotions.every(p => p.selected);
+    this.selectAll = this.paginatedPromotions.every((p) => p.selected);
   }
 
   viewPromotion(promotion: Promotion): void {
@@ -669,57 +771,111 @@ export class GestionDesPromotionsComponent implements OnInit, AfterViewInit {
     }
   
     this.promotionService.getPromotion(promotion.id).subscribe({
-      next: (promo) => {
+      next: (promo: any) => {
+        const etab = this.etablissements.find((e) => e._id === promo.etablissementId);
         this.promotionDetails = {
           ...promo,
           id: promo._id,
+          etablissementId: {
+            _id: promo.etablissementId,
+            nom: etab ? etab.nom : 'Inconnu',
+            type: etab ? etab.type : '',
+          },
           startDate: new Date(promo.startDate).toISOString(),
-          endDate: new Date(promo.endDate).toISOString()
-        };
+          endDate: new Date(promo.endDate).toISOString(),
+          establishmentName: etab ? etab.nom : 'Inconnu',
+          photo: promo.photo ?? null,
+          // Ensure photo is handled as string or array
+        }; 
+        console.log('promotionDetails.photo:', this.promotionDetails?.photo);
+        this.photoPreviewUrl = null;
         this.isDetailModalOpen = true;
       },
       error: (err: Error) => {
         this.showNotification(err.message, 'error');
-      }
+      },
     });
   }
+// Getter to return photos as an array (or empty array if not an array)
+get photoArray(): string[] {
+  const photo = this.promotionDetails?.photo ?? null;
+  if (this.isPhotoArray(photo)) {
+    return photo;
+  }
+  if (typeof photo === 'string') {
+    return [photo];
+  }
+  return [];
+}
+
+
+
+isPhotoString(photos: string | string[] | null | undefined): photos is string {
+  return typeof photos === 'string';
+}
+
   closeDetailModal(): void {
     this.isDetailModalOpen = false;
     this.promotionDetails = null;
   }
-    
 
-  getEstablishmentName(id: string): string {
-    return this.etablissementsType.find(e => e._id === id)?.nom || 'Inconnu';
-  }
-
-  getStatusBadgeClass(status: string): string {
+  getStatusBadgeClass(status: string | undefined): string {
     switch (status) {
       case 'active':
         return 'bg-green-100 text-green-800';
-      case 'scheduled':
-        return 'bg-blue-100 text-blue-800';
-      case 'expired':
-        return 'bg-gray-100 text-gray-800';
       case 'pending':
         return 'bg-yellow-100 text-yellow-800';
+      case 'expired':
+        return 'bg-gray-100 text-gray-800';
       default:
         return 'bg-gray-100 text-gray-800';
     }
   }
 
-  getStatusLabel(status: string): string {
+  getStatusLabel(status: string | undefined): string {
     switch (status) {
       case 'active':
         return 'Actif';
-      case 'scheduled':
-        return 'Programmé';
-      case 'expired':
-        return 'Expiré';
       case 'pending':
         return 'En Attente';
+      case 'expired':
+        return 'Expiré';
       default:
         return 'Inconnu';
     }
   }
+
+  getEstablishmentName(id: string | undefined): string {
+    if (!id) return 'Inconnu';
+    const etab = this.etablissements.find((e) => e._id === id);
+    return etab ? etab.nom : 'Inconnu';
+  }
+
+  updateEtablissementDetails(etablissementId: string): void {
+    const selectedEtab = this.etablissementsType.find((etab) => etab._id === etablissementId);
+    if (selectedEtab) {
+      this.currentPromotion.etablissementId = {
+        _id: selectedEtab._id,
+        nom: selectedEtab.nom,
+        type: selectedEtab.type || this.selectedType,
+      };
+    } else {
+      this.currentPromotion.etablissementId = { _id: '', nom: '', type: '' };
+    }
+  }
+
+isPhotoArray(photos: string | string[] | null | undefined): photos is string[] {
+  return Array.isArray(photos);
 }
+
+
+  // Helper method to get selected days for conditions
+  getSelectedDays(days: { [key: string]: boolean }): string {
+    const selected = this.days.filter(day => days[day]);
+    return selected.length ? selected.join(', ') : 'Aucun jour spécifié';
+  }
+}
+
+
+
+

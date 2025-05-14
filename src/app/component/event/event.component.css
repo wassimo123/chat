@@ -201,12 +201,15 @@ input:focus, select:focus, textarea:focus {
   to { transform: translateY(0); opacity: 1; }
 }
 
+/* Supprime la flèche native du select */
 select {
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%236B7280'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M19 9l-7 7-7-7'%3E%3C/path%3E%3C/svg%3E");
-  background-position: right 0.5rem center;
-  background-repeat: no-repeat;
-  background-size: 1.5em 1.5em;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  appearance: none;
+  background-image: none !important; /* désactive la flèche par défaut */
+  padding-right: 2.5rem; /* espace pour l’icône personnalisée */
 }
+
 
 input[type="date"] {
   appearance: none;

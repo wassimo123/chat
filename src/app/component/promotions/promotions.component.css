@@ -59,32 +59,34 @@ button:active {
   }
 }
 
-.custom-checkbox {
+
+.checkbox-custom {
   appearance: none;
   width: 1.25rem;
   height: 1.25rem;
   border: 2px solid #d1d5db;
-  border-radius: 4px;
+  border-radius: 0.375rem;
   background-color: white;
   cursor: pointer;
+  transition: background-color 0.2s ease;
   position: relative;
 }
 
-.custom-checkbox:checked {
-  background-color: #3b82f6;
-  border-color: #3b82f6;
+.checkbox-custom:checked {
+  background-color: #6366f1;
+  border-color: #6366f1;
 }
 
-.custom-checkbox:checked::after {
+.checkbox-custom:checked::after {
   content: '';
   position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  width: 0.5rem;
-  height: 0.5rem;
-  background-color: white;
-  border-radius: 1px;
+  top: 2px;
+  left: 5px;
+  width: 4px;
+  height: 8px;
+  border: solid white;
+  border-width: 0 2px 2px 0;
+  transform: rotate(45deg);
 }
 
 .custom-range {
@@ -153,6 +155,7 @@ button:active {
   border-radius: 50%;
 }
 
+
 input:checked + .switch-slider {
   background-color: #3b82f6;
 }
@@ -165,9 +168,28 @@ input:checked + .switch-slider:before {
   border-radius: 8px;
 }
 
+/* Supprime la flèche native du select */
 select {
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%236B7280'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M19 9l-7 7-7-7'%3E%3C/path%3E%3C/svg%3E");
-  background-position: right 0.5rem center;
-  background-repeat: no-repeat;
-  background-size: 1.5em 1.5em;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  appearance: none;
+  background-image: none !important; /* désactive la flèche par défaut */
+  padding-right: 2.5rem; /* espace pour l’icône personnalisée */
+}
+.notify-icon {
+  transition: transform 0.2s ease-in-out, background-color 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+}
+
+.notify-icon:hover {
+  transform: scale(1.1);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+}
+
+.info-button {
+  transition: transform 0.2s ease-in-out, background-color 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+}
+
+.info-button:hover {
+  transform: scale(1.05);
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
 }

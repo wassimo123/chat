@@ -36,27 +36,36 @@
           </button>
   
           <!-- Video Modal -->
-          <div *ngIf="isVideoModalOpen" class="fixed inset-0 z-50">
-            <div (click)="closeVideoModal()" class="absolute inset-0 bg-black/70"></div>
-            <div class="relative z-10 min-h-screen flex items-center justify-center p-4">
-              <div class="bg-white rounded-lg w-full max-w-4xl">
-                <div class="p-6 border-b border-gray-200">
-                  <div class="flex justify-between items-center">
-                    <h3 class="text-2xl font-bold text-gray-800">Découvrez Sfax</h3>
-                    <button (click)="closeVideoModal()" class="text-gray-500 hover:text-gray-700" aria-label="Close video modal">
-                      <div class="w-8 h-8 flex items-center justify-center">
-                        <i class="ri-close-line ri-lg" aria-hidden="true"></i>
-                      </div>
-                    </button>
-                  </div>
-                </div>
-                <div class="relative" style="padding-top: 56.25%">
-                  <iframe [src]="videoUrl" class="absolute inset-0 w-full h-full" title="Découvrez Sfax" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
-                </div>
-              </div>
+<div *ngIf="isVideoModalOpen" class="fixed inset-0 z-50 flex items-center justify-center bg-black/70">
+  <!-- Backdrop -->
+  <div (click)="closeVideoModal()" class="absolute inset-0 bg-black/70"></div>
+
+  <!-- Modal Content -->
+  <div class="relative z-50 bg-white rounded-lg w-full max-w-4xl mx-auto p-6">
+    <!-- Modal Header -->
+    <div class="p-6 border-b border-gray-200 flex justify-between items-center">
+      <h3 class="text-2xl font-bold text-gray-800">Découvrez Sfax</h3>
+      <button (click)="closeVideoModal()" class="text-gray-500 hover:text-gray-700" aria-label="Close video modal">
+        <div class="w-8 h-8 flex items-center justify-center">
+          <i class="ri-close-line ri-lg" aria-hidden="true"></i>
+        </div>
+      </button>
+    </div>
+
+            <!-- Modal Body (Iframe) -->
+            <div class="relative w-full pt-[56.25%]"> <!-- 16:9 aspect ratio -->
+              <iframe
+                [src]="videoUrl"
+                class="absolute top-0 left-0 w-full h-full"
+                title="Découvrez Sfax"
+                frameborder="0"
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                allowfullscreen
+              ></iframe> 
             </div>
           </div>
-          <!-- End Modal -->
+        </div>
+        <!-- End Modal -->
         </div>
       </div>
     </div>

@@ -155,51 +155,69 @@
       </div>
 
       <!-- Filters -->
-      <div class="bg-white rounded-lg shadow-sm p-6 mb-6">
-        <div class="flex flex-col md:flex-row md:items-center md:space-x-4">
-          <div class="relative flex-1 mb-4 md:mb-0">
-            <div class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
-              <div class="w-5 h-5 flex items-center justify-center text-gray-400">
-                <i class="ri-search-line"></i>
-              </div>
-            </div>
-            <input type="text" class="bg-gray-50 border border-gray-200 text-gray-900 text-sm rounded-lg block w-full pl-10 p-2.5 focus:outline-none focus:ring-2 focus:ring-primary" placeholder="Rechercher une promotion..." [(ngModel)]="tableSearchQuery" (input)="filterPromotions()">
+     <!-- Filters -->
+<div class="bg-white rounded-lg shadow-sm p-6 mb-6">
+  <div class="flex flex-col md:flex-row md:items-center md:space-x-4">
+    <div class="relative flex-1 mb-4 md:mb-0">
+      <div class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
+        <div class="w-5 h-5 flex items-center justify-center text-gray-400">
+          <i class="ri-search-line"></i>
+        </div>
+      </div>
+      <input type="text" class="bg-gray-50 border border-gray-200 text-gray-900 text-sm rounded-lg block w-full pl-10 p-2.5 focus:outline-none focus:ring-2 focus:ring-primary" placeholder="Rechercher une promotion..." [(ngModel)]="tableSearchQuery" (input)="filterPromotions()">
+    </div>
+    <div class="flex flex-col md:flex-row md:items-center space-y-4 md:space-y-0 md:space-x-4">
+      <div class="relative">
+        <button class="flex items-center justify-between w-full md:w-32 px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-200 rounded-lg hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-primary whitespace-nowrap" (click)="toggleStatusFilter()">
+          <span>{{ selectedStatus ? getStatusLabel(selectedStatus) : 'Statut' }}</span>
+          <div class="w-4 h-4 flex items-center justify-center ml-2">
+            <i class="ri-arrow-down-s-line"></i>
           </div>
-          <div class="flex flex-col md:flex-row md:items-center space-y-4 md:space-y-0 md:space-x-4">
-            <div class="relative">
-              <button class="flex items-center justify-between w-full md:w-40 px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-200 rounded-lg hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-primary whitespace-nowrap" (click)="toggleStatusFilter()">
-                <span>{{ selectedStatus ? getStatusLabel(selectedStatus) : 'Statut' }}</span>
-                <div class="w-4 h-4 flex items-center justify-center ml-2">
-                  <i class="ri-arrow-down-s-line"></i>
-                </div>
-              </button>
-              <div class="absolute mt-1 right-0 md:right-auto bg-white rounded-lg shadow-lg z-10" [class.hidden]="!showStatusFilter">
-                <div class="py-1">
-                  <a class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 cursor-pointer" (click)="selectStatus('')">Tous</a>
-                  <a class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 cursor-pointer" (click)="selectStatus('active')">Actif</a>
-                  <a class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 cursor-pointer" (click)="selectStatus('scheduled')">Programmé</a>
-                  <a class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 cursor-pointer" (click)="selectStatus('expired')">Expiré</a>
-                  <a class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 cursor-pointer" (click)="selectStatus('pending')">En Attente</a>
-                </div>
-              </div>
-            </div>
-            <div class="relative">
-              <button class="flex items-center justify-between w-full md:w-40 px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-200 rounded-lg hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-primary whitespace-nowrap" (click)="toggleEstablishmentFilter()">
-                <span>{{ selectedEstablishment ? getEstablishmentName(selectedEstablishment) : 'Établissement' }}</span>
-                <div class="w-4 h-4 flex items-center justify-center ml-2">
-                  <i class="ri-arrow-down-s-line"></i>
-                </div>
-              </button>
-              <div class="absolute mt-1 right-0 md:right-auto bg-white rounded-lg shadow-lg z-10" [class.hidden]="!showEstablishmentFilter">
-                <div class="py-1">
-                  <a class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 cursor-pointer" (click)="selectEstablishment('')">Tous</a>
-                  <a *ngFor="let establishment of etablissementsType" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 cursor-pointer" (click)="selectEstablishment(establishment._id)">{{ establishment.nom }}</a>
-                </div>
-              </div>
-            </div>
+        </button>
+        <div class="absolute mt-1 right-0 md:right-auto bg-white rounded-lg shadow-lg z-10" [class.hidden]="!showStatusFilter">
+          <div class="py-1">
+            <a class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 cursor-pointer" (click)="selectStatus('')">Tous</a>
+            <a class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 cursor-pointer" (click)="selectStatus('active')">Actif</a>
+            <a class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 cursor-pointer" (click)="selectStatus('pending')">En Attente</a>
+            <a class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 cursor-pointer" (click)="selectStatus('expired')">Expiré</a>
           </div>
         </div>
       </div>
+      <div class="relative">
+        <button class="flex items-center justify-between w-full md:w-50 px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-200 rounded-lg hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-primary whitespace-nowrap" (click)="toggleEstablishmentFilter()">
+          <span>{{ selectedEstablishmentType || 'Type d\'établissement' }}</span>
+          <div class="w-4 h-4 flex items-center justify-center ml-2">
+            <i class="ri-arrow-down-s-line"></i>
+          </div>
+        </button>
+        <div class="absolute mt-1 right-0 md:right-auto bg-white rounded-lg shadow-lg z-10" [class.hidden]="!showEstablishmentFilter">
+          <div class="py-1">
+            <a class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 cursor-pointer" (click)="selectEstablishmentType('')">Tous</a>
+            <a class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 cursor-pointer" (click)="selectEstablishmentType('Hôtel')">Hôtel</a>
+            <a class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 cursor-pointer" (click)="selectEstablishmentType('Restaurant')">Restaurant</a>
+            <a class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 cursor-pointer" (click)="selectEstablishmentType('Café')">Café</a>
+            <a class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 cursor-pointer" (click)="selectEstablishmentType('Sfax')">Sfax</a>
+          </div>
+        </div>
+      </div>
+      <!-- Optional: Add Establishment Dropdown if Needed -->
+      <!-- <div class="relative">
+        <button class="flex items-center justify-between w-full md:w-40 px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-200 rounded-lg hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-primary whitespace-nowrap" (click)="toggleEstablishmentListFilter()">
+          <span>{{ selectedEstablishment ? getEstablishmentName(selectedEstablishment) : 'Établissement' }}</span>
+          <div class="w-4 h-4 flex items-center justify-center ml-2">
+            <i class="ri-arrow-down-s-line"></i>
+          </div>
+        </button>
+        <div class="absolute mt-1 right-0 md:right-auto bg-white rounded-lg shadow-lg z-10" [class.hidden]="!showEstablishmentListFilter">
+          <div class="py-1">
+            <a class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 cursor-pointer" (click)="selectEstablishment('')">Tous</a>
+            <a *ngFor="let establishment of filteredEtablissements" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 cursor-pointer" (click)="selectEstablishment(establishment._id)">{{ establishment.nom }}</a>
+          </div>
+        </div>
+      </div> -->
+    </div>
+  </div>
+</div>
 
       <!-- Table -->
       <div class="bg-white rounded-lg shadow-sm overflow-hidden mb-6">
@@ -245,9 +263,9 @@
                     </button>
                   </div>
                 </th>
-                <th scope="col" class="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  <div class="flex items-center">
-                    <span>Date de début</span>
+                <th scope="col" class="px-6 py-4 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  <div class="flex items-center justify-center">
+                    <span>Dates</span>
                     <button class="ml-1 text-gray-400 hover:text-gray-500" (click)="sortBy('startDate')">
                       <div class="w-4 h-4 flex items-center justify-center">
                         <i [ngClass]="sortField === 'startDate' && sortDirection === 'asc' ? 'ri-arrow-up-s-line' : 'ri-arrow-down-s-line'"></i>
@@ -255,16 +273,7 @@
                     </button>
                   </div>
                 </th>
-                <th scope="col" class="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  <div class="flex items-center">
-                    <span>Date de fin</span>
-                    <button class="ml-1 text-gray-400 hover:text-gray-500" (click)="sortBy('endDate')">
-                      <div class="w-4 h-4 flex items-center justify-center">
-                        <i [ngClass]="sortField === 'endDate' && sortDirection === 'asc' ? 'ri-arrow-up-s-line' : 'ri-arrow-down-s-line'"></i>
-                      </div>
-                    </button>
-                  </div>
-                </th>
+                
                 <th scope="col" class="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                   <div class="flex items-center">
                     <span>Statut</span>
@@ -290,20 +299,34 @@
                   <div class="text-xs text-gray-500">ID: {{ promotion.id }}</div>
                 </td>
                 <td class="px-6 py-4 whitespace-nowrap">
-                  <div class="text-sm text-gray-900">{{ promotion.establishmentName }}</div>
+                  <span class="inline-block px-3 py-1 text-sm font-medium bg-blue-100 text-blue-800 rounded-full">
+                    {{ promotion.etablissementId.nom }}
+                  </span>
                 </td>
                 <td class="px-6 py-4 whitespace-nowrap">
-                  <div class="text-sm text-gray-900">{{ promotion.discount }}</div>
+                  <span 
+                  class="inline-block px-3 py-1 text-sm font-medium rounded-full"
+                  [ngClass]="{
+                    'bg-green-100 text-green-800': promotion.type === 'percentage',
+                    'bg-blue-100 text-blue-800': promotion.type === 'fixed',
+                    'bg-purple-100 text-purple-800': promotion.type === 'freeitem',
+                    'bg-yellow-100 text-yellow-800': promotion.type === 'bundle',
+                    'bg-pink-100 text-pink-800': promotion.type === 'special'
+                  }"
+                >
+                  {{ promotion.discount }}
+                </span>
+
+                </td>
+                
+                <td class="px-6 py-4 whitespace-nowrap">
+                  <div class="text-sm text-gray-900">
+                    {{ promotion.startDate | date:'MMM d, y' }} - {{ promotion.endDate | date:'MMM d, y' }}
+                  </div>
                 </td>
                 <td class="px-6 py-4 whitespace-nowrap">
-                  <div class="text-sm text-gray-900">{{ promotion.startDate | date:'dd/MM/yyyy' }}</div>
-                </td>
-                <td class="px-6 py-4 whitespace-nowrap">
-                  <div class="text-sm text-gray-900">{{ promotion.endDate | date:'dd/MM/yyyy' }}</div>
-                </td>
-                <td class="px-6 py-4 whitespace-nowrap">
-                  <span class="px-2 py-1 text-xs font-medium rounded-full" [ngClass]="getStatusBadgeClass(promotion.status)">
-                    {{ getStatusLabel(promotion.status) }}
+                  <span class="px-2 py-1 text-xs font-medium rounded-full" [ngClass]="getStatusBadgeClass(promotion.status || '')">
+                    {{ getStatusLabel(promotion.status || '') }}
                   </span>
                 </td>
                 <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
@@ -385,7 +408,7 @@
               </div>
               <div>
                 <label for="promo-establishment" class="block text-sm font-medium text-gray-700 mb-1">Nom Établissement <span class="text-red-500">*</span></label>
-                <select id="promo-establishment" name="etablissementID" [(ngModel)]="currentPromotion.establishmentId" class="mt-1 block w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-primary" required>
+                <select id="promo-establishment" name="etablissementID" [(ngModel)]="currentPromotion.etablissementId._id" (ngModelChange)="updateEtablissementDetails($event)" class="mt-1 block w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-primary" required>
                   <option value="" disabled>Sélectionnez un établissement</option>
                   <option *ngFor="let etab of etablissementsType" [value]="etab._id">{{ etab.nom }}</option>
                 </select>
@@ -424,10 +447,43 @@
               <div>
                 <label for="promo-status" class="block text-sm font-medium text-gray-700 mb-1">Statut <span class="text-red-500">*</span></label>
                 <select id="promo-status" name="promo-status" [(ngModel)]="currentPromotion.status" class="mt-1 block w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-primary" required>
+                  <option value="" disabled>Sélectionnez un Statut</option>
                   <option value="active">Actif</option>
-                  <option value="scheduled">Programmé</option>
                   <option value="pending">En Attente</option>
+                  <option value="expired">Expiré</option>
                 </select>
+              </div>
+              <div>
+                <label for="prix-avant" class="block text-sm font-medium text-gray-700 mb-1">Prix avant réduction (DT)</label>
+                <div class="mt-1 relative">
+                  <input
+                    id="prix-avant"
+                    type="number"
+                    name="prix-avant"
+                    [(ngModel)]="currentPromotion.prixAvant"
+                    class="block w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-primary pr-12"
+                    placeholder="Ex: 50.99"
+                    min="0"
+                    step="0.01"
+                  />
+                  <span class="absolute inset-y-0 right-3 flex items-center text-gray-500">DT</span>
+                </div>
+              </div>
+              <div>
+                <label for="prix-apres" class="block text-sm font-medium text-gray-700 mb-1">Prix après réduction (DT)</label>
+                <div class="mt-1 relative">
+                  <input
+                    id="prix-apres"
+                    type="number"
+                    name="prix-apres"
+                    [(ngModel)]="currentPromotion.prixApres"
+                    class="block w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-primary pr-12"
+                    placeholder="Ex: 40.79"
+                    min="0"
+                    step="0.01"
+                  />
+                  <span class="absolute inset-y-0 right-3 flex items-center text-gray-500">DT</span>
+                </div>
               </div>
             </div>
           </div>
@@ -474,37 +530,53 @@
               </div>
             </div>
           </div>
+<!--saghari-->
+          <!-- Photo -->
+<div class="bg-white rounded-lg shadow-sm p-6 mb-6">
+  <h2 class="text-lg font-medium text-gray-900 mb-4">Photo</h2>
 
-          <!-- Photos -->
-          <div class="bg-white rounded-lg shadow-sm p-6 mb-6">
-            <h2 class="text-lg font-medium text-gray-900 mb-4">Photos</h2>
-            <div class="mb-4">
-              <input type="file" (change)="onPhotosChange($event)" multiple accept="image/*" class="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-primary file:text-white hover:file:bg-primary-dark">
-            </div>
-            <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
-              <div *ngFor="let photo of currentPromotion.photos" class="relative photo-preview">
-                <img [src]="photo" alt="Photo de la promotion" class="w-full h-32 object-cover rounded-lg">
-                <button (click)="removePhoto(photo)" class="absolute top-2 right-2 bg-red-500 text-white rounded-full p-1 hover:bg-red-600">
-                  <i class="ri-close-line"></i>
-                </button>
-              </div>
-              <div *ngIf="currentPromotion.photos?.length === 0" class="col-span-full text-center text-sm text-gray-500">
-                Aucune photo ajoutée pour le moment.
-              </div>
-            </div>
-          </div>
+  <div class="mb-4">
+    <input
+      type="file"
+      (change)="onPhotoChange($event)"
+      accept="image/*"
+      class="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-primary file:text-white hover:file:bg-primary-dark">
+  </div>
+
+  <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+    <!-- ✅ Prévisualisation si une nouvelle photo sélectionnée -->
+    <div *ngIf="photoPreviewUrl" class="relative photo-preview">
+      <img [src]="getPhotoUrl(promotionDetails?.photo ?? null)" />
+
+
+      <button (click)="removePhoto()" class="absolute top-2 right-2 bg-red-500 text-white rounded-full p-1 hover:bg-red-600">
+        <i class="ri-close-line"></i>
+      </button>
+    </div>
+
+    <!-- ✅ Photo existante du backend si aucune prévisualisation -->
+    <div *ngIf="!photoPreviewUrl && currentPromotion.photo" class="relative photo-preview">
+      <img [src]="getPhotoUrl(currentPromotion.photo)" alt="Photo de la promotion" class="w-full h-32 object-cover rounded-lg">
+      <button (click)="removePhoto()" class="absolute top-2 right-2 bg-red-500 text-white rounded-full p-1 hover:bg-red-600">
+        <i class="ri-close-line"></i>
+      </button>
+    </div>
+
+    <div *ngIf="!photoPreviewUrl && !currentPromotion.photo" class="col-span-full text-center text-sm text-gray-500">
+      Aucune photo ajoutée pour le moment.
+    </div>
+  </div>
+</div>
+
 
           <!-- Actions -->
           <div class="mt-6 flex justify-end space-x-3">
-            <div class="flex justify-end space-x-3">
-              <button type="button" class="px-4 py-2 border border-gray-300 rounded-lg text-gray-700" (click)="closeModal()">Annuler</button>
-              <button type="submit" class="px-4 py-2 bg-primary text-white rounded-lg">Enregistrer</button>
-            </div>
+            <button type="button" class="px-4 py-2 border border-gray-300 rounded-lg text-gray-700" (click)="closeModal()">Annuler</button>
+            <button type="submit" class="px-4 py-2 bg-primary text-white rounded-lg">Enregistrer</button>
           </div>
         </form>
       </div>
     </div>
-    
   </div>
 
   <!-- Archive Confirmation Modal -->
@@ -520,141 +592,166 @@
         <p class="text-sm text-gray-500">Êtes-vous sûr de vouloir archiver cette promotion ? Cette action peut être annulée ultérieurement.</p>
       </div>
       <div class="flex items-center justify-end space-x-3">
-        <button class="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-200 rounded-lg hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-primary whitespace-nowrap" (click)="closeArchiveModal()">Annuler</button>
+        <button class="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-200 rounded-lg hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-primary whitespace  whitespace-nowrap" (click)="closeArchiveModal()">Annuler</button>
         <button class="px-4 py-2 text-sm font-medium text-white bg-red-500 rounded-lg hover:bg-red-600 focus:outline-none focus:ring-2 focus:ring-red-500 whitespace-nowrap" (click)="archivePromotion()">Archiver</button>
       </div>
     </div>
   </div>
+ <!-- Promotion Detail Modal -->
+<div class="fixed inset-0 z-50 bg-black bg-opacity-60 flex items-center justify-center p-4 transition-all duration-300" [class.hidden]="!isDetailModalOpen">
+  <div class="bg-white rounded-2xl shadow-2xl max-w-4xl w-full p-8 relative overflow-y-auto max-h-[90vh] transform transition-all duration-300 scale-100 hover:scale-[1.01]">
+    <!-- Close Button -->
+    <button class="absolute top-4 right-4 text-gray-500 hover:text-red-600 transition-colors duration-200" (click)="closeDetailModal()">
+      <i class="ri-close-line text-3xl"></i>
+    </button>
 
-  <!-- Promotion Detail Modal -->
-  <div class="fixed inset-0 z-50 bg-black bg-opacity-60 flex items-center justify-center p-4 transition-all duration-300" [class.hidden]="!isDetailModalOpen">
-    <div class="bg-white rounded-2xl shadow-2xl max-w-4xl w-full p-8 relative overflow-y-auto max-h-[90vh] transform transition-all duration-300 scale-100 hover:scale-[1.01]">
-      <!-- Close Button -->
-      <button class="absolute top-4 right-4 text-gray-500 hover:text-red-600 transition-colors duration-200" (click)="closeDetailModal()">
-        <i class="ri-close-line text-3xl"></i>
-      </button>
+    <!-- Modal Header -->
+    <div class="flex items-center space-x-4 border-b border-gray-200 pb-4 mb-6">
+      <div class="w-16 h-16 rounded-full bg-blue-100 flex items-center justify-center">
+        <i class="ri-price-tag-3-line text-3xl text-blue-600"></i>
+      </div>
+      <div>
+        <h2 class="text-2xl font-bold text-gray-800">Détails de la promotion</h2>
+        <p class="text-sm text-gray-500">Nom : {{ promotionDetails?.name }}</p>
+      </div>
+    </div>
 
-      <!-- Modal Header -->
-      <div class="flex items-center space-x-4 border-b border-gray-200 pb-4 mb-6">
-        <div class="w-16 h-16 rounded-full bg-blue-100 flex items-center justify-center">
-          <i class="ri-price-tag-3-line text-3xl text-blue-600"></i>
-        </div>
-        <div>
-          <h2 class="text-2xl font-bold text-gray-800">Détails de la promotion</h2>
-          <p class="text-sm text-gray-500">Nom : {{ promotionDetails?.name }}</p>
+    <!-- Content -->
+    <div *ngIf="promotionDetails as promo" class="space-y-8">
+      <!-- Informations de base -->
+      <div>
+        <h3 class="text-lg font-semibold text-gray-700 mb-4">Informations Générales</h3>
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 text-gray-600">
+          <div class="bg-gray-50 p-4 rounded-lg shadow-sm hover:shadow-md transition-shadow duration-200">
+            <p class="text-sm"><strong>Nom :</strong> {{ promo.name }}</p>
+          </div>
+          <div class="bg-gray-50 p-4 rounded-lg shadow-sm hover:shadow-md transition-shadow duration-200">
+            <p class="text-sm text-gray-700">
+              <strong>Établissement :</strong>
+              <span class="inline-block ml-2 px-3 py-1 rounded-full text-sm font-medium bg-blue-100 text-blue-800">
+                {{ getEstablishmentName(promo.etablissementId._id) }}
+              </span>
+            </p>
+          </div>
+          <div class="bg-gray-50 p-4 rounded-lg shadow-sm hover:shadow-md transition-shadow duration-200">
+            <p class="text-sm text-gray-700">
+              <strong>Type d'Établissement :</strong>
+              <span class="inline-block ml-2 px-3 py-1 rounded-full text-sm font-medium bg-purple-100 text-purple-800">
+                {{ promo.etablissementId.type || 'Inconnu' }}
+              </span>
+            </p>
+          </div>
+          <div class="bg-gray-50 p-4 rounded-lg shadow-sm hover:shadow-md transition-shadow duration-200">
+            <p class="text-sm"><strong>Type :</strong> {{ promo.type }}</p>
+          </div>
+          <div class="bg-gray-50 p-4 rounded-lg shadow-sm hover:shadow-md transition-shadow duration-200">
+            <p class="text-sm text-gray-700">
+              <strong>Remise :</strong>
+              <span class="inline-block ml-2 px-3 py-1 rounded-full text-sm font-medium bg-green-100 text-green-800">
+                {{ promo.discount }}
+              </span>
+            </p>
+          </div>
+          <div class="bg-gray-50 p-4 rounded-lg shadow-sm hover:shadow-md transition-shadow duration-200">
+            <p class="text-sm"><strong>Code promo :</strong> {{ promo.code || 'Aucun' }}</p>
+          </div>
+          <div class="bg-gray-50 p-4 rounded-lg shadow-sm hover:shadow-md transition-shadow duration-200">
+            <p class="text-sm"><strong>Statut :</strong> 
+              <span class="inline-block px-3 py-1 rounded-full text-xs font-medium" 
+                    [ngClass]="{'bg-green-100 text-green-800': promo.status === 'active', 
+                                'bg-gray-100 text-gray-800': promo.status === 'expired',
+                                'bg-yellow-100 text-yellow-800': promo.status === 'pending'}">
+                {{ getStatusLabel(promo.status || 'unknown') }}
+              </span>
+            </p>
+          </div>
+          <div class="bg-gray-50 p-4 rounded-lg shadow-sm hover:shadow-md transition-shadow duration-200">
+            <p class="text-sm"><strong>Limite d’utilisation :</strong> {{ promo.limit || 'Illimité' }}</p>
+          </div>
+            <!-- Add Prix Avant and Prix Apres -->
+            <div class="bg-gray-50 p-4 rounded-lg shadow-sm hover:shadow-md transition-shadow duration-200">
+              <p class="text-sm"><strong>Prix avant réduction :</strong> {{ promo.prixAvant ?? 'Non spécifié' }} DT</p>
+            </div>
+            <div class="bg-gray-50 p-4 rounded-lg shadow-sm hover:shadow-md transition-shadow duration-200">
+              <p class="text-sm"><strong>Prix après réduction :</strong> {{ promo.prixApres ?? 'Non spécifié' }} DT</p>
+            </div>
+
         </div>
       </div>
 
-      <!-- Content -->
-      <div *ngIf="promotionDetails as promo" class="space-y-8">
-        <!-- Informations de base -->
-        <div>
-          <h3 class="text-lg font-semibold text-gray-700 mb-4">Informations Générales</h3>
-          <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 text-gray-600">
-            <div class="bg-gray-50 p-4 rounded-lg shadow-sm hover:shadow-md transition-shadow duration-200">
-              <p class="text-sm"><strong>Nom :</strong> {{ promo.name }}</p>
-            </div>
-            <div class="bg-gray-50 p-4 rounded-lg shadow-sm hover:shadow-md transition-shadow duration-200">
-              <p class="text-sm"><strong>Établissement :</strong> {{ getEstablishmentName(promo.establishmentId) }}</p>
-            </div>
-            <div class="bg-gray-50 p-4 rounded-lg shadow-sm hover:shadow-md transition-shadow duration-200">
-              <p class="text-sm"><strong>Type :</strong> {{ promo.type }}</p>
-            </div>
-            <div class="bg-gray-50 p-4 rounded-lg shadow-sm hover:shadow-md transition-shadow duration-200">
-              <p class="text-sm"><strong>Remise :</strong> {{ promo.discount }}</p>
-            </div>
-            <div class="bg-gray-50 p-4 rounded-lg shadow-sm hover:shadow-md transition-shadow duration-200">
-              <p class="text-sm"><strong>Code promo :</strong> {{ promo.code || 'Aucun' }}</p>
-            </div>
-            <div class="bg-gray-50 p-4 rounded-lg shadow-sm hover:shadow-md transition-shadow duration-200">
-              <p class="text-sm"><strong>Statut :</strong> 
-                <span class="inline-block px-3 py-1 rounded-full text-xs font-medium" 
-                      [ngClass]="{'bg-green-100 text-green-800': promo.status === 'active', 
-                                  'bg-blue-100 text-blue-800': promo.status === 'scheduled',
-                                  'bg-gray-100 text-gray-800': promo.status === 'expired',
-                                  'bg-yellow-100 text-yellow-800': promo.status === 'pending'}">
-                  {{ getStatusLabel(promo.status) }}
-                </span>
-              </p>
-            </div>
-            <div class="bg-gray-50 p-4 rounded-lg shadow-sm hover:shadow-md transition-shadow duration-200">
-              <p class="text-sm"><strong>Limite d’utilisation :</strong> {{ promo.limit || 'Illimité' }}</p>
-            </div>
-          </div>
-        </div>
-
-        <!-- Dates -->
-        <div>
-          <h3 class="text-lg font-semibold text-gray-700 mb-4">Période de Validité</h3>
-          <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 text-gray-600">
-            <div class="bg-gray-50 p-4 rounded-lg shadow-sm hover:shadow-md transition-shadow duration-200">
-              <p class="text-sm flex items-center">
-                <i class="ri-calendar-line text-gray-400 mr-2"></i>
-                <span><strong>Date de début :</strong> {{ promo.startDate | date:'dd/MM/yyyy' }}</span>
-              </p>
-            </div>
-            <div class="bg-gray-50 p-4 rounded-lg shadow-sm hover:shadow-md transition-shadow duration-200">
-              <p class="text-sm flex items-center">
-                <i class="ri-calendar-line text-gray-400 mr-2"></i>
-                <span><strong>Date de fin :</strong> {{ promo.endDate | date:'dd/MM/yyyy' }}</span>
-              </p>
-            </div>
-          </div>
-        </div>
-
-        <!-- Description -->
-        <div>
-          <h3 class="text-lg font-semibold text-gray-700 mb-4">Description</h3>
+      <!-- Dates -->
+      <div>
+        <h3 class="text-lg font-semibold text-gray-700 mb-4">Période de Validité</h3>
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 text-gray-600">
           <div class="bg-gray-50 p-4 rounded-lg shadow-sm hover:shadow-md transition-shadow duration-200">
-            <p class="text-sm text-gray-600">{{ promo.description || 'Aucune description disponible.' }}</p>
+            <p class="text-sm flex items-center">
+              <i class="ri-calendar-line text-gray-400 mr-2"></i>
+              <span><strong>Date de début :</strong> {{ promo.startDate | date:'dd/MM/yyyy' }}</span>
+            </p>
           </div>
-        </div>
-
-        <!-- Conditions -->
-        <div>
-          <h3 class="text-lg font-semibold text-gray-700 mb-4">Conditions</h3>
           <div class="bg-gray-50 p-4 rounded-lg shadow-sm hover:shadow-md transition-shadow duration-200">
-            <ul class="list-disc ml-6 space-y-1 text-sm text-gray-600">
-              <li *ngIf="promo.conditions.minPurchase">
-                Montant minimum d'achat : {{ promo.conditions.minPurchaseAmount || 'Non précisé' }} €
-              </li>
-              <li *ngIf="promo.conditions.newCustomers">
-                Réservé aux nouveaux clients
-              </li>
-              <li *ngIf="promo.conditions.specificItems">
-                Applicable à des articles spécifiques
-              </li>
-              <li *ngIf="promo.conditions.specificDays">
-                Applicable certains jours :
-                <span *ngFor="let day of days" class="inline-block ml-1 font-medium">
-                  {{ promo.conditions.days[day] ? (day | titlecase) + ' ' : '' }}
-                </span>
-              </li>
-              <li *ngIf="!promo.conditions.minPurchase &&
-                        !promo.conditions.newCustomers &&
-                        !promo.conditions.specificItems &&
-                        !promo.conditions.specificDays">
-                Aucune condition appliquée
-              </li>
-            </ul>
+            <p class="text-sm flex items-center">
+              <i class="ri-calendar-line text-gray-400 mr-2"></i>
+              <span><strong>Date de fin :</strong> {{ promo.endDate | date:'dd/MM/yyyy' }}</span>
+            </p>
           </div>
         </div>
+      </div>
 
-        <!-- Photos -->
-        <div *ngIf="promo.photos && promo.photos.length > 0">
-          <h3 class="text-lg font-semibold text-gray-700 mb-4">Photos</h3>
-          <div class="bg-gray-50 p-4 rounded-lg shadow-sm hover:shadow-md transition-shadow duration-200">
-            <div class="grid grid-cols-2 sm:grid-cols-3 gap-4">
-              <img *ngFor="let photo of promo.photos" [src]="photo" alt="Photo" class="w-full h-40 object-cover rounded-lg border border-gray-200 hover:scale-105 transition-transform duration-200">
-            </div>
-          </div>
+      <!-- Description -->
+      <div>
+        <h3 class="text-lg font-semibold text-gray-700 mb-4">Description</h3>
+        <div class="bg-gray-50 p-4 rounded-lg shadow-sm hover:shadow-md transition-shadow duration-200">
+          <p class="text-sm text-gray-600">{{ promo.description || 'Aucune description disponible.' }}</p>
         </div>
+      </div>
 
-        <!-- Actions -->
-        <div class="mt-6 flex justify-end">
-          <button (click)="closeDetailModal()" class="px-4 py-2 bg-primary text-white rounded-lg hover:bg-blue-600 transition-colors duration-200">Fermer</button>
+      <!-- Conditions -->
+      <div>
+        <h3 class="text-lg font-semibold text-gray-700 mb-4">Conditions</h3>
+        <div class="bg-gray-50 p-4 rounded-lg shadow-sm hover:shadow-md transition-shadow duration-200">
+          <ul class="list-disc ml-6 space-y-1 text-sm text-gray-600">
+            <li *ngIf="promo.conditions.minPurchase">
+              Montant minimum d'achat : {{ promo.conditions.minPurchaseAmount || 'Non précisé' }} €
+            </li>
+            <li *ngIf="promo.conditions.newCustomers">
+              Réservé aux nouveaux clients
+            </li>
+            <li *ngIf="promo.conditions.specificItems">
+              Applicable à des articles spécifiques
+            </li>
+            <li *ngIf="promo.conditions.specificDays">
+              Applicable certains jours :
+              <span *ngFor="let day of days" class="inline-block ml-1 font-medium">
+                {{ promo.conditions.days[day] ? (day | titlecase) + ' ' : '' }}
+              </span>
+            </li>
+            <li *ngIf="!promo.conditions.minPurchase && !promo.conditions.newCustomers && !promo.conditions.specificItems && !promo.conditions.specificDays">
+              Aucune condition appliquée
+            </li>
+          </ul>
         </div>
+      </div>
+
+<!-- Photos -->
+<div *ngIf="photoArray.length > 0">
+  <h3 class="text-lg font-semibold text-gray-700 mb-4">Photo</h3>
+  <div class="bg-gray-50 p-4 rounded-lg shadow-sm hover:shadow-md transition-shadow duration-200">
+    <div class="grid grid-cols-2 sm:grid-cols-3 gap-4">
+      <img [src]="getPhotoUrl(promotionDetails.photo)" alt="Photo" />
+
+    </div>
+  </div>
+</div>
+
+      <!-- Actions -->
+      <div class="mt-6 flex justify-end">
+        <button (click)="closeDetailModal()" class="px-4 py-2 bg-primary text-white rounded-lg hover:bg-blue-600 transition-colors duration-200">Fermer</button>
       </div>
     </div>
   </div>
 </div>
+
+
+
+

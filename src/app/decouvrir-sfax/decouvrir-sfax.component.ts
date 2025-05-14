@@ -71,7 +71,9 @@ export class DecouvrirSfaxComponent implements OnInit {
 
   closeVideoModal() {
     this.isVideoModalOpen = false;
-    document.body.style.overflow = '';
+    document.body.style.overflow = ''; // Restore scrolling
+    // Reset the video URL to stop playback
+    this.videoUrl = this.sanitizer.bypassSecurityTrustResourceUrl('https://www.youtube.com/embed/ny9TYVKsI2g?autoplay=0&controls=1&rel=0');
   }
 
   galleries = {
