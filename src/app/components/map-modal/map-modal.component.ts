@@ -1,4 +1,5 @@
 import { Component, Input, AfterViewInit, ElementRef, ViewChild } from '@angular/core';
+import { Loader } from '@googlemaps/js-api-loader';
 
 @Component({
   selector: 'app-map-modal',
@@ -12,7 +13,15 @@ export class MapModalComponent implements AfterViewInit {
   map!: google.maps.Map;
 
   ngAfterViewInit(): void {
-    this.geocodeAddress(this.fullAddress);
+    const loader = new Loader({
+      apiKey: 'AIzaSyBaacRlPP7Nv7b3F46CpTYeIHIN9HUFXKk',
+      version: 'weekly',
+      libraries: ['places']
+    });
+
+    loader.load().then(() => {
+      this.geocodeAddress(this.fullAddress);
+    });
   }
 
   geocodeAddress(address: string) {
@@ -34,10 +43,10 @@ export class MapModalComponent implements AfterViewInit {
       }
     });
   }
+
   closeMap(): void {
     if (this.mapContainer) {
       this.mapContainer.nativeElement.innerHTML = '';
     }
   }
-  
 }

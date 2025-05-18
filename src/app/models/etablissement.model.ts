@@ -43,6 +43,9 @@ export interface ReseauxSociaux {
     horaires: Horaires;
     photos: (string | File)[];
     selected?: boolean;
+    createdAt?: string | Date; // Ajouté pour refléter les données MongoDB
+  updatedAt?: string | Date; // Champ principal pour le tri
+    
     
   }
   

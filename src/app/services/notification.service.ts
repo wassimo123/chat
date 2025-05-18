@@ -43,6 +43,12 @@ export class NotificationService {
     this.saveNotificationsToStorage(updatedNotifications);
   }
 
+  removeNotificationsByEmail(email: string): void {
+    const currentNotifications = this.notificationsSource.getValue();
+    const updatedNotifications = currentNotifications.filter(notif => notif.email !== email);
+    this.notificationsSource.next(updatedNotifications);
+    this.saveNotificationsToStorage(updatedNotifications);
+  }
   
 
   private saveNotificationsToStorage(notifications: Notification[]) {

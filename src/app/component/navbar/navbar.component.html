@@ -4,100 +4,140 @@
   [class.translate-y-0]="isNavbarVisible"
 >
   <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-    <div class="flex justify-between h-16">
-      <div class="flex items-center">
-        <a routerLink="#" class="text-2xl font-['Pacifico'] text-primary">Sfax</a>
-        <div class="hidden md:flex items-center space-x-8 ml-10">
+    <div class="flex justify-between items-center h-16">
+      <!-- Logo + Menu principal -->
+      <div class="flex items-center space-x-6">
+        <!-- Logo -->
+        <a routerLink="/home" class="flex items-center space-x-2">
+          <img src="assets/images/2.png" alt="Logo Sfax" class="h-20 w-auto" />
+        </a>
+
+        <!-- Menu desktop -->
+        <div class="hidden md:flex items-center space-x-10">
           <a routerLink="/home" class="text-gray-700 hover:text-primary">Home</a>
           <a routerLink="/histoire" class="text-gray-700 hover:text-primary">Historique</a>
+
+          <!-- Dropdown établissements -->
           <div class="relative group">
             <button class="text-gray-700 hover:text-primary flex items-center">
-              Etablissements
-              <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 ml-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              Établissements
+              <svg class="h-4 w-4 ml-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
               </svg>
             </button>
-            <div class="absolute left-0 mt-2 w-48 bg-white rounded-md shadow-lg py-1 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300">
+            <div
+              class="absolute left-0 mt-2 w-48 bg-white rounded-md shadow-lg py-1 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300"
+            >
               <a routerLink="/hotels" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Hôtel</a>
               <a routerLink="/cafes" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Café</a>
               <a routerLink="/restaurants" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Restaurant</a>
             </div>
           </div>
-          <a routerLink="/evenement" class="text-gray-700 hover:text-primary">Evenements</a>
+
+          <a routerLink="/evenement" class="text-gray-700 hover:text-primary">Événements</a>
           <a routerLink="/promotion" class="text-gray-700 hover:text-primary">Promotions</a>
-          <a routerLink="/Experience" class="text-gray-700 hover:text-primary">Experience</a>
+          <a routerLink="/Experience" class="text-gray-700 hover:text-primary">Expérience</a>
         </div>
       </div>
-      
-      <!-- Mobile menu button -->
-      <div class="md:hidden flex items-center">
-        <button type="button" (click)="toggleMobileMenu()" class="text-gray-600 hover:text-primary focus:outline-none">
-          <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path *ngIf="!isMobileMenuOpen" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
-            <path *ngIf="isMobileMenuOpen" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
-          </svg>
-        </button>
-      </div>
-      
+
+      <!-- Recherche + Connexion desktop -->
       <div class="hidden md:flex items-center space-x-4">
         <div class="relative">
           <input
             type="text"
             placeholder="Rechercher..."
-            class="pl-10 pr-4 py-2 border rounded-full text-sm focus:outline-none focus:border-primary"
+            class="h-10 pl-10 pr-4 py-2 border border-gray-300 rounded-full text-sm focus:outline-none focus:ring-2 focus:ring-primary"
           />
           <i class="ri-search-line absolute left-3 top-2.5 text-gray-400"></i>
         </div>
-        <button routerLink="/connexion"
-          class="bg-primary text-white px-4 py-2 !rounded-button hover:bg-blue-700 whitespace-nowrap"
+        <button
+          routerLink="/connexion"
+          class="h-10 bg-primary text-white px-4 py-2 rounded-full text-sm hover:bg-blue-700 whitespace-nowrap"
         >
           Se connecter
         </button>
       </div>
+
+      <!-- Mobile menu icon -->
+      <div class="md:hidden flex items-center">
+        <button type="button" (click)="toggleMobileMenu()" class="text-gray-600 hover:text-primary focus:outline-none">
+          <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path
+              *ngIf="!isMobileMenuOpen"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              d="M4 6h16M4 12h16M4 18h16"
+            />
+            <path
+              *ngIf="isMobileMenuOpen"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              d="M6 18L18 6M6 6l12 12"
+            />
+          </svg>
+        </button>
+      </div>
     </div>
-    
-    <!-- Mobile menu, show/hide based on menu state -->
+
+    <!-- Menu mobile -->
     <div class="md:hidden" *ngIf="isMobileMenuOpen">
       <div class="px-2 pt-2 pb-3 space-y-1">
         <a routerLink="/home" class="block px-3 py-2 text-base font-medium text-gray-700 hover:text-primary">Home</a>
         <a routerLink="/actualites" class="block px-3 py-2 text-base font-medium text-gray-700 hover:text-primary">Actualités</a>
-        
-        <!-- Mobile dropdown -->
+
+        <!-- Dropdown mobile -->
         <div class="relative">
-          <button (click)="toggleEtablissementsDropdown()" class="flex justify-between w-full px-3 py-2 text-base font-medium text-gray-700 hover:text-primary">
-            Etablissements
-            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 ml-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path *ngIf="!isEtablissementsOpen" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
-              <path *ngIf="isEtablissementsOpen" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 15l7-7 7 7" />
+          <button
+            (click)="toggleEtablissementsDropdown()"
+            class="flex justify-between w-full px-3 py-2 text-base font-medium text-gray-700 hover:text-primary"
+          >
+            Établissements
+            <svg class="h-4 w-4 ml-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path
+                *ngIf="!isEtablissementsOpen"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M19 9l-7 7-7-7"
+              />
+              <path
+                *ngIf="isEtablissementsOpen"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M5 15l7-7 7 7"
+              />
             </svg>
           </button>
           <div class="pl-4 space-y-1" *ngIf="isEtablissementsOpen">
-            <!--<a routerLink="/hotels" class="block px-3 py-2 text-base font-medium text-gray-700 hover:text-primary">Hôtel</a>-->
-            <a routerLink="/etablissements/hotels" class="block px-3 py-2 text-base font-medium text-gray-700 hover:text-primary">Hôtel</a>
-            <a routerLink="/etablissements/cafe" class="block px-3 py-2 text-base font-medium text-gray-700 hover:text-primary">Café</a>
-            <a routerLink="/etablissements/restaurant" class="block px-3 py-2 text-base font-medium text-gray-700 hover:text-primary">Restaurant</a>
+            <a routerLink="/etablissements/hotels" class="block px-3 py-2 text-base text-gray-700 hover:text-primary">Hôtel</a>
+            <a routerLink="/etablissements/cafe" class="block px-3 py-2 text-base text-gray-700 hover:text-primary">Café</a>
+            <a routerLink="/etablissements/restaurant" class="block px-3 py-2 text-base text-gray-700 hover:text-primary">Restaurant</a>
           </div>
         </div>
-        
-        <a routerLink="/event" class="block px-3 py-2 text-base font-medium text-gray-700 hover:text-primary">Evenements</a>
+
+        <a routerLink="/event" class="block px-3 py-2 text-base font-medium text-gray-700 hover:text-primary">Événements</a>
         <a routerLink="/promotion" class="block px-3 py-2 text-base font-medium text-gray-700 hover:text-primary">Promotions</a>
-        <a routerLink="/Experience" class="block px-3 py-2 text-base font-medium text-gray-700 hover:text-primary">Experience</a>
-        
-        <!-- Mobile search -->
+        <a routerLink="/Experience" class="block px-3 py-2 text-base font-medium text-gray-700 hover:text-primary">Expérience</a>
+
+        <!-- Recherche mobile -->
         <div class="px-3 py-2">
           <div class="relative">
             <input
               type="text"
               placeholder="Rechercher..."
-              class="w-full pl-10 pr-4 py-2 border rounded-full text-sm focus:outline-none focus:border-primary"
+              class="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-full text-sm focus:outline-none focus:ring-2 focus:ring-primary"
             />
             <i class="ri-search-line absolute left-3 top-2.5 text-gray-400"></i>
           </div>
         </div>
-        
+
         <div class="px-3 py-2">
-          <button routerLink="/connexion"
-            class="w-full bg-primary text-white px-4 py-2 !rounded-button hover:bg-blue-700 whitespace-nowrap"
+          <button
+            routerLink="/connexion"
+            class="w-full bg-primary text-white px-4 py-2 rounded-full text-sm hover:bg-blue-700"
           >
             Se connecter
           </button>

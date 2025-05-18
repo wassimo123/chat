@@ -72,7 +72,8 @@ export class GestionDesEtablissementsComponent implements OnInit, AfterViewInit 
   
   isAuthenticated: boolean = false; // Ajout de la propriété isAuthenticated
   constructor(private etablissementService: EtablissementService,private userService: UserService,private notificationService: NotificationService,
-    private router: Router) {}
+    private router: Router) {this.sortField = "updatedAt";
+      this.sortDirection = "desc";}
 
   ngOnInit(): void {
      // Vérification de l'authentification
@@ -149,10 +150,20 @@ export class GestionDesEtablissementsComponent implements OnInit, AfterViewInit 
   loadEtablissements(): void {
     this.etablissementService.getEtablissements().subscribe({
       next: (etablissements: Etablissement[]) => {
+        // Mapper les établissements et convertir updatedAt en Date
         this.etablissements = etablissements.map((e: Etablissement) => ({
           ...e,
           selected: false,
+          updatedAt: e.updatedAt ? new Date(e.updatedAt) : new Date(), // Fallback si absent
         }));
+  
+        // Trier par updatedAt (du plus récent au plus ancien)
+        this.etablissements.sort((a, b) => {
+          const dateA = new Date(a.updatedAt!).getTime();
+          const dateB = new Date(b.updatedAt!).getTime();
+          return dateB - dateA; // Tri décroissant
+        });
+  
         this.filteredEtablissements = this.etablissements.filter(e => e.statut !== "Inactif");
         this.updateStats();
         this.updatePagination();
@@ -163,7 +174,6 @@ export class GestionDesEtablissementsComponent implements OnInit, AfterViewInit 
       },
     });
   }
-
   initCharts(): void {
     if (this.typeChartRef && this.typeChartRef.nativeElement) {
       const ctx = this.typeChartRef.nativeElement.getContext("2d");
@@ -310,15 +320,20 @@ export class GestionDesEtablissementsComponent implements OnInit, AfterViewInit 
       this.sortDirection = this.sortDirection === "asc" ? "desc" : "asc";
     } else {
       this.sortField = field;
-      this.sortDirection = "asc";
+      this.sortDirection = field === "updatedAt" ? "desc" : "asc"; // Par défaut décroissant pour updatedAt
     }
-
+  
     this.filteredEtablissements.sort((a, b) => {
+      if (field === "updatedAt") {
+        const dateA = new Date(a.updatedAt!).getTime();
+        const dateB = new Date(b.updatedAt!).getTime();
+        return this.sortDirection === "asc" ? dateA - dateB : dateB - dateA;
+      }
       const valueA = a[field as keyof Etablissement] as string;
       const valueB = b[field as keyof Etablissement] as string;
       return this.sortDirection === "asc" ? valueA.localeCompare(valueB) : valueB.localeCompare(valueA);
     });
-
+  
     this.updatePagination();
   }
 
@@ -460,6 +475,18 @@ isValidEmail(email: string): boolean {
     });
   }
 
+  // editEtablissement(etablissement: Etablissement): void {
+  //   this.modalTitle = "Modifier un établissement";
+  //   this.currentEtablissement = {
+  //     ...etablissement,
+  //     reseauxSociaux: etablissement.reseauxSociaux || { facebook: "", instagram: "", twitter: "", linkedin: "" },
+  //     description: etablissement.description || "",
+  //     services: etablissement.services || [],
+  //     horaires: etablissement.horaires || this.getDefaultHoraires(),
+  //     photos: etablissement.photos || [],
+  //   };
+  //   this.isModalOpen = true;
+  // }
   editEtablissement(etablissement: Etablissement): void {
     this.modalTitle = "Modifier un établissement";
     this.currentEtablissement = {
@@ -468,7 +495,7 @@ isValidEmail(email: string): boolean {
       description: etablissement.description || "",
       services: etablissement.services || [],
       horaires: etablissement.horaires || this.getDefaultHoraires(),
-      photos: etablissement.photos || [],
+      photos: etablissement.photos ? [...etablissement.photos] : [],
     };
     this.isModalOpen = true;
   }
@@ -490,53 +517,63 @@ saveEtablissement(): void {
     return;
   }
 
-// Vérifier la validité de l'email
-if (!this.isValidEmail(this.currentEtablissement.email)) {
-  this.showNotification("Veuillez entrer une adresse email valide.", "error");
-  return;
-}
-
-    if (this.modalTitle === "Ajouter un établissement") {
-      this.etablissementService.addEtablissement(this.currentEtablissement).subscribe({
-        next: (response: Etablissement) => {
-          const newEtablissement: Etablissement = { ...response, selected: false };
-          console.log("newEtablissement:",newEtablissement);
-          this.etablissements.push(newEtablissement);
-          this.closeModal();
-          this.updateStats();
-          this.filterEtablissements();
-          this.showNotification("Établissement ajouté avec succès !", "success");
-        },
-        error: (err: any) => {
-          this.showNotification("Erreur lors de l’ajout: " + err.message, "error");
-        },
-      });
-    } else if (this.currentEtablissement.id) {
-      this.etablissementService.updateEtablissement(this.currentEtablissement.id, this.currentEtablissement).subscribe({
-        next: (response: Etablissement) => {
-          const updatedEtablissement: Etablissement = { ...response, selected: false };
-          const index = this.etablissements.findIndex((e) => e.id === updatedEtablissement.id);
-          if (index !== -1) this.etablissements[index] = updatedEtablissement;
-          this.closeModal();
-          this.updateStats();
-          this.filterEtablissements();
-          this.showNotification("Établissement modifié avec succès !", "success");
-        },
-        error: (err: any) => {
-          this.showNotification("Erreur lors de la mise à jour: " + err.message, "error");
-        },
-      });
-    }
+  // Vérifier la validité de l'email
+  if (!this.isValidEmail(this.currentEtablissement.email)) {
+    this.showNotification("Veuillez entrer une adresse email valide.", "error");
+    return;
   }
+
+  if (this.modalTitle === "Ajouter un établissement") {
+    this.etablissementService.addEtablissement(this.currentEtablissement).subscribe({
+      next: (response: Etablissement) => {
+        const newEtablissement: Etablissement = {
+          ...response,
+          selected: false,
+          updatedAt: response.updatedAt || new Date().toISOString(), // Fallback si absent
+        };
+        console.log("newEtablissement:", newEtablissement);
+        this.etablissements.unshift(newEtablissement); // Ajouter en tête
+        this.closeModal();
+        this.updateStats();
+        this.filterEtablissements();
+        this.showNotification("Établissement ajouté avec succès !", "success");
+      },
+      error: (err: any) => {
+        this.showNotification("Erreur lors de l’ajout: " + err.message, "error");
+      },
+    });
+  } else if (this.currentEtablissement.id) {
+    this.etablissementService.updateEtablissement(this.currentEtablissement.id, this.currentEtablissement).subscribe({
+      next: (response: Etablissement) => {
+        const updatedEtablissement: Etablissement = {
+          ...response,
+          selected: false,
+          updatedAt: response.updatedAt || new Date().toISOString(), // Mettre à jour avec la date actuelle si absent
+        };
+        const index = this.etablissements.findIndex((e) => e.id === updatedEtablissement.id);
+        if (index !== -1) this.etablissements[index] = updatedEtablissement;
+        this.closeModal();
+        this.updateStats();
+        this.filterEtablissements();
+        this.showNotification("Établissement modifié avec succès !", "success");
+      },
+      error: (err: any) => {
+        this.showNotification("Erreur lors de la mise à jour: " + err.message, "error");
+      },
+    });
+  }
+}
 
   closeModal(): void {
     this.isModalOpen = false;
   }
 
-  openArchiveModal(etablissement: Etablissement): void {
+  openArchiveModal(etablissement: Etablissement): void { // Fermer la modale de modification si elle est ouverte
     this.etablissementToArchive = etablissement;
     this.isArchiveModalOpen = true;
+    
   }
+  
 
   closeArchiveModal(): void {
     this.isArchiveModalOpen = false;
@@ -572,6 +609,24 @@ if (!this.isValidEmail(this.currentEtablissement.email)) {
   //   this.selectedAddressForMap = `${etablissement.adresse}, ${etablissement.ville ?? ''}, ${etablissement.codePostal ?? ''}, ${etablissement.pays ?? ''}`;
   //   this.showMapPopup = true;
   // }
+  // viewEtablissement1(etablissement: Etablissement): void {
+  //   this.modalTitle = "Détails de l'établissement";
+  //   this.currentEtablissement = {
+  //     ...etablissement,
+  //     reseauxSociaux: etablissement.reseauxSociaux || { facebook: "", instagram: "", twitter: "", linkedin: "" },
+  //     description: etablissement.description || "",
+  //     services: etablissement.services || [],
+  //     horaires: etablissement.horaires || this.getDefaultHoraires(),
+  //     photos: etablissement.photos || [],
+  //   };
+  //   this.isModalOpen = true;
+  //   setTimeout(() => {
+  //     const modalContent = document.querySelector(".modal-content");
+  //     if (modalContent) {
+  //       modalContent.scrollTop = 0;
+  //     }
+  //   });
+  // }
   viewEtablissement1(etablissement: Etablissement): void {
     this.modalTitle = "Détails de l'établissement";
     this.currentEtablissement = {
@@ -580,7 +635,7 @@ if (!this.isValidEmail(this.currentEtablissement.email)) {
       description: etablissement.description || "",
       services: etablissement.services || [],
       horaires: etablissement.horaires || this.getDefaultHoraires(),
-      photos: etablissement.photos || [],
+      photos: etablissement.photos ? [...etablissement.photos] : [],
     };
     this.isModalOpen = true;
     setTimeout(() => {
@@ -726,46 +781,72 @@ if (!this.isValidEmail(this.currentEtablissement.email)) {
         return "bg-gray-100 text-gray-800";
     }
   }
+// onPhotoSelected(event: Event): void {
+//   const input = event.target as HTMLInputElement;
+
+//   if (input.files && input.files.length) {
+//     const files = Array.from(input.files);
+
+//     if (!this.currentEtablissement.photos) {
+//       this.currentEtablissement.photos = [];
+//     }
+
+//     files.forEach(file => {
+//       this.currentEtablissement.photos.push(file); // Garde le fichier brut
+//     });
+//   }
+// }
 onPhotoSelected(event: Event): void {
   const input = event.target as HTMLInputElement;
+  if (!input.files || input.files.length === 0) return;
 
-  if (input.files && input.files.length) {
-    const files = Array.from(input.files);
-
-    if (!this.currentEtablissement.photos) {
-      this.currentEtablissement.photos = [];
-    }
-
-    files.forEach(file => {
-      this.currentEtablissement.photos.push(file); // Garde le fichier brut
-    });
+  const files = Array.from(input.files);
+  if (!this.currentEtablissement.photos) {
+    this.currentEtablissement.photos = [];
   }
+
+  files.forEach((file) => {
+    this.currentEtablissement.photos.push(file); // Stocke le fichier
+  });
 }
+
+  // resolvePhotoUrl(photo: string | File): string {
+  //   if (photo instanceof File) {
+  //     return URL.createObjectURL(photo);
+  //   }
+  //   return photo;
+  // }
+  photoBlobUrls = new Map<File, string>();
 
   resolvePhotoUrl(photo: string | File): string {
     if (photo instanceof File) {
-      return URL.createObjectURL(photo);
+      if (!this.photoBlobUrls.has(photo)) {
+        const url = URL.createObjectURL(photo);
+        this.photoBlobUrls.set(photo, url);
+      }
+      return this.photoBlobUrls.get(photo)!;
     }
-    return photo;
+  
+    // Pour les chemins serveur
+    if (photo.startsWith('http')) return photo;
+    return `http://localhost:5000/${photo}`;
   }
   
+  // deletePhoto(photo: string | File): void {
+  //   const index = this.currentEtablissement.photos.indexOf(photo);
+  //   if (index !== -1) {
+  //     this.currentEtablissement.photos.splice(index, 1);
+  //   }
+  // }
   deletePhoto(photo: string | File): void {
-    const index = this.currentEtablissement.photos.indexOf(photo);
-    if (index !== -1) {
-      this.currentEtablissement.photos.splice(index, 1);
-    }
+    this.currentEtablissement.photos = this.currentEtablissement.photos.filter((p) => p !== photo);
   }
   
   
 // Supprimer cette méthode
-ngOnDestroy() {
-  if (this.currentEtablissement.photos) {
-    this.currentEtablissement.photos.forEach(photo => {
-      if (photo instanceof File) {
-        URL.revokeObjectURL(this.resolvePhotoUrl(photo));
-      }
-    });
-  }
+ngOnDestroy(): void {
+  this.photoBlobUrls.forEach(url => URL.revokeObjectURL(url));
+  this.photoBlobUrls.clear();
 }
   
   

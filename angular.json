@@ -27,6 +27,12 @@
               "node_modules/aos/dist/aos.css"
             ],
             "scripts": []
+            ,
+  "allowedCommonJsDependencies": [
+    "sweetalert2",
+    "aos",
+  "leaflet"
+  ]
           },
           "configurations": {
             "production": {

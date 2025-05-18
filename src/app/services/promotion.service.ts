@@ -17,6 +17,7 @@ export interface Etablissement {
 export class PromotionService {
   private apiUrl = 'http://localhost:5000/api/promotions';
   private etabUrl = 'http://localhost:5000/api/etablissements';
+  private newsletterUrl = 'http://localhost:5000/api/newsletter';
 
   constructor(private http: HttpClient) {}
 
@@ -57,7 +58,9 @@ export class PromotionService {
     if (photo) {
       formData.append('photo', photo);
     }
-
+    for (let [key, value] of (formData as any).entries()) {
+      
+    }
     return this.http.post<Promotion>(this.apiUrl, formData).pipe(catchError(this.handleError));
   }
 
@@ -76,7 +79,7 @@ updatePromotion(id: string, promotion: Promotion, photos?: File[]): Observable<P
   formData.append('prixAvant', promotion.prixAvant?.toString() || '');
   formData.append('prixApres', promotion.prixApres?.toString() || '');
   formData.append('conditions', JSON.stringify(promotion.conditions));
-//saghari
+
 if (photos && photos.length > 0) {
   formData.append('photo', photos[0]); // ✅ NOM EXACTEMENT: 'photo'
 }
@@ -88,6 +91,19 @@ if (photos && photos.length > 0) {
     return this.http.patch(`${this.apiUrl}/${id}/archive`, {}).pipe(catchError(this.handleError));
   }
 
+
+ notifyPromotion(email: string, promotionId: string): Observable<any> {
+    return this.http.post<any>('http://localhost:5000/api/promotions/promotion-notify', {
+      email,
+      promotionId
+    }).pipe(catchError(this.handleError));
+  }
+  
+  subscribeToNewsletter(email: string): Observable<any> {
+    return this.http.post<any>(`${this.newsletterUrl}/subscribe`, { email }).pipe(catchError(this.handleError));
+  }
+
+  
   getEtablissements(): Observable<Etablissement[]> {
     return this.http.get<Etablissement[]>(this.etabUrl).pipe(catchError(this.handleError));
   }

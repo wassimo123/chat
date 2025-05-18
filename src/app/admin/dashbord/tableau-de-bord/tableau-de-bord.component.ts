@@ -226,7 +226,14 @@ export class TableauDeBordComponent implements OnInit, AfterViewInit {
   }
 
   initCharts() {
-    const userActivityChart = echarts.init(this.userActivityChartElement.nativeElement);
+    // 🎯 Pour le graphique d'activité
+    const chartDomActivity = this.userActivityChartElement.nativeElement;
+    const existingActivityChart = echarts.getInstanceByDom(chartDomActivity);
+    if (existingActivityChart) {
+      echarts.dispose(chartDomActivity);
+    }
+    const userActivityChart = echarts.init(chartDomActivity);
+  
     const userActivityOption = {
       animation: false,
       tooltip: {
@@ -263,10 +270,7 @@ export class TableauDeBordComponent implements OnInit, AfterViewInit {
           areaStyle: {
             color: {
               type: 'linear',
-              x: 0,
-              y: 0,
-              x2: 0,
-              y2: 1,
+              x: 0, y: 0, x2: 0, y2: 1,
               colorStops: [
                 { offset: 0, color: 'rgba(87, 181, 231, 0.1)' },
                 { offset: 1, color: 'rgba(87, 181, 231, 0)' }
@@ -277,8 +281,15 @@ export class TableauDeBordComponent implements OnInit, AfterViewInit {
       ]
     };
     userActivityChart.setOption(userActivityOption);
-
-    const userRolesChart = echarts.init(this.userRolesChartElement.nativeElement);
+  
+    // 🎯 Pour le graphique des rôles
+    const chartDomRoles = this.userRolesChartElement.nativeElement;
+    const existingRolesChart = echarts.getInstanceByDom(chartDomRoles);
+    if (existingRolesChart) {
+      echarts.dispose(chartDomRoles);
+    }
+    const userRolesChart = echarts.init(chartDomRoles);
+  
     const userRolesOption = {
       animation: false,
       tooltip: {
@@ -318,7 +329,7 @@ export class TableauDeBordComponent implements OnInit, AfterViewInit {
     };
     userRolesChart.setOption(userRolesOption);
   }
-
+  
   resizeCharts() {
     const userActivityChart = echarts.getInstanceByDom(this.userActivityChartElement.nativeElement);
     const userRolesChart = echarts.getInstanceByDom(this.userRolesChartElement.nativeElement);

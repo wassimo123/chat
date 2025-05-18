@@ -41,6 +41,7 @@ interface EtablissementRaw {
   photos: string[];
 }
 
+
 @Injectable({
   providedIn: 'root'
 })
@@ -62,7 +63,7 @@ export class EtablissementService {
       id: raw._id,
     };
   }
-  //////houni bedel
+ 
   getEtablissementByvaliderId(id: string): Observable<any> {
     return this.http.get(`${this.apiUrl}/valider/${id}`);
   }
@@ -190,7 +191,7 @@ export class EtablissementService {
       });
     }
   
-    // formData.append('partenaireId', '664f6bc9c4f95f28d0c5e782'); // <-- Remplace par un ObjectId réel
+    
 
     console.log('Sending form data to backend');
     
@@ -203,13 +204,76 @@ export class EtablissementService {
   }
   
 
-  // Mettre à jour un établissement (mise à jour complète)
   updateEtablissement(id: string, etablissement: Etablissement): Observable<Etablissement> {
-    return this.http.put<EtablissementRaw>(`${this.apiUrl}/${id}`, etablissement, { headers: this.getHeaders() }).pipe(
+    const formData = new FormData();
+  
+    formData.append('nom', etablissement.nom);
+    formData.append('adresse', etablissement.adresse);
+    formData.append('type', etablissement.type);
+    formData.append('statut', etablissement.statut);
+    formData.append('visibility', etablissement.visibility || 'public');
+    formData.append('codePostal', etablissement.codePostal || '');
+    formData.append('ville', etablissement.ville || '');
+    formData.append('pays', etablissement.pays || '');
+    formData.append('showMap', (etablissement.showMap ?? true).toString());
+    formData.append('telephone', etablissement.telephone);
+    formData.append('email', etablissement.email);
+    formData.append('siteWeb', etablissement.siteWeb);
+    formData.append('description', etablissement.description);
+  
+    if (etablissement.services?.length) {
+      etablissement.services.forEach(service => formData.append('services', service));
+    }
+  
+    if (etablissement.reseauxSociaux) {
+      (Object.keys(etablissement.reseauxSociaux) as (keyof ReseauxSociaux)[]).forEach(key => {
+        const value = etablissement.reseauxSociaux[key];
+        if (value) {
+          formData.append(`reseauxSociaux[${key}]`, value);
+        }
+      });
+    }
+  
+    if (etablissement.horaires) {
+      const days = ['lundi', 'mardi', 'mercredi', 'jeudi', 'vendredi', 'samedi', 'dimanche'];
+      days.forEach(day => {
+        const dayHoraire = etablissement.horaires[day as keyof Horaires] as {
+          open: string;
+          close: string;
+          closed: boolean;
+        };
+      
+        formData.append(`horaires[${day}][open]`, dayHoraire.open);
+        formData.append(`horaires[${day}][close]`, dayHoraire.close);
+        formData.append(`horaires[${day}][closed]`, dayHoraire.closed.toString());
+      });
+  
+      formData.append('horaires[is24_7]', etablissement.horaires.is24_7.toString());
+      if (etablissement.horaires.specialHours) {
+        formData.append('horaires[specialHours]', etablissement.horaires.specialHours);
+      }
+    }
+  
+    if (etablissement.photos?.length) {
+      etablissement.photos.forEach(photo => {
+        if (typeof photo === 'string') {
+          formData.append('existingPhotos', photo); // chemin déjà enregistré
+        } else {
+          formData.append('photos', photo); // fichier à uploader
+        }
+      });
+    }
+    console.log('FormData final envoyé :');
+    formData.forEach((value, key) => {
+      console.log(key, value);
+    });//wassimmm
+  
+    return this.http.put<EtablissementRaw>(`${this.apiUrl}/${id}`, formData).pipe(
       map(raw => this.mapToEtablissement(raw)),
       catchError(this.handleError)
     );
   }
+  
 
   // Archiver un établissement (mise à jour partielle)
   archiverEtablissement(id: string): Observable<Etablissement> {

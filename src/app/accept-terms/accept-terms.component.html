@@ -1,24 +1,35 @@
-<div class="flex items-center justify-center min-h-screen bg-gray-100">
-    <div class="w-full max-w-md bg-white rounded-lg shadow-lg p-8">
-      <h1 class="text-2xl font-bold text-center mb-6 text-gray-900">Nouvelles conditions d'utilisation</h1>
-      <p class="text-sm text-gray-600 mb-4">
-        Une nouvelle version des conditions d'utilisation est disponible. Veuillez les lire et les accepter pour continuer.
-      </p>
-      <div class="border p-4 rounded-lg bg-gray-50 max-h-64 overflow-y-auto mb-4">
-        <h2 class="text-lg font-semibold">{{ latestTerms?.version }}</h2>
-        <p>{{ latestTerms?.content }}</p>
-        <p class="text-sm text-gray-500 mt-2">Dernière mise à jour : {{ latestTerms?.lastUpdated | date }}</p>
-      </div>
-      <div class="flex items-center gap-2 mb-4">
-        <input type="checkbox" [(ngModel)]="termsAccepted" class="w-4 h-4 border-gray-300 text-blue-600 focus:ring-blue-500" />
-        <label class="text-sm text-gray-600">J'accepte les nouvelles conditions d'utilisation.</label>
-      </div>
-      <button
-        (click)="acceptTerms()"
-        [disabled]="!termsAccepted"
-        class="w-full bg-blue-600 text-white py-3 rounded-lg hover:bg-blue-700 transition disabled:bg-gray-400"
-      >
-        Accepter et continuer
-      </button>
+<div class="min-h-screen bg-gradient-to-b from-[#004080] to-[#3B82F6] flex items-center justify-center px-4 font-poppins">
+  <div class="w-full max-w-md bg-white rounded-3xl shadow-2xl p-6 animate-fadeSlideIn">
+
+    <h1 class="text-2xl font-bold text-center mb-4 text-gray-800 tracking-wide">
+      Nouvelles conditions d'utilisation
+    </h1>
+
+    <p class="text-sm text-gray-600 mb-4 text-center">
+      Une nouvelle version des conditions d'utilisation est disponible.<br>
+      Veuillez les lire et les accepter pour continuer.
+    </p>
+
+    <!-- Bloc des conditions -->
+    <div class="border p-4 rounded-lg bg-gray-50 max-h-64 overflow-y-auto mb-4 text-sm text-gray-700">
+      <h2 class="text-base font-semibold mb-2">{{ latestTerms?.version }}</h2>
+      <p>{{ latestTerms?.content }}</p>
+      <p class="text-xs text-gray-500 mt-3">Dernière mise à jour : {{ latestTerms?.lastUpdated | date }}</p>
     </div>
+
+    <!-- Acceptation des conditions -->
+    <div class="flex items-start gap-2 mb-4">
+      <input type="checkbox" [(ngModel)]="termsAccepted" class="w-4 h-4 border-gray-300 text-blue-600 focus:ring-blue-500 mt-1" />
+      <label class="text-sm text-gray-600">J'accepte les nouvelles conditions d'utilisation.</label>
+    </div>
+
+    <!-- Bouton accepter -->
+    <button
+      (click)="acceptTerms()"
+      [disabled]="!termsAccepted"
+      class="w-full bg-blue-600 text-white py-3 rounded-full hover:bg-blue-700 transition disabled:bg-gray-400 text-sm font-semibold">
+      Accepter et continuer
+    </button>
+
   </div>
+</div>

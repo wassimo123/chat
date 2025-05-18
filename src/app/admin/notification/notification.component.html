@@ -1,15 +1,20 @@
 <div class="flex h-screen bg-gray-50 min-h-screen">
   <!-- Sidebar -->
-  <aside class="w-64 bg-white shadow-sm">
-    <div class="h-16 flex items-center px-6">
-      <div class="text-2xl font-['Pacifico'] text-primary">Sfax</div>
+  <aside *ngIf="isAuthenticated" class="w-64 bg-white shadow-sm">
+    <div class="h-16 flex items-center px-20">
+      <img src="assets/images/2.png" alt="Logo Sfax" class="h-[80px] w-[140px]" />
+
+
+
     </div>
     <nav class="mt-4">
-      <a routerLink="/dashboard" class="flex items-center px-6 py-3 text-gray-600 hover:bg-gray-50 hover:text-primary">
-        <i class="ri-dashboard-line mr-3"></i> <span>Tableau de bord</span>
+      <a routerLink="/dashboard" routerLinkActive="bg-gray-50 text-primary" class="flex items-center px-6 py-3 text-gray-600 hover:bg-gray-50 hover:text-primary">
+        <i class="ri-dashboard-line mr-3"></i>
+        <span>Tableau de bord</span>
       </a>
-      <a routerLink="/users" class="flex items-center px-6 py-3 text-gray-600 hover:bg-gray-50 hover:text-primary">
-        <i class="ri-user-line mr-3"></i> <span>Utilisateurs</span>
+      <a routerLink="/users" routerLinkActive="bg-gray-50 text-primary" class="flex items-center px-6 py-3 text-gray-600 hover:bg-gray-50 hover:text-primary">
+        <i class="ri-user-line mr-3"></i>
+        <span>Utilisateurs</span>
       </a>
       <a routerLink="/etablissements" routerLinkActive="bg-gray-50 text-primary" class="flex items-center px-6 py-3 text-gray-600 hover:bg-gray-50 hover:text-primary">
         <i class="ri-building-line mr-3"></i>
@@ -25,9 +30,10 @@
       </a>
       <a routerLink="/publicites" routerLinkActive="bg-gray-50 text-primary" class="flex items-center px-6 py-3 text-gray-600 hover:bg-gray-50 hover:text-primary">
         <i class="ri-advertisement-line mr-3"></i> <span>Publicités</span>
-       </a>
-      <a routerLink="/notifications" class="flex items-center px-6 py-3 text-gray-600 hover:bg-gray-50 hover:text-primary">
-        <i class="ri-notification-line mr-3"></i> <span>Notifications</span>
+      </a>
+      <a routerLink="/notifications" routerLinkActive="bg-gray-50 text-primary" class="flex items-center px-6 py-3 text-gray-600 hover:bg-gray-50 hover:text-primary">
+        <i class="ri-notification-line mr-3"></i>
+        <span>Notifications</span>
       </a>
     </nav>
   </aside>
@@ -35,7 +41,7 @@
   <!-- Contenu principal -->
   <div *ngIf="isAuthenticated; else notAuthenticated"  class="flex-1 flex flex-col">
         <!-- Header -->
-        <header class="bg-white shadow-sm h-16">
+        <header class="bg-white shadow-sm h-20">
           <div class="h-full px-6 flex items-center justify-between">
             <div class="flex items-center">
               <div class="relative">

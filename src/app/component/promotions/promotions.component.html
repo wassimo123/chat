@@ -6,81 +6,62 @@
       <!-- Sidebar with Filters -->
       <aside class="w-full md:w-1/4 bg-white p-6 rounded shadow-sm">
         <h3 class="text-lg font-semibold mb-4">Filtres</h3>
+        <!-- Barre de recherche -->
         <div class="relative mb-4">
           <input
             type="text"
             [(ngModel)]="searchQuery"
-            (ngModelChange)="filterPromotions()"
+            (ngModelChange)="onFiltersChange()"
             placeholder="Rechercher une promotion..."
             class="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-full focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent text-sm"
           />
-          <div
-            class="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 flex items-center justify-center text-gray-400"
-          >
+          <div class="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 flex items-center justify-center text-gray-400">
             <i class="ri-search-line"></i>
           </div>
         </div>
         
-        <!-- Categories -->
+        <!-- Catégories -->
         <div class="mb-6">
           <h4 class="text-sm font-medium text-gray-700 uppercase tracking-wider mb-3">Catégories</h4>
           <div class="space-y-2">
             <label class="flex items-center" *ngFor="let category of categories">
-              <input
-                type="checkbox"
-                class="checkbox-custom mr-2"
-                [(ngModel)]="category.selected"
-                (ngModelChange)="filterPromotions()"
-              />
+              <input type="checkbox" class="checkbox-custom mr-2" [(ngModel)]="category.selected" (ngModelChange)="onFiltersChange()" />
               <span>{{ category.name }}</span>
             </label>
           </div>
         </div>
 
-        <!-- Price -->
+        <!-- Prix (DT) -->
         <div class="mb-6">
           <h4 class="text-sm font-medium text-gray-700 uppercase tracking-wider mb-3">Prix (DT)</h4>
           <div class="flex items-center space-x-3">
             <div class="flex-1">
               <label class="block text-sm text-gray-600 mb-1">Min</label>
-              <div class="relative">
-                <input
-                  type="number"
-                  [(ngModel)]="priceMin"
-                  (ngModelChange)="filterPromotions()"
-                  placeholder="0"
-                  class="w-full px-3 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent text-sm pr-10"
-                />
-                <span class="absolute inset-y-0 right-3 flex items-center text-gray-500">DT</span>
-              </div>
+              <input
+                type="number"
+                [(ngModel)]="priceMin"
+                (ngModelChange)="onFiltersChange()"
+                class="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm"
+              />
             </div>
             <div class="flex-1">
               <label class="block text-sm text-gray-600 mb-1">Max</label>
-              <div class="relative">
-                <input
-                  type="number"
-                  [(ngModel)]="priceMax"
-                  (ngModelChange)="filterPromotions()"
-                  placeholder="500"
-                  class="w-full px-3 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent text-sm pr-10"
-                />
-                <span class="absolute inset-y-0 right-3 flex items-center text-gray-500">DT</span>
-              </div>
+              <input
+                type="number"
+                [(ngModel)]="priceMax"
+                (ngModelChange)="onFiltersChange()"
+                class="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm"
+              />
             </div>
           </div>
         </div>
 
-        <!-- Promotion Types -->
+        <!-- Type de promotion -->
         <div class="mb-6">
           <h4 class="text-sm font-medium text-gray-700 uppercase tracking-wider mb-3">Type de promotion</h4>
           <div class="space-y-2">
             <label class="flex items-center" *ngFor="let type of promotionTypes">
-              <input
-                type="checkbox"
-                class="checkbox-custom mr-2"
-                [(ngModel)]="type.selected"
-                (ngModelChange)="filterPromotions()"
-              />
+              <input type="checkbox" class="checkbox-custom mr-2" [(ngModel)]="type.selected" (ngModelChange)="onFiltersChange()" />
               <span>{{ type.name }}</span>
             </label>
           </div>
@@ -89,30 +70,20 @@
         <!-- Agenda -->
         <div class="mb-6">
           <h4 class="text-sm font-medium text-gray-700 uppercase tracking-wider mb-3">Agenda</h4>
-          <div class="space-y-4">
-            <div class="agenda-field">
-              <label class="block text-sm font-medium text-gray-700 mb-1">Du</label>
-              <div class="relative">
-                <input
-                  type="date"
-                  [(ngModel)]="startDate"
-                  (ngModelChange)="filterPromotions()"
-                  class="w-full pl-3 pr-5 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary text-sm transition-all duration-300"
-                />
-              </div>
-            </div>
-            <div class="agenda-field">
-              <label class="block text-sm font-medium text-gray-700 mb-1">Au</label>
-              <div class="relative">
-                <input
-                  type="date"
-                  [(ngModel)]="endDate"
-                  (ngModelChange)="filterPromotions()"
-                  class="w-full pl-3 pr-5 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary text-sm transition-all duration-300"
-                />
-              </div>
-            </div>
-          </div>
+          <label class="block text-sm text-gray-600 mb-1">Du</label>
+          <input
+            type="date"
+            [(ngModel)]="startDate"
+            (ngModelChange)="onFiltersChange()"
+            class="w-full mb-2 px-3 py-2 border border-gray-200 rounded-lg text-sm"
+          />
+          <label class="block text-sm text-gray-600 mb-1">Au</label>
+          <input
+            type="date"
+            [(ngModel)]="endDate"
+            (ngModelChange)="onFiltersChange()"
+            class="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm"
+          />
         </div>
       </aside>
 
@@ -128,8 +99,8 @@
               <div class="relative">
                 <select
                   [(ngModel)]="sortOption"
-                  (ngModelChange)="sortPromotions()"
-                  class="bg-white px-4 py-2 rounded-full border border-gray-300 pl-4 pr-8 focus:outline-none focus:ring-2 focus:ring-primary"
+                  (ngModelChange)="onFiltersChange()"
+                  class="w-full bg-white px-4 py-2 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-primary"
                 >
                   <option value="recent">Les plus récentes</option>
                   <option value="dateAsc">Date plus proche</option>
@@ -149,50 +120,32 @@
             class="bg-white rounded-lg shadow-lg overflow-hidden promotion-card"
           >
             <div class="relative">
-              <!--saghari-->
               <img
-              [src]="'http://localhost:5000' + promotion.photo"
-              [alt]="promotion.name"
-              class="w-full h-48 object-cover"
-              (error)="promotion.photo = 'https://via.placeholder.com/300'"
-            />
-            
+                [src]="'http://localhost:5000' + promotion.photo"
+                [alt]="promotion.name"
+                class="w-full h-48 object-cover"
+                (error)="promotion.photo = 'https://via.placeholder.com/300'"
+              />
               <div
                 class="absolute top-4 left-4 bg-red-500 text-white px-3 py-1 rounded-full text-sm font-semibold"
                 *ngIf="promotion.discount"
               >
                 {{ promotion.discount }}
               </div>
-              <!-- <div
-                class="absolute top-4 right-4 bg-primary text-white px-3 py-1 rounded-full text-sm font-semibold"
-                *ngIf="promotion.isNew"
+              <div
+                class="absolute top-4 right-4 px-3 py-1 rounded-full text-sm font-semibold shadow-sm"
+                [ngClass]="getCategoryBadgeClass(promotion.category)"
               >
-                Nouveau
-              </div> -->
-              <!-- Nouveau badge TYPE d'établissement (ex: Café, Hôtel...) -->
-                  <div
-                  class="absolute top-4 right-4 px-3 py-1 rounded-full text-sm font-semibold shadow-sm"
-                  [ngClass]="getCategoryBadgeClass(promotion.category)"
-                  >
-                  {{ promotion.category }}
-                  </div>
+                {{ promotion.category }}
+              </div>
             </div>
             <div class="p-6">
               <div class="flex items-center justify-between mb-4">
                 <span class="text-sm text-primary"
                   >Valable jusqu'au {{ promotion.endDate | date: "dd MMMM yyyy" }}</span
                 >
-                <!-- <span
-                class="px-3 py-1 rounded-full text-sm font-semibold"
-                [ngClass]="getBadgeClass(promotion.category)"
-              >
-                {{ promotion.category }}
-              </span> -->
-              
-                
               </div>
 
-              <!-- Nouvelle structure de titre + icône -->
               <div class="flex items-center space-x-3 mb-1">
                 <div
                   class="w-10 h-10 rounded-full flex items-center justify-center"
@@ -206,8 +159,6 @@
               <p class="text-base text-gray-800 leading-normal mb-2">
                 Établissement: {{ promotion.etablissementName }}
               </p>
-              
-              
 
               <div class="flex items-center mb-2">
                 <i class="ri-calendar-line text-gray-600 mr-2"></i>
@@ -237,8 +188,6 @@
                     {{ promotion.code }}
                   </span>
                 </div>
-                
-                
               </div>
 
               <div class="flex justify-between items-center">
@@ -340,104 +289,187 @@
 
 <app-footer></app-footer>
 
-<!-- Promotion Detail Modal -->
+<!-- Modal de notification -->
 <div
-  class="fixed inset-0 z-50 bg-black bg-opacity-60 flex items-center justify-center p-4 transition-all duration-300"
-  [class.hidden]="!showNotifyModal"
+  class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50 backdrop-blur-sm"
+  *ngIf="showNotifyModal && selectedPromotion"
 >
-  <div
-    class="bg-white rounded-2xl shadow-2xl max-w-lg w-full p-8 relative overflow-y-auto max-h-[90vh] transform transition-all duration-300 scale-100 hover:scale-[1.01]"
-  >
-    <!-- Close Button -->
+  <div class="bg-white rounded-xl shadow-2xl w-full max-w-md p-6 relative">
+    <!-- Bouton de fermeture -->
     <button
-      class="absolute top-4 right-4 text-gray-500 hover:text-red-600 transition-colors duration-200"
+      class="absolute top-4 right-4 text-gray-400 hover:text-red-600"
       (click)="closeModal()"
     >
-      <i class="ri-close-line text-3xl"></i>
+      <i class="ri-close-line text-2xl"></i>
     </button>
 
-    <!-- Modal Header -->
-    <div class="flex items-center space-x-4 border-b border-gray-200 pb-4 mb-6">
-      <div class="w-16 h-16 rounded-full bg-blue-100 flex items-center justify-center">
-        <i class="ri-price-tag-3-line text-3xl text-blue-600"></i>
-      </div>
-      <div>
-        <h2 class="text-2xl font-bold text-gray-800">Détails de la promotion</h2>
-        <p class="text-sm text-gray-500">{{ selectedPromotion?.title }}</p>
-      </div>
-    </div>
+    <!-- Titre -->
+    <h2 class="text-xl font-bold text-gray-900 mb-2">
+      Notification - {{ selectedPromotion.title }}
+    </h2>
 
-    <!-- Modal Content -->
-    <div *ngIf="selectedPromotion as promo" class="space-y-6 text-sm text-gray-700">
-      <div class="bg-gray-50 p-4 rounded-lg shadow-sm">
-        <p><strong class="font-semibold">Nom de la promotion :</strong> {{ promo.title }}</p>
+    <!-- Sous-titre -->
+    <p class="text-gray-600 mb-4">
+      Recevez un rappel par e-mail un jour avant la fin de cette promotion.
+    </p>
+
+    <!-- Formulaire email -->
+    <label for="notifEmail" class="block text-sm font-medium text-gray-700 mb-1">
+      Email
+    </label>
+    <input
+      type="email"
+      id="notifEmail"
+      [(ngModel)]="notificationEmail"
+      class="w-full px-4 py-2 mb-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
+      placeholder="exemple@email.com"
+      [ngClass]="{'border-red-500': notificationMessage && !notificationSuccess}"
+    />
+
+    <!-- Message de succès ou erreur -->
+    <p *ngIf="notificationMessage" 
+       class="text-sm text-center mb-2"
+       [ngClass]="{
+         'text-green-600': notificationSuccess,
+         'text-red-600': !notificationSuccess
+       }">
+      {{ notificationMessage }}
+    </p>
+
+    <!-- Boutons -->
+    <div class="flex justify-end gap-3 mt-3">
+      <button
+        class="px-4 py-2 rounded-lg border border-gray-300 text-gray-700 hover:bg-gray-100"
+        (click)="closeModal()"
+        [disabled]="isLoading"
+      >
+        Annuler
+      </button>
+      <button
+        class="px-4 py-2 rounded-lg bg-primary text-white hover:bg-indigo-600 flex items-center gap-2"
+        (click)="confirmNotification()"
+        [disabled]="isLoading"
+      >
+        <span *ngIf="isLoading" class="animate-spin h-4 w-4 border-2 border-white border-t-transparent rounded-full"></span>
+        <span>{{ isLoading ? 'Envoi...' : 'Confirmer' }}</span>
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- Promotion Detail Modal -->
+<div class="fixed inset-0 z-50 bg-black bg-opacity-50 backdrop-blur-sm flex items-center justify-center p-2 sm:p-4" *ngIf="selectedPromotion && showPromotionDetailModal">
+  <div class="bg-white rounded-xl shadow-2xl w-full max-w-sm sm:max-w-md md:max-w-lg p-5 sm:p-6 relative">
+    <!-- Bouton de fermeture -->
+    <button class="absolute top-4 right-4 text-gray-400 hover:text-red-600" (click)="closeModal()">
+      <i class="ri-close-line text-2xl"></i>
+    </button>
+
+    <!-- Titre -->
+    <h2 class="text-2xl font-bold text-gray-800 mb-4">{{ selectedPromotion.name }}</h2>
+
+    <!-- Détails -->
+    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 text-sm text-gray-700">
+      <div class="flex items-center space-x-2">
+        <i class="ri-calendar-line text-purple-600"></i>
+        <span>{{ selectedPromotion.startDate | date:'dd/MM/yyyy' }} - {{ selectedPromotion.endDate | date:'dd/MM/yyyy' }}</span>
       </div>
-      <div class="bg-gray-50 p-4 rounded-lg shadow-sm">
-        <p><strong class="font-semibold">Type d’établissement :</strong> {{ promo.category }}</p>
-      </div>
-      <div class="bg-gray-50 p-4 rounded-lg shadow-sm">
-        <p><strong class="font-semibold">Nom de l’établissement :</strong> {{ promo.etablissementName }}</p>
-      </div>
-      <div class="bg-gray-50 p-4 rounded-lg shadow-sm">
-        <p><strong class="font-semibold">Type de promotion :</strong> {{ promo.type || 'Non spécifié' }}</p>
-      </div>
-      <div class="bg-gray-50 p-4 rounded-lg shadow-sm">
-        <p><strong class="font-semibold">Valeur de la promotion :</strong> {{ promo.discount || 'N/A' }}</p>
-      </div>
-      <div class="bg-gray-50 p-4 rounded-lg shadow-sm text-center">
-        <p class="text-sm font-semibold text-gray-700 mb-2">Code promo</p>
-        <span class="inline-block bg-purple-100 text-primary font-semibold px-3 py-1 rounded-full">
-          {{ promo.code }}
+
+      <div class="flex items-center space-x-2">
+        <i class="ri-percent-line text-purple-600"></i>
+        <span>Réduction :</span>
+        <span
+          *ngIf="selectedPromotion.discount"
+          class="inline-block bg-blue-100 text-blue-800 text-sm font-semibold px-3 py-1 rounded-full"
+        >
+          {{ selectedPromotion.discount }}
+        </span>
+        <span
+          *ngIf="!selectedPromotion.discount"
+          class="inline-block bg-gray-100 text-gray-500 text-sm font-semibold px-3 py-1 rounded-full"
+        >
+          N/A
         </span>
       </div>
-      <div class="bg-gray-50 p-4 rounded-lg shadow-sm">
-        <p><strong class="font-semibold">Date de début :</strong> {{ promo.startDate | date: 'dd MMMM yyyy' }}</p>
-      </div>
-      <div class="bg-gray-50 p-4 rounded-lg shadow-sm">
-        <p><strong class="font-semibold">Date de fin :</strong> {{ promo.endDate | date: 'dd MMMM yyyy' }}</p>
-      </div>
-      <div class="bg-gray-50 p-4 rounded-lg shadow-sm">
-        <p><strong class="font-semibold">Limite d’utilisation :</strong> {{ promo.limit || 'Illimité' }}</p>
-      </div>
-      <div class="bg-gray-50 p-4 rounded-lg shadow-sm">
-        <p><strong class="font-semibold">Prix avant réduction :</strong> {{ promo.originalPrice || 'N/A' }} DT</p>
-      </div>
-      <div class="bg-gray-50 p-4 rounded-lg shadow-sm">
-        <p><strong class="font-semibold">Prix après réduction :</strong> {{ promo.price || 'N/A' }} DT</p>
-      </div>
-      <div class="bg-gray-50 p-4 rounded-lg shadow-sm">
-        <p><strong class="font-semibold">Description :</strong> {{ promo.description || 'Aucune description.' }}</p>
-      </div>
-      <div *ngIf="promo.conditions" class="bg-gray-50 p-4 rounded-lg shadow-sm">
-        <p class="font-semibold mb-2">Conditions :</p>
-        <ul class="list-disc ml-6 space-y-1">
-          <li *ngIf="promo.conditions.minPurchase">
-            Montant minimum d’achat :
-            {{ promo.conditions.minPurchaseAmount || 'Non précisé' }} DT
-          </li>
-          <li *ngIf="promo.conditions.newCustomers">
-            Réservée aux nouveaux clients
-          </li>
-          <li *ngIf="promo.conditions.specificItems && promo.conditions.specificItems.length > 0">
-            Produits spécifiques :
-            {{ promo.conditions.specificItems.join(', ') }}
-          </li>
-          <li *ngIf="promo.conditions.specificDays && promo.conditions.specificDays.length > 0">
-            Jours valides :
-            {{ promo.conditions.specificDays.join(', ') }}
-          </li>
-        </ul>
-      </div>
-      
-    </div>
-    
 
-    <!-- Modal Actions -->
-    <div class="mt-6 flex justify-end">
-      <button
-        (click)="closeModal()"
-        class="px-4 py-2 bg-primary text-white rounded-lg hover:bg-blue-600 transition-colors duration-200"
-      >
+      <div class="flex items-center space-x-2">
+        <i class="ri-lock-line text-purple-600"></i>
+        <span class="inline-block px-3 py-1 rounded-full text-sm font-semibold bg-green-100 text-green-800">Statut : {{ selectedPromotion.status || 'Non spécifié' }}</span>
+      </div>
+
+      <div class="flex items-center space-x-2">
+        <i class="ri-price-tag-3-line text-purple-600"></i>
+        <span>Type : {{ getPromotionTypeLabel(selectedPromotion.type || '') }}</span>
+      </div>
+
+      <div class="flex items-center space-x-2">
+        <i class="ri-shield-check-line text-purple-600"></i>
+        <span>Limite d’utilisation : {{ selectedPromotion.limit || 'Illimité' }}</span>
+      </div>
+
+      <div class="flex items-center space-x-2">
+        <i class="ri-building-line text-purple-600"></i>
+        <span>Établissement : {{ selectedPromotion.etablissementName }}</span>
+      </div>
+
+      <div class="flex items-center space-x-2">
+        <i class="ri-hotel-line text-purple-600"></i>
+        <span class="bg-purple-100 text-purple-800 font-semibold px-2 py-1 rounded-full">
+          {{ selectedPromotion.etablissementType }}
+        </span>
+      </div>
+
+      <div>
+        <strong>Description :</strong>
+        <p class="text-gray-600">{{ selectedPromotion.description || 'Aucune' }}</p>
+      </div>
+
+      <div class="flex space-x-3">
+        <p><strong>Avant :</strong> <span class="line-through text-red-500">{{ selectedPromotion.prixAvant || 'N/A' }} DT</span></p>
+        <p><strong>Après :</strong> <span class="text-green-600 font-bold">{{ selectedPromotion.prixApres || 'N/A' }} DT</span></p>
+      </div>
+
+      <div class="flex items-center space-x-2">
+        <span class="text-sm font-bold">Code Promo :</span>
+        <span class="inline-block bg-purple-100 text-primary font-semibold px-3 py-1 rounded-full text-sm">
+          {{ selectedPromotion.code || 'Aucun code' }}
+        </span>
+      </div>
+    </div>
+
+    <!-- Conditions -->
+    <div *ngIf="selectedPromotion?.conditions" class="bg-gray-50 p-4 rounded-lg shadow-sm mt-4">
+      <p class="font-semibold text-gray-800 mb-2">Conditions :</p>
+      <ul class="list-disc ml-6 space-y-2 text-sm text-gray-700">
+        <li *ngIf="selectedPromotion.conditions?.minPurchase">
+          Montant minimum d’achat : {{ selectedPromotion.conditions?.minPurchaseAmount ?? 'Non précisé' }} DT
+        </li>
+        <li *ngIf="selectedPromotion.conditions?.newCustomers">
+          Réservé aux nouveaux clients
+        </li>
+        <li *ngIf="selectedPromotion.conditions?.specificItems?.length">
+          Applicable à des articles spécifiques :
+          <div class="mt-1 flex flex-wrap gap-2">
+            <span
+              *ngFor="let item of selectedPromotion.conditions?.specificItems"
+              class="inline-block bg-blue-100 text-blue-800 px-2 py-1 rounded-full text-xs"
+            >
+              {{ item }}
+            </span>
+          </div>
+        </li>
+        <li *ngIf="selectedPromotion?.conditions?.days && getValidDays(selectedPromotion.conditions?.days).length > 0">
+          <span class="font-semibold text-gray-700">Applicable certains jours :</span>
+          <span class="ml-2 text-gray-800">
+            {{ getValidDays(selectedPromotion.conditions?.days).join(' ') }}
+          </span>
+        </li>
+      </ul>
+    </div>
+
+    <!-- Footer bouton -->
+    <div class="mt-6 text-center">
+      <button class="bg-primary text-white px-5 py-2 rounded-full hover:bg-indigo-700 transition" (click)="closeModal()">
         Fermer
       </button>
     </div>

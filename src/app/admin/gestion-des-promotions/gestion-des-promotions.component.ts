@@ -7,6 +7,7 @@ import { UserService } from '../../services/user.service';
 import { Router } from '@angular/router';
 import { Promotion } from '../../models/promotion.model';
 
+
 Chart.register(...registerables);
 
 interface PromoStats {
@@ -112,36 +113,94 @@ export class GestionDesPromotionsComponent implements OnInit, AfterViewInit {
       },
     });
   
-    this.notificationService.notifications$.subscribe((notifications) => {
-      let unreadNotifications = notifications.filter((notif) => !notif.read);
-      const checkPromises = unreadNotifications.map((notif) => {
-        if (!notif.email) {
-          return Promise.resolve(null);
-        }
-        return this.userService
-          .checkUserExists(notif.email)
-          .toPromise()
-          .then(
-            (response) => {
-              if (response && response.exists) {
-                return notif;
-              } else {
-                console.log(`Utilisateur avec email ${notif.email} n'existe plus, suppression de la notification.`);
-                return null;
-              }
-            },
-            (error) => {
-              console.error(`Erreur lors de la vérification de l'utilisateur ${notif.email}:`, error);
-              return null;
-            }
-          );
-      });
+  //   this.notificationService.notifications$.subscribe((notifications) => {
+  //     let unreadNotifications = notifications.filter((notif) => !notif.read);
+  //     const checkPromises = unreadNotifications.map((notif) => {
+  //       if (!notif.email) {
+  //         return Promise.resolve(null);
+  //       }
+  //       return this.userService
+  //         .checkUserExists(notif.email)
+  //         .toPromise()
+  //         .then(
+  //           (response) => {
+  //             if (response && response.exists) {
+  //               return notif;
+  //             } else {
+  //               console.log(`Utilisateur avec email ${notif.email} n'existe plus, suppression de la notification.`);
+  //               return null;
+  //             }
+  //           },
+  //           (error) => {
+  //             console.error(`Erreur lors de la vérification de l'utilisateur ${notif.email}:`, error);
+  //             return null;
+  //           }
+  //         );
+  //     });
   
-      Promise.all(checkPromises).then((results) => {
-        this.notifications = results.filter((notif) => notif !== null) as any[];
-      });
+  //     Promise.all(checkPromises).then((results) => {
+  //       this.notifications = results.filter((notif) => notif !== null) as any[];
+  //     });
+  //   });
+  // }
+  // this.notificationService.notifications$.subscribe((notifications) => {
+  //   let unreadNotifications = notifications.filter((notif) => !notif.read);
+  //   const checkPromises = unreadNotifications.map((notif) => {
+  //     if (!notif.email) {
+  //       return Promise.resolve(null);
+  //     }
+  //     return this.userService.checkUserExists(notif.email).toPromise().then(
+  //       (response) => {
+  //         if (response && Array.isArray(response) && response[0].exists) {
+  //           return notif; // User exists
+  //         } else {
+  //           console.log(`Utilisateur avec email ${notif.email} n'existe plus, suppression de la notification.`);
+  //           // this.notificationService.removeNotificationsByEmail(notif.email); 
+  //           return null; // User doesn't exist or error
+  //         }
+  //       },
+  //       (error) => {
+  //         console.error(`Erreur lors de la vérification de l'utilisateur ${notif.email}:`, error);
+  //         this.showNotification(`Erreur lors de la vérification de l'email ${notif.email}: ${error.message}`, 'error');
+  //         return null;
+  //       }
+  //     );
+  //   });
+
+  //   Promise.all(checkPromises).then((results) => {
+  //     this.notifications = results.filter((notif) => notif !== null) as any[];
+  //   });
+  // });
+  this.notificationService.notifications$.subscribe(notifications => {
+    console.log('Notifications reçues:', notifications);
+    let unreadNotifications = notifications.filter(notif => !notif.read);
+    const updatedNotifications: any[] = [];
+    let checkPromises = unreadNotifications.map(notif => {
+      if (!notif.email) {
+        return Promise.resolve(null);
+      }
+      return this.userService.checkUserExists(notif.email).toPromise().then(
+        (response) => {
+          if (response && response.exists) {
+            return notif;
+          } else {
+            console.log(`Utilisateur avec email ${notif.email} n'existe plus, suppression de la notification.`);
+            return null;
+          }
+        },
+        error => {
+          console.error(`Erreur lors de la vérification de l'utilisateur ${notif.email}:`, error);
+          return null;
+        }
+      );
     });
-  }
+
+    Promise.all(checkPromises).then(results => {
+      const validNotifications = results.filter(notif => notif !== null);
+      this.notifications = validNotifications;
+    });
+  });
+}
 
   ngAfterViewInit(): void {
     if (this.isAuthenticated) {
@@ -185,35 +244,54 @@ selectEstablishmentType(type: string): void {
   }
 }
 
-  loadPromotions(): void {
-    this.promotionService.getPromotions().subscribe({
-      next: (promotions) => {
-        this.promotions = promotions.map((p: any) => {
-          const etab = this.etablissements.find((e) => e._id === p.etablissementId);
-          return {
-            ...p,
-            id: p._id,
-            selected: false,
-            etablissementId: {
-              _id: p.etablissementId,
-              nom: etab ? etab.nom : 'Inconnu',
-              type: etab ? etab.type : '',
-            },
-            startDate: new Date(p.startDate).toISOString().split('T')[0],
-            endDate: new Date(p.endDate).toISOString().split('T')[0],
-            establishmentName: etab ? etab.nom : 'Inconnu',
-          };
-        });
-        this.filteredPromotions = [...this.promotions];
-        this.updateStats();
-        this.updatePagination();
-        this.updateCharts();
-      },
-      error: (err: Error) => {
-        this.showNotification(err.message, 'error');
-      },
-    });
-  }
+loadPromotions(): void {
+  this.promotionService.getPromotions().subscribe({
+    next: (promotions) => {
+      const today = new Date();
+
+      this.promotions = promotions.map((p: any) => {
+        const etab = this.etablissements.find((e) => e._id === p.etablissementId);
+
+        const startDate = new Date(p.startDate);
+        const endDate = new Date(p.endDate);
+
+        // Mettre à jour localement le statut si expiré
+        let status = p.status;
+        if (status === 'active' && endDate < today) {
+          status = 'expired';
+        }
+
+        return {
+          ...p,
+          id: p._id,
+          selected: false,
+          status: status, // mise à jour locale
+          etablissementId: {
+            _id: p.etablissementId,
+            nom: etab ? etab.nom : 'Inconnu',
+            type: etab ? etab.type : '',
+          },
+          startDate: startDate.toISOString().split('T')[0],
+          endDate: endDate.toISOString().split('T')[0],
+          establishmentName: etab ? etab.nom : 'Inconnu',
+          photo: p.photo ?? null,
+        };
+      });
+
+      //  Afficher uniquement les promotions actives
+      // this.promotions = this.promotions.filter(p => p.status === 'active');
+
+      this.filteredPromotions = [...this.promotions];
+      this.updateStats();
+      this.updatePagination();
+      this.updateCharts();
+    },
+    error: (err: Error) => {
+      this.showNotification(err.message, 'error');
+    },
+  });
+}
+
 
   onTypeChange(): void {
     this.etablissementsType = [];
@@ -409,6 +487,7 @@ onPhotoChange(event: any): void {
     const reader = new FileReader();
     reader.onload = () => {
       this.photoPreviewUrl = reader.result as string; // ✅ uniquement pour affichage
+      this.currentPromotion.photo = this.photoPreviewUrl;
     };
     reader.readAsDataURL(file);
   }
@@ -419,11 +498,18 @@ removePhoto(): void {
   this.photoPreviewUrl = null;
   this.currentPromotion.photo = null; // annule photo existante
 }
-getPhotoUrl(photo: string | string[]|null|undefined): string {
-  if (Array.isArray(photo)) {
-    return photo.length > 0 ? `http://localhost:5000${photo[0]}` : 'https://via.placeholder.com/300';
+getPhotoUrl(photo: string | string[] | null | undefined): string {
+  if (Array.isArray(photo) && photo.length > 0) {
+    return `http://localhost:5000${photo[0]}`; // Use the first photo if it’s an array
   }
-  return photo ? `http://localhost:5000${photo}` : 'https://via.placeholder.com/300';
+  if (typeof photo === 'string') {
+    // Check if the photo is already a base64 string (starts with "data:image")
+    if (photo.startsWith('data:image')) {
+      return photo; // Base64 string, use directly
+    }
+    return `http://localhost:5000${photo}`; // Assume it’s a path, prepend the server URL
+  }
+  return 'https://via.placeholder.com/300'; // Fallback for null/undefined
 }
 
   
@@ -547,7 +633,7 @@ getPhotoUrl(photo: string | string[]|null|undefined): string {
       this.showNotification('La date de début doit être antérieure à la date de fin.', 'error');
       return;
     }
-
+    const promotionData = { ...this.currentPromotion, photo: undefined };
     if (!this.currentPromotion.id) {
       this.promotionService.addPromotion(this.currentPromotion, this.selectedFile || undefined).subscribe({
         next: () => {
@@ -799,13 +885,13 @@ toggleEstablishmentListFilter(): void {
 // Getter to return photos as an array (or empty array if not an array)
 get photoArray(): string[] {
   const photo = this.promotionDetails?.photo ?? null;
-  if (this.isPhotoArray(photo)) {
-    return photo;
+  if (Array.isArray(photo)) {
+    return photo; // Already an array
   }
   if (typeof photo === 'string') {
-    return [photo];
+    return [photo]; // Convert string to array
   }
-  return [];
+  return []; // Return empty array if null or undefined
 }
 
 

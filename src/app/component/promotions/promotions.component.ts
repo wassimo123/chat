@@ -4,14 +4,13 @@ import { FormsModule } from '@angular/forms';
 import { NavbarComponent } from '../navbar/navbar.component';
 import { FooterComponent } from '../footer/footer.component';
 import { PromotionService, Etablissement } from '../../services/promotion.service';
-
 import { Router } from '@angular/router';
 
 interface FilterOption {
   name: string;
   selected: boolean;
 }
-// models/promotion.model.ts
+
 export interface Promotion {
   name: string;
   photo?: string;
@@ -37,6 +36,7 @@ export interface Promotion {
 }
 
 interface ExtendedPromotion extends Promotion {
+  _id: string;
   image: string;
   title: string;
   price: string;
@@ -49,8 +49,8 @@ interface ExtendedPromotion extends Promotion {
   etablissementName: string;
   description: string;
   code: string;
-  
-  
+  status?: string;
+  createdAt: Date;
 }
 
 @Component({
@@ -69,8 +69,8 @@ export class PromotionsComponent implements OnInit {
   newsletterSuccess: boolean = false;
   isDuplicate: boolean = false;
   emailError: boolean = false;
-  registeredEmails: string[] = ['test@example.com', 'affeswassim3@gmail.com'];
-
+  showPromotionDetailModal: boolean = false;
+  isLoading: boolean = false;
   currentPage: number = 1;
   itemsPerPage: number = 9;
   priceMin: number = 0;
@@ -108,33 +108,80 @@ export class PromotionsComponent implements OnInit {
   loadPromotions(): void {
     this.promotionService.getPromotions().subscribe({
       next: (promotions: any[]) => {
-        this.promotions = promotions.map(p => ({
-          ...p,
-          image: p.photo || 'https://via.placeholder.com/300',
-          title: p.name,
-          price: p.prixApres != null ? (+p.prixApres).toFixed(2) : 'N/A',
-          originalPrice: p.prixAvant != null ? (+p.prixAvant).toFixed(2) : 'N/A',
-          expiry: new Date(p.endDate),
-          isNew: new Date(p.startDate) > new Date(Date.now() - 7 * 24 * 60 * 60 * 1000),
-          expiringSoon: new Date(p.endDate) < new Date(Date.now() + 7 * 24 * 60 * 60 * 1000),
-          bookmarked: false,
-          category: p.etablissementType || 'Inconnu',
-          etablissementName: p.etablissementName || 'Inconnu',
-          description: p.description || 'Aucune description disponible.',
-          code: p.code || 'Aucun code',
-          conditions: p.conditions || undefined, // sécurisation
-        }));
+        const now = new Date();
+  
+        this.promotions = promotions
+          .map(p => {
+            return {
+              ...p,
+              createdAt: new Date(p.createdAt),
+              image: p.photo || 'https://via.placeholder.com/300',
+              title: p.name || 'Sans titre',
+              price: p.prixApres !== undefined && p.prixApres !== null ? (+p.prixApres).toFixed(2) : 'N/A',
+              originalPrice: p.prixAvant !== undefined && p.prixAvant !== null ? (+p.prixAvant).toFixed(2) : 'N/A',
+              expiry: new Date(p.endDate),
+              isNew: new Date(p.startDate) > new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000),
+              expiringSoon: new Date(p.endDate) < new Date(now.getTime() + 7 * 24 * 60 * 60 * 1000),
+              bookmarked: false,
+              category: p.etablissementType || 'Inconnu',
+              etablissementName: p.etablissementName || 'Inconnu',
+              description: p.description || 'Aucune description disponible.',
+              code: p.code || 'Aucun code',
+              conditions: {
+                minPurchase: p.conditions?.minPurchase ?? false,
+                minPurchaseAmount: p.conditions?.minPurchaseAmount ?? null,
+                newCustomers: p.conditions?.newCustomers ?? false,
+                specificItems: p.conditions?.specificItems ?? [],
+                specificDays: p.conditions?.specificDays ?? [],
+                days: p.conditions?.days ?? {}
+              },
+            };
+          })
+          .filter(p => p.status === 'active');
+
         this.filteredPromotions = [...this.promotions];
         this.updatePagination();
       },
       error: (err) => {
-        console.error('Erreur lors du chargement des promotions:', err);
+        console.error('Erreur lors du chargement des promotions :', err);
       }
     });
   }
-  
-  
-  
+
+  onFiltersChange(): void {
+    this.filterPromotions();
+  }
+
+  confirmNotification(): void {
+    if (!this.notificationEmail.trim() || !/^\S+@\S+\.\S+$/.test(this.notificationEmail)) {
+      this.notificationSuccess = false;
+      this.notificationMessage = 'Veuillez entrer un e-mail valide.';
+      return;
+    }
+
+    if (!this.selectedPromotion) {
+      this.notificationSuccess = false;
+      this.notificationMessage = 'Aucune promotion sélectionnée.';
+      return;
+    }
+
+    this.isLoading = true;
+    this.promotionService.notifyPromotion(this.notificationEmail, this.selectedPromotion['_id']).subscribe({
+      next: (res) => {
+        this.notificationSuccess = true;
+        this.notificationMessage = res.message || 'Inscription à la notification réussie ! Un e-mail de confirmation vous a été envoyé.';
+        this.isLoading = false;
+        setTimeout(() => {
+          this.closeModal();
+        }, 3000);
+      },
+      error: (err) => {
+        this.notificationSuccess = false;
+        this.notificationMessage = err.error?.message || 'Une erreur est survenue lors de l’inscription.';
+        this.isLoading = false;
+      }
+    });
+  }
 
   getPromotionTypeLabel(type: string): string {
     const typeMap: { [key: string]: string } = {
@@ -151,44 +198,50 @@ export class PromotionsComponent implements OnInit {
     const email = this.newsletterEmail.trim();
     const isValidEmail = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
 
-    if (!isValidEmail) {
-      this.emailError = true;
-      this.newsletterSuccess = false;
-      this.isDuplicate = false;
-      return;
-    }
-
-    if (this.registeredEmails.includes(email.toLowerCase())) {
-      this.isDuplicate = true;
-      this.newsletterSuccess = false;
-      this.emailError = false;
-      return;
-    }
-
-    this.registeredEmails.push(email.toLowerCase());
-    this.newsletterSuccess = true;
+    // Reset all flags
+    this.newsletterSuccess = false;
     this.isDuplicate = false;
     this.emailError = false;
 
-    setTimeout(() => {
-      this.newsletterSuccess = false;
-      this.newsletterEmail = '';
-    }, 5000);
-  }
+    if (!isValidEmail) {
+      this.emailError = true;
+      return;
+    }
 
-  onNotify(promotion: ExtendedPromotion): void {
-    console.log('Notification demandée pour :', promotion.title);
+    this.promotionService.subscribeToNewsletter(email).subscribe({
+      next: (res) => {
+        this.newsletterSuccess = true;
+        this.newsletterEmail = '';
+        setTimeout(() => {
+          this.newsletterSuccess = false;
+        }, 5000);
+      },
+      error: (err) => {
+        if (err.message === 'Cet email est déjà inscrit à la newsletter.') {
+          this.isDuplicate = true;
+          setTimeout(() => {
+            this.isDuplicate = false;
+          }, 5000);
+        } else {
+          this.emailError = true;
+        }
+      }
+    });
   }
 
   filterPromotions() {
     this.filteredPromotions = this.promotions.filter((promo) => {
       const matchesSearch = this.searchQuery
         ? promo.title.toLowerCase().includes(this.searchQuery.toLowerCase()) ||
-          promo.description.toLowerCase().includes(this.searchQuery.toLowerCase())
+          promo.description.toLowerCase().includes(this.searchQuery.toLowerCase()) ||
+          promo.etablissementName.toLowerCase().includes(this.searchQuery.toLowerCase())
         : true;
 
       const matchesCategory = this.categories.some((c) => c.selected)
-        ? this.categories.some((c) => c.selected && c.name === promo.category)
+        ? this.categories.some((c) => {
+            const singularName = c.name.replace(/s$/, '');
+            return c.selected && singularName.toLowerCase() === promo.category?.toLowerCase();
+          })
         : true;
 
       const matchesType = this.promotionTypes.some((t) => t.selected)
@@ -217,7 +270,7 @@ export class PromotionsComponent implements OnInit {
     this.filteredPromotions.sort((a, b) => {
       switch (this.sortOption) {
         case 'recent':
-          return new Date(b.startDate).getTime() - new Date(a.startDate).getTime();
+          return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
         case 'dateAsc':
           return new Date(a.endDate).getTime() - new Date(b.endDate).getTime();
         case 'dateDesc':
@@ -245,7 +298,8 @@ export class PromotionsComponent implements OnInit {
 
   openPromotionModal(promotion: ExtendedPromotion) {
     this.selectedPromotion = promotion;
-    this.showNotifyModal = true;
+    this.showPromotionDetailModal = true;
+    this.showNotifyModal = false;
   }
 
   get totalPages(): number {
@@ -276,14 +330,46 @@ export class PromotionsComponent implements OnInit {
   openNotifyModal(promotion: ExtendedPromotion) {
     this.selectedPromotion = promotion;
     this.showNotifyModal = true;
+    this.showPromotionDetailModal = false;
+    this.notificationEmail = '';
+    this.notificationMessage = '';
+    this.notificationSuccess = false;
   }
 
   closeModal() {
-    this.showNotifyModal = false;
     this.selectedPromotion = null;
+    this.showPromotionDetailModal = false;
+    this.showNotifyModal = false;
     this.notificationEmail = '';
     this.notificationMessage = '';
+    this.notificationSuccess = false;
   }
+
+  getValidDays(days: { [key: string]: boolean } | undefined): string[] {
+    if (!days || typeof days !== 'object') return [];
+  
+    const dayNames: { [key: string]: string } = {
+      monday: 'Lundi',
+      tuesday: 'Mardi',
+      wednesday: 'Mercredi',
+      thursday: 'Jeudi',
+      friday: 'Vendredi',
+      saturday: 'Samedi',
+      sunday: 'Dimanche',
+      lundi: 'Lundi',
+      mardi: 'Mardi',
+      mercredi: 'Mercredi',
+      jeudi: 'Jeudi',
+      vendredi: 'Vendredi',
+      samedi: 'Samedi',
+      dimanche: 'Dimanche'
+    };
+  
+    return Object.entries(days)
+      .filter(([_, isValid]) => isValid)
+      .map(([key]) => dayNames[key.toLowerCase()] || key);
+  }
+
   getCategoryIconData(category: string): { icon: string, bgClass: string, colorClass: string } {
     const cat = category?.toLowerCase();
   
@@ -302,13 +388,13 @@ export class PromotionsComponent implements OnInit {
   
     return { icon: 'ri-price-tag-3-line', bgClass: 'bg-gray-100', colorClass: 'text-gray-600' };
   }
-  
+
   getCategoryBadgeClass(type: string): string {
     switch (type) {
       case 'Hôtel':
         return 'bg-purple-100 text-purple-800';
-        case 'Café':
-          return 'bg-cafe-light text-cafe-dark';
+      case 'Café':
+        return 'bg-cafe-light text-cafe-dark';
       case 'Sfax':
         return 'bg-gray-200 text-gray-800';
       case 'Restaurant':
@@ -317,6 +403,4 @@ export class PromotionsComponent implements OnInit {
         return 'bg-gray-100 text-gray-700';
     }
   }
-
-  
 }

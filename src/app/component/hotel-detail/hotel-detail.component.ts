@@ -22,6 +22,7 @@ export class HotelDetailComponent implements OnInit {
   reservationTime: string = '12:00';
   numberOfPeople: string = '1';
   map: any;
+  currentPhotoIndex: number = 0;
 
   constructor(
     private route: ActivatedRoute,
@@ -37,7 +38,10 @@ export class HotelDetailComponent implements OnInit {
           next: (hotel) => {
             this.hotel = hotel;
           },
+          
           error: (err) => {
+            console.log("ID reçu dans l'URL :", id);
+
             console.error("Erreur lors du chargement de l'hôtel :", err);
           }
         });
@@ -105,6 +109,25 @@ export class HotelDetailComponent implements OnInit {
   closeModal() {
     this.showConfirmationModal = false;
   }
+  get currentPhotoUrl(): string {
+    if (!this.hotel?.photos || this.hotel.photos.length === 0) {
+      return 'assets/images/default-hotel.jpg';
+    }
+    return `http://localhost:5000/${this.hotel.photos[this.currentPhotoIndex]}`;
+  }
+  showNextPhoto(): void {
+    if (this.hotel && this.hotel.photos.length > 0) {
+      this.currentPhotoIndex = (this.currentPhotoIndex + 1) % this.hotel.photos.length;
+    }
+  }
+  
+  showPreviousPhoto(): void {
+    if (this.hotel && this.hotel.photos.length > 0) {
+      this.currentPhotoIndex = (this.currentPhotoIndex - 1 + this.hotel.photos.length) % this.hotel.photos.length;
+    }
+  }
+
+  
 }
 
 

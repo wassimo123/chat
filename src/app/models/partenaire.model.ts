@@ -31,51 +31,8 @@ export interface Establishment {
     twitter?: string;
     linkedin?: string;
   };
-  photos?: File[];
+  photos?: (string | File)[];
   clientName?: string;
   clientEmail?: string;
 }
 
-// export interface Promotion {
-//   id?: string;
-//   title: string;
-//   startDate: string;
-//   endDate: string;
-//   reduction: number;
-//   conditions?: string;
-//   image?: File | null;
-// }
-
-// export interface Event {
-//   id?: string;
-//   nom: string;
-//   dateDebut: string;
-//   dateFin: string;
-//   heureDebut: string;
-//   heureFin: string;
-//   lieu: string;
-//   ville: string;
-//   capacite: number;
-//   categorie: string;
-//   organisateur?: string;
-//   description?: string;
-//   estPublic: boolean;
-//   statut: string;
-//   typeEtablissement: string;
-//   establishmentId: string;
-//   photo?: string;
-//   prix: {
-//     estGratuit: boolean;
-//     montant: number;
-//   };
-//   visibility?: string;
-// }
-
-// export interface Payment {
-//   cardName: string;
-//   cardNumber: string;
-//   expiry: string;
-//   cvv: string;
-//   pack: string;
-//   amount: number;
-// }

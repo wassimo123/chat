@@ -1,5 +1,28 @@
-<div class="p-8">
-    <h1 class="text-2xl font-bold mb-4">Politique de confidentialité</h1>
-    <p *ngIf="privacy">{{ privacy.content }}</p>
-    <p *ngIf="!privacy">Chargement...</p>
+<div class="min-h-screen bg-gradient-to-b from-[#004080] to-[#3B82F6] flex items-center justify-center px-4 font-poppins">
+  <div class="bg-white rounded-3xl shadow-2xl w-full max-w-3xl p-8 animate-fadeSlideIn">
+
+    <!-- Titre -->
+    <h1 class="text-3xl font-bold text-gray-800 mb-6 text-center tracking-wide">
+      Politique de confidentialité
+    </h1>
+
+    <!-- Contenu -->
+     
+    <div *ngIf="privacy" class="text-xs text-gray-500 text-center mt-4">
+      <p *ngIf="privacy">{{ privacy.content }}</p>
+      Version {{ privacy.version }} – Mis à jour le {{ privacy.lastUpdated | date:'longDate' }}
+    </div>
+    
+
+    <!-- Bouton retour -->
+    <div class="mt-8 text-center">
+      <button
+        (click)="goToSignup()"
+        class="text-blue-600 hover:text-blue-800 font-medium transition text-sm underline"
+      >
+        ← Retour à la page d’inscription
+      </button>
+    </div>
+
   </div>
+</div>

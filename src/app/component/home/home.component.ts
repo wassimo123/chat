@@ -43,7 +43,7 @@ export class HomeComponent {
   ngOnInit() {
     setInterval(() => {
       this.currentIndex = (this.currentIndex + 1) % this.images.length;
-    }, 5000); // toutes les 10 secondes par exemple
+    }, 4000); // toutes les 10 secondes par exemple
   }
   
 ///////////////

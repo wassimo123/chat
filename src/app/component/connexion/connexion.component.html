@@ -1,54 +1,137 @@
-<div class="flex items-center justify-center min-h-screen bg-gray-50">
-  <div class="bg-white p-8 rounded-lg shadow-lg w-full max-w-md">
-    <h2 class="text-2xl font-semibold text-gray-900 mb-6 text-center">Connexion</h2>
-    <form (ngSubmit)="onSubmit()">
-      <div class="mb-4">
-        <label class="block text-sm font-medium text-gray-700">Email</label>
-        <input
-          type="email"
-          [(ngModel)]="email"
-          name="email"
-          class="mt-1 block w-full border border-gray-300 rounded-button px-3 py-2 focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
-          placeholder="Entrez votre email"
-          required
-        />
+<div class="min-h-screen flex items-center justify-center bg-gradient-to-b from-[#004080] to-[#3B82F6] font-poppins px-4">
+  <div class="w-full max-w-4xl bg-white rounded-3xl shadow-2xl flex overflow-hidden relative gap-0 animate-slideFade">
+
+    <!-- Partie gauche (Bienvenue à Sfax) avec logo et texte stylisé -->
+    <div class="w-1/2 relative hidden md:flex flex-col justify-center items-center px-6 py-16 bg-gradient-to-b from-[#004080] to-[#3B82F6] text-white text-center">
+
+      <!-- Animation SVG fluide -->
+      <svg class="absolute inset-0 w-full h-full z-0" viewBox="0 0 800 800" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid slice">
+        <defs>
+          <linearGradient id="grad" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" style="stop-color:#3B82F6;" />
+            <stop offset="100%" style="stop-color:#1e3a8a;" />
+          </linearGradient>
+        </defs>
+        <path fill="url(#grad)">
+          <animate attributeName="d" dur="12s" repeatCount="indefinite"
+            values="
+            M437,308Q386,376,338,437Q290,498,220,486Q150,474,138,401Q126,328,134,248Q142,168,202,133Q262,98,330,98Q398,98,444,151Q490,204,487,271Q484,338,437,308Z;
+            M421,300Q385,350,347,405Q309,460,234,452Q159,444,136,372Q113,300,132,236Q151,172,212,143Q273,114,332,126Q391,138,422,195Q453,252,421,300Z;
+            M437,308Q386,376,338,437Q290,498,220,486Q150,474,138,401Q126,328,134,248Q142,168,202,133Q262,98,330,98Q398,98,444,151Q490,204,487,271Q484,338,437,308Z"
+          />
+        </path>
+      </svg>
+
+      <!-- Grand cercle en dégradé -->
+      <div class="absolute -top-32 -left-20 w-[500px] h-[500px] bg-gradient-to-br from-[#3B82F6] via-[#2563eb] to-[#1e3a8a] rounded-full"></div>
+
+      <!-- Logo -->
+      <div class="absolute top-[-18px] left-[46%] transform -translate-x-1/2 z-20">
+        <img src="assets/images/2.png" alt="Logo" class="w-36 h-32 object-contain" />
       </div>
-      <div class="mb-4">
-        <label class="block text-sm font-medium text-gray-700">Mot de passe</label>
-        <div class="relative">
+
+      <!-- Cercles décoratifs -->
+      <div class="absolute -bottom-20 left-8 w-44 h-44 bg-blue-600 rounded-full shadow-2xl"></div>
+      <div class="absolute bottom-0 left-[45%] w-40 h-40 bg-gradient-to-br from-[#3B82F6] to-[#1e3a8a] rounded-full shadow-xl"></div>
+
+      <!-- Contenu centré dans la zone supérieure -->
+      <div class="z-10 max-w-md mt-[-40px] -ml-10">
+        <h2 class="text-4xl font-[Pacifico] font-semibold mb-1 tracking-wide">Bienvenue à</h2>
+        <h1 class="text-4xl font-[Pacifico]">Sfax</h1>
+        <p class="text-sm font-light leading-relaxed px-4">
+          Accédez à votre compte pour explorer toutes les fonctionnalités du portail numérique de la ville.
+        </p>
+      </div>
+
+      <!-- Forme blanche ondulée à droite -->
+      <div class="absolute top-0 right-[-1px] h-full w-20 z-10">
+        <svg class="h-full w-full" viewBox="0 0 100 100" preserveAspectRatio="none">
+          <path d="M0,0 C50,30 50,70 0,100 L100,100 L100,0 Z" fill="white" />
+        </svg>
+      </div>
+    </div>
+
+    <!-- Partie droite (formulaire) -->
+    <div class="w-full md:w-1/2 p-10 z-10">
+      <h2 class="text-xl font-semibold text-gray-800 mb-6 text-center">Connexion</h2>
+      <form (ngSubmit)="onSubmit()">
+        <!-- Email -->
+        <div class="mb-4">
+          <label class="block text-xs font-medium text-gray-700">Email</label>
           <input
-            [type]="showPassword ? 'text' : 'password'"
-            [(ngModel)]="password"
-            name="password"
-            class="mt-1 block w-full border border-gray-300 rounded-button px-3 py-2 focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
-            placeholder="Entrez votre mot de passe"
+            type="email"
+            [(ngModel)]="email"
+            name="email"
+            class="mt-1 block w-full border border-gray-300 rounded-full px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-600"
+            placeholder="Entrez votre email"
             required
           />
-          <button type="button" (click)="togglePasswordVisibility()" class="absolute inset-y-0 right-0 flex items-center pr-3">
-            <i [class]="showPassword ? 'ri-eye-off-line' : 'ri-eye-line'" class="text-gray-500"></i>
+        </div>
+
+        <!-- Mot de passe -->
+        <div class="mb-4">
+          <label class="block text-xs font-medium text-gray-700">Mot de passe</label>
+          <div class="relative">
+            <input
+              [type]="showPassword ? 'text' : 'password'"
+              [(ngModel)]="password"
+              name="password"
+              class="mt-1 block w-full border border-gray-300 rounded-full px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-600"
+              placeholder="Entrez votre mot de passe"
+              required
+            />
+            <button type="button" (click)="togglePasswordVisibility()" class="absolute inset-y-0 right-0 flex items-center pr-3">
+              <i [class]="showPassword ? 'ri-eye-off-line' : 'ri-eye-line'" class="text-gray-500"></i>
+            </button>
+          </div>
+        </div>
+
+        <!-- Options -->
+        <div class="flex items-center justify-between mb-4">
+          <label class="flex items-center">
+            <input type="checkbox" [(ngModel)]="rememberMe" name="rememberMe" class="h-4 w-4 text-blue-600 border-gray-300 rounded">
+            <span class="ml-2 text-xs text-gray-600">Se souvenir de moi</span>
+          </label>
+          <a (click)="forgotPassword()" class="text-xs text-blue-600 hover:underline cursor-pointer">
+            Mot de passe oublié ?
+          </a>
+        </div>
+
+        <!-- Bouton connexion -->
+        <div class="flex justify-center">
+          <button type="submit" class="bg-gradient-to-r from-blue-500 to-blue-700 hover:from-blue-600 hover:to-blue-800 text-white px-6 py-2 rounded-full transition text-sm font-medium">
+            Se connecter
           </button>
         </div>
+      </form>
+
+      <div class="mt-4 text-center">
+        <p class="text-xs text-gray-600">
+          Vous n'avez pas de compte ?
+          <a (click)="createAccount()" class="text-blue-600 hover:underline cursor-pointer">
+            Créer un compte
+          </a>
+        </p>
       </div>
-      <div class="flex items-center justify-between mb-4">
-        <label class="flex items-center">
-          <input type="checkbox" [(ngModel)]="rememberMe" name="rememberMe" class="h-4 w-4 text-primary focus:ring-primary border-gray-300 rounded">
-          <span class="ml-2 text-sm text-gray-600">Se souvenir de moi</span>
-        </label>
-        <a (click)="forgotPassword()" class="text-sm text-primary hover:text-primary-dark cursor-pointer">
-          Mot de passe oublié ?
-        </a>
-      </div>
-      <button type="submit" class="w-full bg-primary text-white px-4 py-2 rounded-button">
-        Se connecter
-      </button>
-    </form>
-    <div class="mt-4 text-center">
-      <p class="text-sm text-gray-600">
-        Vous n'avez pas de compte ?
-        <a (click)="createAccount()" class="text-primary hover:text-primary-dark cursor-pointer">
-          Créer un compte
-        </a>
-      </p>
     </div>
+
+    <!-- Cercle bas droite -->
+    <div class="absolute bottom-0 right-0 w-16 h-16 bg-gradient-to-br from-blue-600 to-blue-400 rounded-tl-full z-0"></div>
   </div>
 </div>
+
+<style>
+@keyframes slideFade {
+  0% {
+    opacity: 0;
+    transform: translateY(30px) scale(0.95);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+.animate-slideFade {
+  animation: slideFade 0.8s ease-out both;
+}
+</style>

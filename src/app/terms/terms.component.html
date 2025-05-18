@@ -1,5 +1,35 @@
-<div class="p-8">
-    <h1 class="text-2xl font-bold mb-4">Conditions d'utilisation</h1>
-    <p *ngIf="terms">{{ terms.content }}</p>
-    <p *ngIf="!terms">Chargement...</p>
+<div class="min-h-screen bg-gradient-to-b from-[#004080] to-[#3B82F6] flex items-center justify-center px-4 font-poppins">
+  <div class="bg-white rounded-3xl shadow-2xl w-full max-w-3xl p-8 animate-fadeSlideIn">
+
+    <!-- Titre -->
+    <h1 class="text-3xl font-bold text-gray-800 mb-6 text-center tracking-wide">
+      Conditions d'utilisation
+    </h1>
+
+    <!-- Contenu -->
+    <div class="text-gray-700 text-sm leading-relaxed space-y-4 text-center">
+      <ng-container *ngIf="terms; else loading">
+        <p>{{ terms.content }}</p>
+        <p class="text-xs text-gray-500 mt-2">
+          Version {{ terms.version }} – Mis à jour le {{ terms.lastUpdated | date:'longDate' }}
+
+        </p>
+        
+      </ng-container>
+      <ng-template #loading>
+        <p class="italic text-gray-500">Chargement...</p>
+      </ng-template>
+    </div>
+
+    <!-- Bouton retour -->
+    <div class="mt-8 text-center">
+      <button
+        (click)="goToSignup()"
+        class="text-blue-600 hover:text-blue-800 font-medium transition text-sm underline"
+      >
+        ← Retour à la page d’inscription
+      </button>
+    </div>
+
   </div>
+</div>

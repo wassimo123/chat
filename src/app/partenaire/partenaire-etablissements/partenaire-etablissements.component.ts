@@ -1,9 +1,10 @@
-import { Component, OnInit, ChangeDetectorRef, HostListener } from '@angular/core';
+import { Component, OnInit, ChangeDetectorRef, HostListener,NgZone , ViewChild, ElementRef} from '@angular/core';
 import { FormBuilder, FormGroup, Validators, FormArray, FormControl } from '@angular/forms';
 import { Router } from '@angular/router';
 import Swal from 'sweetalert2';
 import { EtablissementService } from '../../services/etablissement.service'; // Import the service
 import { Etablissement } from 'src/app/models/etablissement.model';
+
 
 
 interface PricingPlan {
@@ -26,6 +27,8 @@ interface PendingRequest {
   styleUrls: ['./partenaire-etablissements.component.css']
 })
 export class PartenaireEtablissementsComponent implements OnInit {
+  @ViewChild('photoInput') photoInput!: ElementRef<HTMLInputElement>;
+  
   establishmentForm: FormGroup;
   selectedPlan: any;
   paymentForm: FormGroup;
@@ -57,7 +60,8 @@ export class PartenaireEtablissementsComponent implements OnInit {
     private fb: FormBuilder,
     private cdr: ChangeDetectorRef,
     private router: Router,
-    private etablissementService: EtablissementService // Inject the service
+    private etablissementService: EtablissementService,
+    private ngZone: NgZone
   ) {
     // Establishment Form with updated validators
     this.establishmentForm = this.fb.group({
@@ -81,7 +85,7 @@ export class PartenaireEtablissementsComponent implements OnInit {
         twitter: ['', Validators.pattern(/^https:\/\/(www\.)?twitter\.com\/.*/)],
         linkedin: ['', Validators.pattern(/^https:\/\/(www\.)?linkedin\.com\/.*/)]
       }),
-      photos: this.fb.array([])
+      photos: [] as (string | File)[]
     });
 
     // Payment Form
@@ -154,9 +158,6 @@ export class PartenaireEtablissementsComponent implements OnInit {
   }
 
   resetForm(): void {
-    this.establishmentForm.reset();
-    this.photosPreview = []; // Clear photo previews
-    this.currentEtablissement.photos = []; // Clear photos array
     this.establishmentForm.reset({
       establishmentName: '',
       establishmentType: '',
@@ -178,11 +179,39 @@ export class PartenaireEtablissementsComponent implements OnInit {
         linkedin: ''
       }
     });
+  
+    // Réinitialiser les services
     this.servicesControls.forEach(control => control.setValue(false));
-    while (this.photos.length) {
-      this.photos.removeAt(0);
-    }
+  
+    // Révoquer et vider les URLs des photos
+    this.photosPreview.forEach(url => {
+      if (url.startsWith('blob:')) {
+        URL.revokeObjectURL(url);
+      }
+    });
     this.photosPreview = [];
+  
+    // Vider les photos de currentEtablissement et révoquer les blobs
+    if (this.currentEtablissement.photos) {
+      this.currentEtablissement.photos.forEach((photo: string | File) => {
+        if (photo instanceof File && this.photoBlobUrls.has(photo)) {
+          URL.revokeObjectURL(this.photoBlobUrls.get(photo)!);
+          this.photoBlobUrls.delete(photo);
+        }
+      });
+      this.currentEtablissement.photos = [];
+    }
+  
+    // Réinitialiser l'input fichier via un sélecteur DOM
+    const photoInput = document.querySelector('input[type="file"]') as HTMLInputElement;
+    if (photoInput) {
+      photoInput.value = '';
+      console.log('Input file value reset to:', photoInput.value);
+    } else {
+      console.warn('photoInput not found in DOM during resetForm');
+    }
+  
+    // Réinitialiser les horaires
     this.currentEtablissement.horaires = {
       is24_7: false,
       specialHours: '',
@@ -194,49 +223,47 @@ export class PartenaireEtablissementsComponent implements OnInit {
       samedi: { open: '', close: '', closed: false },
       dimanche: { open: '', close: '', closed: false }
     };
+  
+    // Forcer la détection de changement
+    this.cdr.detectChanges();
   }
-
+  
   handleFileInput(event: Event): void {
     const input = event.target as HTMLInputElement;
+    if (!input.files) return;
   
-    if (input.files && input.files.length) {
-      const files = Array.from(input.files);
+    const files = Array.from(input.files);
   
-      // Ensure photosPreview array exists
-      if (!this.photosPreview) {
-        this.photosPreview = [];
-      }
+    //  On s'assure que l'objet currentEtablissement et le tableau photos existent
+    if (!this.currentEtablissement) {
+      this.currentEtablissement = {};
+    }
   
-      // Read the file and convert it to base64
-      files.forEach(file => {
-        const reader = new FileReader();
-        reader.onload = (e) => {
-          if (e.target && e.target.result) {
-            // Push the base64 string into the photosPreview array
-            this.photosPreview.push(e.target.result as string); // Ensure it's a base64 string
+    if (!this.currentEtablissement.photos) {
+      this.currentEtablissement.photos = [];
+    }
+  
+    files.forEach((file) => {
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        if (e.target && e.target.result) {
+          //  Sécurité assurée ici aussi
+          if (!this.currentEtablissement.photos) {
+            this.currentEtablissement.photos = [];
           }
-        };
-        reader.readAsDataURL(file); // Converts the file to a base64 string
-      });
-    }
+          this.currentEtablissement.photos.push(file); // fichier brut, pas base64
+        }
+      };
+      reader.readAsDataURL(file);
+    });
   }
   
   
-  
-  
-  removePhoto(photo: string): void {
-    const photoIndex = this.photosPreview.indexOf(photo);
-    if (photoIndex !== -1) {
-      this.photosPreview.splice(photoIndex, 1); // Remove from photosPreview array
-    }
-  
-    // Also remove it from the FormArray if necessary
-    const formPhotoIndex = this.currentEtablissement.photos.indexOf(photo);
-    if (formPhotoIndex !== -1) {
-      this.currentEtablissement.photos.splice(formPhotoIndex, 1); // Remove from form photos array
-    }
+  removePhoto(photoUrl: string) {
+    this.photosPreview = this.photosPreview.filter(p => p !== photoUrl);
   }
   
+ 
   
   onSubmitEstablishmentForm(event: Event): void {
     event.preventDefault();
@@ -273,9 +300,19 @@ export class PartenaireEtablissementsComponent implements OnInit {
 
   confirmSelection(): void {
     if (!this.selectedPlan) {
-      this.selectedPlan = this.pricingPlans[0]; // Default to 'Basique' if not selected
+      if (!this.pricingPlans || this.pricingPlans.length === 0) {
+        Swal.fire({
+          icon: 'error',
+          title: 'Erreur',
+          text: 'Aucun pack disponible. Veuillez contacter le support.',
+          confirmButtonText: 'OK',
+          confirmButtonColor: '#3085d6'
+        });
+        return;
+      }
+      this.selectedPlan = this.pricingPlans[0];
     }
-
+  
     Swal.fire({
       title: 'Confirmer la sélection',
       text: `Vous avez sélectionné le pack ${this.selectedPlan.name} pour ${this.selectedPlan.price} TND. Voulez-vous confirmer ?`,
@@ -287,130 +324,130 @@ export class PartenaireEtablissementsComponent implements OnInit {
       cancelButtonColor: '#d33'
     }).then((result) => {
       if (result.isConfirmed) {
-        this.showConfirmationDialog = false;
         this.closePricingModal();
-        this.submitFinal();
+        this.submitFinal().then(() => {
+          this.selectedPlan = null;
+          // Delay resetForm to ensure the view is stable
+          setTimeout(() => {
+            this.resetForm();
+          }, 0);
+        }).catch((error) => {
+          Swal.fire({
+            icon: 'error',
+            title: 'Erreur',
+            text: 'Une erreur est survenue lors de la soumission. Veuillez réessayer.',
+            confirmButtonText: 'OK',
+            confirmButtonColor: '#d33'
+          });
+          console.error('Submission error:', error);
+        });
       }
     });
   }
-
-  submitFinal(): void {
-    if (!this.selectedPlan) {
-      Swal.fire({
-        icon: 'error',
-        title: 'Erreur',
-        text: 'Veuillez sélectionner un pack avant de continuer.',
-        confirmButtonText: 'OK',
-        confirmButtonColor: '#3085d6'
-      });
-      return;
-    }
-  
-    const infos = {
-      description: this.establishmentForm.value.description || '',
-      services: this.servicesOptions.filter((_, i) => this.establishmentForm.value.services[i]),
-      socialMedia: {
-        facebook: this.establishmentForm.value.socialMedia.facebook || '',
-        instagram: this.establishmentForm.value.socialMedia.instagram || '',
-        twitter: this.establishmentForm.value.socialMedia.twitter || '',
-        linkedin: this.establishmentForm.value.socialMedia.linkedin || ''
-      },
-      horaires: this.currentEtablissement.horaires,
-      telephone: this.establishmentForm.value.phone || '',
-      email: this.establishmentForm.value.email || '',
-      siteWeb: this.establishmentForm.value.website || '',
-      ville: this.establishmentForm.value.city || '',
-      pays: this.establishmentForm.value.country || 'Tunisie',
-      codePostal: this.establishmentForm.value.postalCode || '',
-      showMap: this.establishmentForm.value.showMap || false,
-      photos: this.photosPreview // Ensure base64 photos are included here
-    };
-  
-    const data = {
-      partenaireId:this.partenaireId, // Hardcoded partenaireId
-      nom: this.establishmentForm.value.establishmentName,
-      adresse: this.establishmentForm.value.address,
-      type: this.establishmentForm.value.establishmentType,
-      statut: this.establishmentForm.value.statut || 'En attente',
-      visibility: this.establishmentForm.value.visibility || 'public',
-      pack: this.selectedPlan.name,
-      informations: infos,
-      reseauxSociaux: {
-        facebook: this.establishmentForm.value.socialMedia.facebook || '',
-        instagram: this.establishmentForm.value.socialMedia.instagram || '',
-        twitter: this.establishmentForm.value.socialMedia.twitter || '',
-        linkedin: this.establishmentForm.value.socialMedia.linkedin || ''
-      },
-      description: this.establishmentForm.value.description || '',
-      services: this.servicesOptions.filter((_, i) => this.establishmentForm.value.services[i]),
-      horaires: this.currentEtablissement.horaires,
-      photos: this.photosPreview, // Ensure photos are correctly passed
-      showMap: this.establishmentForm.value.showMap,
-      telephone: this.establishmentForm.value.phone,
-      email: this.establishmentForm.value.email,
-      siteWeb: this.establishmentForm.value.website,
-      ville: this.establishmentForm.value.city,
-      pays: this.establishmentForm.value.country,
-      codePostal: this.establishmentForm.value.postalCode
-    };
-  
-    // First, call the Etablissement API to add the establishment
-    this.etablissementService.addEtablissement(data).subscribe({
-      next: (response) => {
-        console.log("data",data);
-        // Show success for establishment creation
-        Swal.fire({
-          icon: 'success',
-          title: 'Établissement ajouté',
-          text: 'Votre établissement a été ajouté avec succès.',
-          confirmButtonText: 'OK',
-          confirmButtonColor: '#3085d6'
-        }).then(() => {
-          this.resetForm();
-        });
-  
-        // Now call the Publicite API to add the advertisement
-        const publicitéData = {
-          etablissementId: response.id, // The new establishment's ID from the response
-          utilisateurId: this.partenaireId, // The partenaire's ID
-          description: this.establishmentForm.value.description || 'Publicité pour l\'établissement',
-          pack: this.selectedPlan.name // The selected pack for the establishment
-        };
-  
-        this.etablissementService.addPublicite(publicitéData).subscribe({
-          next: (pubResponse) => {
-            Swal.fire({
-              icon: 'success',
-              title: 'Publicité ajoutée',
-              text: 'La publicité pour votre établissement a été ajoutée avec succès.',
-              confirmButtonText: 'OK',
-              confirmButtonColor: '#3085d6'
-            });
-          },
-          error: (pubError) => {
-            Swal.fire({
-              icon: 'error',
-              title: 'Erreur',
-              text: 'Une erreur est survenue lors de l\'ajout de la publicité.',
-              confirmButtonText: 'OK',
-              confirmButtonColor: '#d33'
-            });
-          }
-        });
-  
-      },
-      error: (err) => {
+ 
+  submitFinal(): Promise<void> {
+    return new Promise((resolve, reject) => {
+      if (!this.selectedPlan) {
         Swal.fire({
           icon: 'error',
           title: 'Erreur',
-          text: 'Une erreur est survenue lors de l\'ajout de l\'établissement.',
+          text: 'Veuillez sélectionner un pack avant de continuer.',
           confirmButtonText: 'OK',
-          confirmButtonColor: '#d33'
+          confirmButtonColor: '#3085d6'
         });
+        reject(new Error('No plan selected'));
+        return;
       }
+  
+      const etablissementData: Etablissement = {
+        nom: this.establishmentForm.value.establishmentName,
+        adresse: this.establishmentForm.value.address,
+        type: this.establishmentForm.value.establishmentType,
+        statut: this.establishmentForm.value.statut || 'En attente',
+        visibility: this.establishmentForm.value.visibility || 'public',
+        codePostal: this.establishmentForm.value.postalCode,
+        ville: this.establishmentForm.value.city,
+        pays: this.establishmentForm.value.country,
+        showMap: this.establishmentForm.value.showMap,
+        telephone: this.establishmentForm.value.phone,
+        email: this.establishmentForm.value.email,
+        siteWeb: this.establishmentForm.value.website,
+        description: this.establishmentForm.value.description || '',
+        services: this.servicesOptions.filter((_, i) => this.establishmentForm.value.services[i]),
+        reseauxSociaux: {
+          facebook: this.establishmentForm.value.socialMedia.facebook || '',
+          instagram: this.establishmentForm.value.socialMedia.instagram || '',
+          twitter: this.establishmentForm.value.socialMedia.twitter || '',
+          linkedin: this.establishmentForm.value.socialMedia.linkedin || ''
+        },
+        horaires: this.currentEtablissement.horaires,
+        photos: this.currentEtablissement.photos
+      };
+  
+      this.etablissementService.addEtablissement(etablissementData).subscribe({
+        next: (response) => {
+          const publicitéData = {
+            etablissementId: response.id,
+            utilisateurId: this.partenaireId,
+            description: this.establishmentForm.value.description || 'Publicité pour l\'établissement',
+            pack: this.selectedPlan.name
+          };
+  
+          this.etablissementService.addPublicite(publicitéData).subscribe({
+            next: () => {
+              Swal.fire({
+                icon: 'success',
+                title: 'Publicité ajoutée',
+                text: 'La publicité a été créée avec succès.',
+                confirmButtonText: 'OK',
+                confirmButtonColor: '#3085d6'
+              });
+  
+              this.pendingRequests.push({
+                establishment: {
+                  establishmentName: this.establishmentForm.value.establishmentName,
+                  establishmentType: this.establishmentForm.value.establishmentType
+                },
+                plan: this.selectedPlan,
+                timestamp: new Date()
+              });
+              this.pendingConfirmation = true;
+  
+              Swal.fire({
+                icon: 'success',
+                title: 'Établissement ajouté',
+                text: 'Votre établissement a été ajouté avec succès.',
+                confirmButtonText: 'OK',
+                confirmButtonColor: '#3085d6'
+              });
+  
+              resolve(); // Resolve the promise on success
+            },
+            error: (pubError) => {
+              Swal.fire({
+                icon: 'error',
+                title: 'Erreur',
+                text: 'Erreur lors de l’ajout de la publicité.',
+                confirmButtonText: 'OK',
+                confirmButtonColor: '#d33'
+              });
+              reject(pubError);
+            }
+          });
+        },
+        error: (err) => {
+          Swal.fire({
+            icon: 'error',
+            title: 'Erreur',
+            text: 'Une erreur est survenue lors de l\'ajout de l\'établissement.',
+            confirmButtonText: 'OK',
+            confirmButtonColor: '#d33'
+          });
+          reject(err);
+        }
+      });
     });
   }
-  
   
   
   onSubmitPaymentForm(event: Event): void {
@@ -422,33 +459,75 @@ export class PartenaireEtablissementsComponent implements OnInit {
     }
   }
 
-  onPhotoSelected(event: Event): void {
-    const input = event.target as HTMLInputElement;
+ 
+  onPhotoSelected(event: Event) {
+    const target = event.target as HTMLInputElement;
+    const files = target.files;
   
-    if (input.files && input.files.length) {
-      const files = Array.from(input.files);
+    if (!files || files.length === 0) return;
   
-      if (!this.currentEtablissement.photos) {
-        this.currentEtablissement.photos = [];
-      }
+    if (!this.currentEtablissement.photos) {
+      this.currentEtablissement.photos = [];
+    }
   
-      files.forEach(file => {
-        this.currentEtablissement.photos.push(file); // Garde le fichier brut
-      });
+    const newPreviews: string[] = [];
+    let filesProcessed = 0;
+  
+    for (let i = 0; i < files.length; i++) {
+      const file = files[i];
+      this.currentEtablissement.photos.push(file);
+  
+      const reader = new FileReader();
+      reader.onload = (e: any) => {
+        newPreviews.push(e.target.result);
+        filesProcessed++;
+  
+        // Quand tous les fichiers sont lus, mettre à jour photosPreview
+        if (filesProcessed === files.length) {
+          this.ngZone.run(() => {
+            this.photosPreview = [...this.photosPreview, ...newPreviews];
+            this.cdr.detectChanges(); // Forcer la détection de changement
+          });
+        }
+      };
+      reader.readAsDataURL(file);
     }
   }
   
-    resolvePhotoUrl(photo: string | File): string {
-      if (photo instanceof File) {
-        return URL.createObjectURL(photo);
-      }
-      return photo;
-    }
+  
+    photoBlobUrls = new Map<File, string>();
+   
 
-    deletePhoto(photo: string | File): void {
-      const index = this.currentEtablissement.photos.indexOf(photo);
-      if (index !== -1) {
-        this.currentEtablissement.photos.splice(index, 1);
+    resolvePhotoUrl(photo: string | File): string {
+      if (typeof photo === 'string') {
+        return 'http://localhost:5000/uploads/' + photo;
+      } else {
+        let blobUrl = this.photoBlobUrls.get(photo);
+        if (!blobUrl) {
+          blobUrl = URL.createObjectURL(photo);
+          this.photoBlobUrls.set(photo, blobUrl);
+        }
+        return blobUrl;
       }
+    }
+   
+    deletePhoto(photo: string | File) {
+      if (!this.currentEtablissement.photos) this.currentEtablissement.photos = [];
+      if (!this.photosPreview) this.photosPreview = [];
+    
+      this.currentEtablissement.photos = this.currentEtablissement.photos.filter((p: string | File) => p !== photo);
+    
+      if (photo instanceof File) {
+        const blobUrl = this.photoBlobUrls.get(photo);
+        if (blobUrl) {
+          URL.revokeObjectURL(blobUrl);
+          this.photoBlobUrls.delete(photo);
+          this.photosPreview = this.photosPreview.filter(p => p !== blobUrl);
+        }
+      } else {
+        this.photosPreview = this.photosPreview.filter(p => p !== photo);
+      }
+    
+      this.cdr.detectChanges();
     }
 }

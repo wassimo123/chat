@@ -1,6 +1,6 @@
 import { NgModule } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
-import { FormsModule , ReactiveFormsModule} from '@angular/forms';
+import { FormsModule , ReactiveFormsModule,} from '@angular/forms';
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
 import { NgxEchartsModule } from 'ngx-echarts';
@@ -102,6 +102,7 @@ import { DecouvrirSfaxComponent } from './decouvrir-sfax/decouvrir-sfax.componen
     HeritageDetailComponent,
     TemoignagesComponent,
     DecouvrirSfaxComponent,
+    ReactiveFormsModule,
     
 ],
   providers: [],

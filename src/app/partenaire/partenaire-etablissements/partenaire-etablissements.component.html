@@ -446,36 +446,44 @@
               </div>
 
               <!-- Photos -->
-              <div>
-                <h3 class="text-lg font-medium text-gray-800 mb-4">Photos</h3>
+             
+              <div class="bg-white rounded-lg shadow-sm p-6 mb-6">
+                <h2 class="text-lg font-medium text-gray-900 mb-4">Photos</h2>
               
-                <div *ngIf="photosPreview.length > 0">
-                  <h3>Prévisualisation des photos :</h3>
-                  <div *ngFor="let photo of photosPreview; let i = index">
-                    <img [src]="photo" alt="Image Preview" width="100" height="100" />
-                    <button (click)="removePhoto(photo)">Supprimer</button>
+                <!-- Input fichier -->
+                <div class="mb-4">
+                  <input
+                    type="file"
+                    multiple
+                    (change)="onPhotoSelected($event)"
+                    accept="image/*"
+                    class="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-primary file:text-white hover:file:bg-primary-dark"
+                  />
+                </div>
+              
+                <!-- Aperçu des images -->
+                <div class="flex flex-wrap gap-4">
+                  <div
+                    *ngFor="let photo of currentEtablissement.photos; let i = index"
+                    class="relative w-24 h-24 border border-gray-200 rounded-lg overflow-hidden"
+                  >
+                    <img
+                      [src]="resolvePhotoUrl(photo)"
+                      alt="Photo de l'établissement"
+                      class="w-full h-full object-cover"
+                    />
+                    <button
+                      type="button"
+                      (click)="deletePhoto(photo)"
+                      class="absolute top-1 right-1 bg-red-500 text-white rounded-full w-5 h-5 flex items-center justify-center hover:bg-red-600"
+                      title="Supprimer"
+                    >
+                      <i class="ri-close-line text-sm leading-none"></i>
+                    </button>
                   </div>
                 </div>
-                
-                <input type="file" (change)="handleFileInput($event)" multiple />
-                
               </div>
-                        <!-- Photos -->
-          <!--<div class="bg-white rounded-lg shadow-sm p-6 mb-6">
-            <h2 class="text-lg font-medium text-gray-900 mb-4">Photos</h2>
-            <div class="mb-4">
-              <input type="file" multiple (change)="onPhotoSelected($event)">
-            </div>
-            <div *ngFor="let photo of currentEtablissement.photos; let i = index" class="relative inline-block mr-4">
-              <img [src]="resolvePhotoUrl(photo)" width="100" height="100" class="rounded-lg" />
-              <button 
-                type="button" 
-                (click)="deletePhoto(photo)" 
-                class="absolute top-0 right-0 bg-red-500 text-white rounded-full w-6 h-6 flex items-center justify-center">
-                <span class="text-xs">X</span>
-              </button>
-            </div>
-          </div>-->
+              
             </div>
 
             <div class="flex justify-end space-x-3 mt-6 pt-6 border-t">
@@ -496,6 +504,7 @@
           </form>
         </section>
 
+        <!-- Pending Confirmation Section (Placed below the form content) -->
         <section *ngIf="pendingConfirmation" class="bg-yellow-50 border-l-4 border-yellow-400 p-4 mb-8">
           <div class="flex">
             <div class="flex-shrink-0">
@@ -519,102 +528,107 @@
             </ul>
           </div>
         </section>
-
-        <!-- Modal for Pricing Packages -->
-        <div *ngIf="showPricingModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-          <div class="bg-white rounded-lg w-full max-w-4xl max-h-[90vh] overflow-y-auto">
-            <!-- Modal Header -->
-            <div class="p-6 sticky top-0 bg-white border-b flex justify-between items-center">
-              <h2 class="text-2xl font-bold text-gray-800">Choisissez Votre Publicité (Pack)</h2>
-              <button 
-                (click)="closePricingModal()"
-                class="text-gray-500 hover:text-gray-700 transition-colors"
-                aria-label="Fermer la modal"
-              >
-                <i class="ri-close-line text-2xl"></i>
-              </button>
-            </div>
-
-            <!-- Modal Body -->
-            <div class="p-6">
-              <!-- Pricing Packages Section -->
-              <div class="mb-8">
-                <h3 class="text-xl font-semibold text-gray-800 mb-4">Nos Packs</h3>
-                <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-                  <article *ngFor="let plan of pricingPlans" class="bg-[#1e1b4b] rounded-lg p-6 text-white relative overflow-hidden h-full shadow-lg hover:shadow-xl transition-shadow">
-                    <span class="absolute top-0 right-0 bg-red-500 text-white px-4 py-1 text-sm font-medium">
-                      {{ plan.duration }}
-                    </span>
-                    <h4 class="text-xl font-bold mb-2">{{ plan.name }}</h4>
-                    <p class="text-sm mb-4 opacity-80">Idéal pour les petites entreprises</p>
-                    <div class="text-4xl font-bold mb-6">{{ plan.price }} TND</div>
-                    <ul class="space-y-3 mb-6">
-                      <li class="flex items-center">
-                        <i class="ri-check-line mr-2 text-red-500"></i>
-                        <span>{{ plan.impressions }}</span>
-                      </li>
-                      <li class="flex items-center">
-                        <i class="ri-check-line mr-2 text-red-500"></i>
-                        <span>{{ plan.adsPerWeek }}</span>
-                      </li>
-                      <li class="flex items-center">
-                        <i class="ri-check-line mr-2 text-red-500"></i>
-                        <span>{{ plan.support }}</span>
-                      </li>
-                    </ul>
-                    <button 
-                      (click)="selectPlan(plan)" 
-                      class="w-full bg-red-500 hover:bg-red-600 text-white py-3 rounded-button font-medium transition-colors"
-                      [ngClass]="{'bg-green-500 hover:bg-green-600': selectedPlan?.name === plan.name}"
-                    >
-                      {{ selectedPlan?.name === plan.name ? 'SÉLECTIONNÉ' : 'CHOISIR CE PACK' }}
-                    </button>
-                  </article>
-                </div>
-              </div>
-            </div>
-
-            <!-- Modal Footer -->
-            <div class="p-6 border-t flex justify-end space-x-3">
-              <button 
-                (click)="closePricingModal()"
-                class="px-4 py-2 border border-gray-300 rounded-button text-gray-700 hover:bg-gray-50 transition-colors"
-              >
-                Annuler
-              </button>
-              <button 
-                (click)="confirmSelection()"
-                [disabled]="!selectedPlan"
-                class="px-4 py-2 bg-primary hover:bg-primary/90 text-white rounded-button transition-colors disabled:bg-gray-300 disabled:cursor-not-allowed"
-              >
-                Envoyer
-              </button>
-            </div>
-          </div>
-        </div>
-
-        <!-- Validation Error Dialog -->
-        <div *ngIf="showValidationDialog" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-          <div class="bg-white rounded-lg w-full max-w-sm p-6">
-            <div class="flex items-center mb-4">
-              <i class="ri-error-warning-line text-red-500 text-2xl mr-3"></i>
-              <h3 class="text-lg font-semibold text-gray-800">Erreur</h3>
-            </div>
-            <p class="text-sm text-gray-600 mb-6">Veuillez remplir tous les champs obligatoires.</p>
-            <div class="flex justify-end">
-              <button 
-                (click)="closeValidationDialog()"
-                class="bg-primary hover:bg-primary/90 text-white px-4 py-2 rounded-button transition-colors"
-              >
-                OK
-              </button>
-            </div>
-          </div>
-        </div>
-
-        <!-- SweetAlert2 CDN -->
-        <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
       </div>
     </main>
+
+    <!-- Footer (optional, can be kept or removed) -->
+    <footer class="bg-gray-50 p-6">
+      <!-- Footer content, if any -->
+    </footer>
   </div>
 </div>
+
+<!-- Modal for Pricing Packages -->
+<div *ngIf="showPricingModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+  <div class="bg-white rounded-lg w-full max-w-4xl max-h-[90vh] overflow-y-auto">
+    <!-- Modal Header -->
+    <div class="p-6 sticky top-0 bg-white border-b flex justify-between items-center">
+      <h2 class="text-2xl font-bold text-gray-800">Choisissez Votre Publicité (Pack)</h2>
+      <button 
+        (click)="closePricingModal()"
+        class="text-gray-500 hover:text-gray-700 transition-colors"
+        aria-label="Fermer la modal"
+      >
+        <i class="ri-close-line text-2xl"></i>
+      </button>
+    </div>
+
+    <!-- Modal Body -->
+    <div class="p-6">
+      <!-- Pricing Packages Section -->
+      <div class="mb-8">
+        <h3 class="text-xl font-semibold text-gray-800 mb-4">Nos Packs</h3>
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+          <article *ngFor="let plan of pricingPlans" class="bg-[#1e1b4b] rounded-lg p-6 text-white relative overflow-hidden h-full shadow-lg hover:shadow-xl transition-shadow">
+            <span class="absolute top-0 right-0 bg-red-500 text-white px-4 py-1 text-sm font-medium">
+              {{ plan.duration }}
+            </span>
+            <h4 class="text-xl font-bold mb-2">{{ plan.name }}</h4>
+            <p class="text-sm mb-4 opacity-80">Idéal pour les petites entreprises</p>
+            <div class="text-4xl font-bold mb-6">{{ plan.price }} TND</div>
+            <ul class="space-y-3 mb-6">
+              <li class="flex items-center">
+                <i class="ri-check-line mr-2 text-red-500"></i>
+                <span>{{ plan.impressions }}</span>
+              </li>
+              <li class="flex items-center">
+                <i class="ri-check-line mr-2 text-red-500"></i>
+                <span>{{ plan.adsPerWeek }}</span>
+              </li>
+              <li class="flex items-center">
+                <i class="ri-check-line mr-2 text-red-500"></i>
+                <span>{{ plan.support }}</span>
+              </li>
+            </ul>
+            <button 
+              (click)="selectPlan(plan)" 
+              class="w-full bg-red-500 hover:bg-red-600 text-white py-3 rounded-button font-medium transition-colors"
+              [ngClass]="{'bg-green-500 hover:bg-green-600': selectedPlan?.name === plan.name}"
+            >
+              {{ selectedPlan?.name === plan.name ? 'SÉLECTIONNÉ' : 'CHOISIR CE PACK' }}
+            </button>
+          </article>
+        </div>
+      </div>
+    </div>
+
+    <!-- Modal Footer -->
+    <div class="p-6 border-t flex justify-end space-x-3">
+      <button 
+        (click)="closePricingModal()"
+        class="px-4 py-2 border border-gray-300 rounded-button text-gray-700 hover:bg-gray-50 transition-colors"
+      >
+        Annuler
+      </button>
+      <button 
+        (click)="confirmSelection()"
+        [disabled]="!selectedPlan"
+        class="px-4 py-2 bg-primary hover:bg-primary/90 text-white rounded-button transition-colors disabled:bg-gray-300 disabled:cursor-not-allowed"
+      >
+        Envoyer
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- Validation Error Dialog -->
+<div *ngIf="showValidationDialog" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+  <div class="bg-white rounded-lg w-full max-w-sm p-6">
+    <div class="flex items-center mb-4">
+      <i class="ri-error-warning-line text-red-500 text-2xl mr-3"></i>
+      <h3 class="text-lg font-semibold text-gray-800">Erreur</h3>
+    </div>
+    <p class="text-sm text-gray-600 mb-6">Veuillez remplir tous les champs obligatoires.</p>
+    <div class="flex justify-end">
+      <button 
+        (click)="closeValidationDialog()"
+        class="bg-primary hover:bg-primary/90 text-white px-4 py-2 rounded-button transition-colors"
+      >
+        OK
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- SweetAlert2 CDN -->
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>

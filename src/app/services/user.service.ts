@@ -1,6 +1,8 @@
 import { Injectable } from '@angular/core';
-import { HttpClient, HttpHeaders } from '@angular/common/http';
-import { Observable } from 'rxjs';
+import { HttpClient, HttpHeaders, HttpErrorResponse } from '@angular/common/http';
+import { Observable, throwError } from 'rxjs';
+import { catchError, map, tap } from 'rxjs/operators';
+import { NotificationService } from './notification.service'; // ✅ Correct
 
 @Injectable({
   providedIn: 'root',
@@ -8,7 +10,8 @@ import { Observable } from 'rxjs';
 export class UserService {
   private apiUrl = 'http://localhost:5000/api';
 
-  constructor(private http: HttpClient) {}
+  constructor(private http: HttpClient,
+    private notificationService: NotificationService) {}
 
   private getHeaders(): HttpHeaders {
     const token = localStorage.getItem('token');
@@ -57,17 +60,44 @@ export class UserService {
     return this.http.post(`${this.apiUrl}/reset-password`, { token, newPassword, confirmPassword });
   }
 
-  checkUserExists(email: string): Observable<{ exists: boolean, status?: string }> {
-    return this.http.get<{ exists: boolean, status?: string }>(`${this.apiUrl}/users/check-email/${email}`, { headers: this.getHeaders() });
+  // checkUserExists(email: string): Observable<{ exists: boolean, status?: string }> {
+  //   return this.http.get<{ exists: boolean, status?: string }>(`${this.apiUrl}/users/check-email/${email}`, { headers: this.getHeaders() });
+  // }
+  checkUserExists(email: string): Observable<{ exists: boolean; status?: string } | null> {
+    return this.http
+      .get<{ exists: boolean; status?: string }>(`${this.apiUrl}/users/check-email/${email}`, { headers: this.getHeaders() })
+      .pipe(
+        map((response) => response), // Success case
+        catchError((error: HttpErrorResponse) => {
+          if (error.status === 404 && error.error && error.error.exists === false) {
+            return [error.error]; // Return { exists: false } as a valid response
+          }
+          if (error.status === 401) {
+            localStorage.removeItem('token');
+            localStorage.removeItem('user');
+            window.location.href = '/connexion?error=session-expired';
+            return throwError(() => new Error('Session expirée, veuillez vous reconnecter.'));
+          }
+          return throwError(() => new Error(error.message || 'Erreur lors de la vérification de l\'email.'));
+        })
+      );
   }
-
   updateUserStatus(email: string, status: string): Observable<any> {
     return this.http.patch(`${this.apiUrl}/users/status/${email}`, { status }, { headers: this.getHeaders() });
   }
 
 // Nouvelle méthode pour supprimer un utilisateur
+// deleteUser(email: string): Observable<any> {
+//   return this.http.delete(`${this.apiUrl}/users/${email}`, { headers: this.getHeaders() });
+// }
 deleteUser(email: string): Observable<any> {
-  return this.http.delete(`${this.apiUrl}/users/${email}`, { headers: this.getHeaders() });
+  return this.http.delete(`${this.apiUrl}/users/${email}`, { headers: this.getHeaders() }).pipe(
+    tap(() => {
+      // Notify the NotificationService to remove notifications for this email
+      (UserService as any).notificationService.removeNotificationsByEmail(email);
+
+    })
+  );
 }
 
   // Nouvelle méthode pour récupérer les activités récentes

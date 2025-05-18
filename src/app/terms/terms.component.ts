@@ -1,5 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-terms',
@@ -8,8 +9,9 @@ import { HttpClient } from '@angular/common/http';
 })
 export class TermsComponent implements OnInit {
   terms: any;
+  
 
-  constructor(private http: HttpClient) {}
+  constructor(private http: HttpClient, private router: Router) {}
 
   ngOnInit() {
     this.http.get('http://localhost:5000/api/terms').subscribe(
@@ -20,5 +22,9 @@ export class TermsComponent implements OnInit {
         console.error('Erreur lors du chargement des conditions:', error);
       }
     );
+  }
+
+  goToSignup(): void {
+    this.router.navigate(['/inscription']);
   }
 }

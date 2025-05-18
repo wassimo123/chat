@@ -1,16 +1,16 @@
-<div class="flex items-center justify-center min-h-screen bg-gray-100 pt-20">
-  <div class="w-full max-w-md bg-white rounded-lg shadow-lg p-8">
-    <h1 class="text-2xl font-bold text-center mb-6 text-gray-900">Inscription</h1>
-    
-    <form (ngSubmit)="onSubmit()" #registerForm="ngForm" class="space-y-4">
-      
-      <!-- Nom & Prénom -->
-      <div class="grid grid-cols-2 gap-4">
+<div class="min-h-screen bg-gradient-to-b from-[#004080] to-[#3B82F6] flex items-center justify-center px-4 py-6 font-poppins">
+  <div class="w-full max-w-3xl bg-white rounded-3xl shadow-2xl p-6 animate-fadeSlideIn">
+    <h1 class="text-2xl font-bold text-center mb-6 text-gray-800 tracking-wide">Créer un compte</h1>
+
+    <form (ngSubmit)="onSubmit()" #registerForm="ngForm" class="space-y-5">
+
+      <!-- Row 1: Nom + Prénom -->
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
         <div>
           <label class="text-sm font-medium text-gray-700">Nom</label>
           <div class="relative">
-            <input type="text" name="nom" [(ngModel)]="user.nom" 
-              class="w-full rounded-lg border border-gray-300 py-3 px-4 pl-10 focus:ring-2 focus:ring-blue-500 text-sm"
+            <input type="text" name="nom" [(ngModel)]="user.nom"
+              class="w-full rounded-full border border-gray-300 py-2 px-4 pl-10 focus:ring-2 focus:ring-blue-500 text-sm"
               placeholder="Votre nom" required />
             <i class="ri-user-line absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"></i>
           </div>
@@ -19,116 +19,105 @@
           <label class="text-sm font-medium text-gray-700">Prénom</label>
           <div class="relative">
             <input type="text" name="prenom" [(ngModel)]="user.prenom"
-              class="w-full rounded-lg border border-gray-300 py-3 px-4 pl-10 focus:ring-2 focus:ring-blue-500 text-sm"
+              class="w-full rounded-full border border-gray-300 py-2 px-4 pl-10 focus:ring-2 focus:ring-blue-500 text-sm"
               placeholder="Votre prénom" required />
             <i class="ri-user-line absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"></i>
           </div>
         </div>
       </div>
 
-      <!-- Email -->
-      <div>
-        <label class="text-sm font-medium text-gray-700">Email</label>
-        <div class="relative">
-          <input type="email" name="email" [(ngModel)]="user.email"
-            class="w-full rounded-lg border border-gray-300 py-3 px-4 pl-10 focus:ring-2 focus:ring-blue-500 text-sm"
-            placeholder="Votre adresse email" required />
-          <i class="ri-mail-line absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"></i>
+      <!-- Row 2: Email + Mot de passe -->
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div>
+          <label class="text-sm font-medium text-gray-700">Email</label>
+          <div class="relative">
+            <input type="email" name="email" [(ngModel)]="user.email"
+              class="w-full rounded-full border border-gray-300 py-2 px-4 pl-10 focus:ring-2 focus:ring-blue-500 text-sm"
+              placeholder="Votre adresse email" required />
+            <i class="ri-mail-line absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"></i>
+          </div>
+        </div>
+        <div>
+          <label class="text-sm font-medium text-gray-700">Mot de passe</label>
+          <div class="relative">
+            <input [type]="showPassword ? 'text' : 'password'" name="password" [(ngModel)]="user.password"
+              class="w-full rounded-full border border-gray-300 py-2 px-4 pl-10 pr-10 focus:ring-2 focus:ring-blue-500 text-sm"
+              placeholder="Mot de passe" required />
+            <i class="ri-lock-line absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"></i>
+            <button type="button" (click)="togglePasswordVisibility()" class="absolute right-3 top-1/2 -translate-y-1/2">
+              <i [class]="showPassword ? 'ri-eye-off-line' : 'ri-eye-line'" class="text-gray-400"></i>
+            </button>
+          </div>
         </div>
       </div>
 
-      <!-- Mot de passe -->
-      <div>
-        <label class="text-sm font-medium text-gray-700">Mot de passe</label>
-        <div class="relative">
-          <input 
-            [type]="showPassword ? 'text' : 'password'" 
-            name="password" 
-            [(ngModel)]="user.password"
-            class="w-full rounded-lg border border-gray-300 py-3 px-4 pl-10 pr-10 focus:ring-2 focus:ring-blue-500 text-sm"
-            placeholder="Votre mot de passe" 
-            required />
-          <i class="ri-lock-line absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"></i>
-          <button type="button" (click)="togglePasswordVisibility()" class="absolute right-3 top-1/2 -translate-y-1/2">
-            <i [class]="showPassword ? 'ri-eye-off-line' : 'ri-eye-line'" class="text-gray-400"></i>
-          </button>
+      <!-- Row 3: Confirmation mot de passe + Téléphone -->
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div>
+          <label class="text-sm font-medium text-gray-700">Confirmer le mot de passe</label>
+          <div class="relative">
+            <input [type]="showConfirmPassword ? 'text' : 'password'" name="confirmPassword" [(ngModel)]="user.confirmPassword"
+              class="w-full rounded-full border border-gray-300 py-2 px-4 pl-10 pr-10 focus:ring-2 focus:ring-blue-500 text-sm"
+              placeholder="Confirmation" required />
+            <i class="ri-lock-line absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"></i>
+            <button type="button" (click)="toggleConfirmPasswordVisibility()" class="absolute right-3 top-1/2 -translate-y-1/2">
+              <i [class]="showConfirmPassword ? 'ri-eye-off-line' : 'ri-eye-line'" class="text-gray-400"></i>
+            </button>
+          </div>
+        </div>
+        <div>
+          <label class="text-sm font-medium text-gray-700">Téléphone</label>
+          <div class="relative">
+            <input type="tel" name="telephone" [(ngModel)]="user.telephone"
+              class="w-full rounded-full border border-gray-300 py-2 px-4 pl-10 focus:ring-2 focus:ring-blue-500 text-sm"
+              placeholder="Numéro de téléphone" required />
+            <i class="ri-phone-line absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"></i>
+          </div>
         </div>
       </div>
 
-      <!-- Confirmation mot de passe -->
-      <div>
-        <label class="text-sm font-medium text-gray-700">Confirmer le mot de passe</label>
-        <div class="relative">
-          <input 
-            [type]="showConfirmPassword ? 'text' : 'password'" 
-            name="confirmPassword" 
-            [(ngModel)]="user.confirmPassword"
-            class="w-full rounded-lg border border-gray-300 py-3 px-4 pl-10 pr-10 focus:ring-2 focus:ring-blue-500 text-sm"
-            placeholder="Confirmez votre mot de passe" 
-            required />
-          <i class="ri-lock-line absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"></i>
-          <button type="button" (click)="toggleConfirmPasswordVisibility()" class="absolute right-3 top-1/2 -translate-y-1/2">
-            <i [class]="showConfirmPassword ? 'ri-eye-off-line' : 'ri-eye-line'" class="text-gray-400"></i>
-          </button>
+      <!-- Row 4: Adresse + Matricule fiscale + Date de création -->
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <div>
+          <label class="text-sm font-medium text-gray-700">Adresse</label>
+          <div class="relative">
+            <input type="text" name="adresse" [(ngModel)]="user.adresse"
+              class="w-full rounded-full border border-gray-300 py-2 px-4 pl-10 focus:ring-2 focus:ring-blue-500 text-sm"
+              placeholder="Adresse" required />
+            <i class="ri-map-pin-line absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"></i>
+          </div>
         </div>
-      </div>
-
-      <!-- Téléphone -->
-      <div>
-        <label class="text-sm font-medium text-gray-700">Téléphone</label>
-        <div class="relative">
-          <input type="tel" name="telephone" [(ngModel)]="user.telephone"
-            class="w-full rounded-lg border border-gray-300 py-3 px-4 pl-10 focus:ring-2 focus:ring-blue-500 text-sm"
-            placeholder="Votre numéro de téléphone" required />
-          <i class="ri-phone-line absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"></i>
+        <div>
+          <label class="text-sm font-medium text-gray-700">Matricule fiscale</label>
+          <div class="relative">
+            <input type="text" name="matriculeFiscale" [(ngModel)]="user.matriculeFiscale"
+              class="w-full rounded-full border border-gray-300 py-2 px-4 pl-10 focus:ring-2 focus:ring-blue-500 text-sm"
+              placeholder="Matricule fiscale" required />
+            <i class="ri-file-list-line absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"></i>
+          </div>
         </div>
-      </div>
-
-      <!-- Adresse -->
-      <div>
-        <label class="text-sm font-medium text-gray-700">Adresse</label>
-        <div class="relative">
-          <input type="text" name="adresse" [(ngModel)]="user.adresse"
-            class="w-full rounded-lg border border-gray-300 py-3 px-4 pl-10 focus:ring-2 focus:ring-blue-500 text-sm"
-            placeholder="Votre adresse" required />
-          <i class="ri-map-pin-line absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"></i>
-        </div>
-      </div>
-
-      <!-- Matricule fiscale -->
-      <div>
-        <label class="text-sm font-medium text-gray-700">Matricule fiscale</label>
-        <div class="relative">
-          <input type="text" name="matriculeFiscale" [(ngModel)]="user.matriculeFiscale"
-            class="w-full rounded-lg border border-gray-300 py-3 px-4 pl-10 focus:ring-2 focus:ring-blue-500 text-sm"
-            placeholder="Votre matricule fiscale" required />
-          <i class="ri-file-list-line absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"></i>
-        </div>
-      </div>
-
-      <!-- Date de création -->
-      <div>
-        <label class="text-sm font-medium text-gray-700">Date de création</label>
-        <div class="relative">
+        <div>
+          <label class="text-sm font-medium text-gray-700">Date de création</label>
           <input type="date" name="dateCreation" [(ngModel)]="user.dateCreation"
-            class="w-full rounded-lg border border-gray-300 py-3 px-4 focus:ring-2 focus:ring-blue-500 text-sm"
+            class="w-full rounded-full border border-gray-300 py-2 px-4 focus:ring-2 focus:ring-blue-500 text-sm"
             required />
         </div>
       </div>
 
       <!-- Conditions d'utilisation -->
-      <div class="flex items-center gap-2">
+      <div class="flex items-start gap-2">
         <input type="checkbox" name="terms" [(ngModel)]="user.terms"
-          class="w-4 h-4 border-gray-300 text-blue-600 focus:ring-blue-500" required />
-        <label class="text-sm text-gray-600">J'accepte les 
-          <a [routerLink]="['/terms']" class="text-blue-600 hover:text-blue-800">conditions d'utilisation</a> 
-          et la 
-          <a [routerLink]="['/privacy']" class="text-blue-600 hover:text-blue-800">politique de confidentialité</a>.
+          class="w-4 h-4 mt-1 border-gray-300 text-blue-600 focus:ring-blue-500" required />
+        <label class="text-sm text-gray-600">J'accepte les
+          <a [routerLink]="['/terms']" class="text-blue-600 hover:text-blue-800 underline">conditions d'utilisation</a>
+          et la
+          <a [routerLink]="['/privacy']" class="text-blue-600 hover:text-blue-800 underline">politique de confidentialité</a>.
         </label>
       </div>
 
-      <!-- Bouton d'inscription -->
-      <button type="submit" class="w-full bg-blue-600 text-white py-3 rounded-lg hover:bg-blue-700 transition">
+      <!-- Bouton inscription -->
+      <button type="submit"
+        class="w-full bg-blue-600 text-white py-2 rounded-full hover:bg-blue-700 transition text-sm font-semibold">
         S'inscrire
       </button>
 
@@ -139,6 +128,7 @@
           Se connecter
         </a>
       </p>
+
     </form>
   </div>
 </div>
