@@ -28,6 +28,11 @@ module.exports = {
       fontFamily: {
         poppins: ['Poppins', 'sans-serif'],
       },
+      animation: {
+        'bounce-arrow1': 'bounceArrow 2s infinite',
+        'bounce-arrow2': 'bounceArrow 2s infinite 0.2s',
+        'bounce-arrow3': 'bounceArrow 2s infinite 0.4s',
+      },
     },
   },
   plugins: [],

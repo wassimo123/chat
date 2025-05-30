@@ -17,7 +17,7 @@
       Tunisie, où tradition et modernité se rencontrent harmonieusement.
     </p>
     
-    <!--wasssssiiiimmmmmm-->
+    
     <a href="/decouvrire"
    class="h-10 inline-flex items-center justify-center bg-primary text-white px-4 py-2 rounded-full text-sm hover:bg-blue-700 whitespace-nowrap"
    data-aos="fade-up" data-aos-delay="300">
@@ -89,19 +89,12 @@
             reconnue pour sa gastronomie unique, ses traditions artisanales
             et l'hospitalité de ses habitants.
           </p>
-          <!-- <a 
-               href="#" 
-               class="btn btn-primary inline-block mt-6" 
-               data-aos="fade-up" 
-              data-aos-delay="400"
-                 >
-  En savoir plus
-</a> -->
+         
 
         </div>
         <div class=" featured-big1 featured-small1 ">
           <img
-            src="https://public.readdy.ai/ai/img_res/d86ed7ae9e9cb5aea20ad1a3bb7a5600.jpg"
+            src="https://upload.wikimedia.org/wikipedia/commons/thumb/4/4a/Sfax.jpg/640px-Sfax.jpg"
             alt="Médina de Sfax"
             class="featured-big"
             data-aos="zoom-in"
@@ -202,7 +195,7 @@
         <div class="single-pricing text-center" data-aos="fade-up" data-aos-delay="0" data-aos-duration="600">
           <span>1 Mois</span>
           <h2>Pack Basique</h2>
-          <p class="desc">Idéal pour les petites entreprises</p>
+          <p class="desc">Idéal pour les entreprises</p>
           <p class="price">50 TND</p>
           <p>1000 impressions / mois</p>
           <p>1 publicité par semaine</p>
@@ -219,7 +212,7 @@
         <div class="single-pricing text-center" data-aos="fade-up" data-aos-delay="300" data-aos-duration="600">
           <span>3 Mois</span>
           <h2>Pack Standard</h2>
-          <p class="desc">Pour les entreprises en croissance</p>
+          <p class="desc">Idéal pour les entreprises</p>
           <p class="price">120 TND</p>
           <p>5000 impressions / mois</p>
           <p>5 publicités par semaine</p>
@@ -236,7 +229,7 @@
         <div class="single-pricing text-center" data-aos="fade-up" data-aos-delay="600" data-aos-duration="600">
           <span>6 Mois</span>
           <h2>Pack Avancé</h2>
-          <p class="desc">Pour un impact maximum</p>
+          <p class="desc">Idéal pour les entreprises</p>
           <p class="price">200 TND</p>
           <p>10000 impressions / mois</p>
           <p>10 publicités par semaine</p>
@@ -285,79 +278,82 @@
       </div>
     </div>
   </section>
+<!-- Section avec fond dégradé moderne -->
+<section class="min-h-screen bg-gradient-to-br from-blue-100 via-white to-blue-200 py-16 px-4">
 
- <!-- Évaluer notre site -->
-<div class="bg-white p-6 rounded-lg shadow-md max-w-xl mx-auto">
-  <h2 class="text-xl font-semibold mb-4">Évaluer notre site</h2>
+  <!-- Évaluer notre site (ta carte actuelle, inchangée) -->
+  <div class="bg-white p-6 rounded-lg shadow-md max-w-xl mx-auto">
+    <h2 class="text-xl font-semibold mb-4">Évaluer notre site</h2>
 
-  <!-- Success/Error Messages -->
-  <div *ngIf="successMessage" class="bg-green-100 text-green-700 p-3 rounded mb-4">
-    {{ successMessage }}
+    <!-- Success/Error Messages -->
+    <div *ngIf="successMessage" class="bg-green-100 text-green-700 p-3 rounded mb-4">
+      {{ successMessage }}
+    </div>
+    <div *ngIf="errorMessage" class="bg-red-100 text-red-700 p-3 rounded mb-4">
+      {{ errorMessage }}
+    </div>
+
+    <!-- User Name Input -->
+    <input
+      [(ngModel)]="newAvis.utilisateur"
+      class="w-full border p-2 rounded mb-4"
+      placeholder="Votre nom (facultatif)"
+    />
+
+    <!-- Star Rating -->
+    <div class="flex mb-4 space-x-1">
+      <i
+        class="ri-star-fill text-2xl cursor-pointer"
+        *ngFor="let star of [1,2,3,4,5]"
+        (mouseenter)="hovered = star"
+        (mouseleave)="hovered = 0"
+        (click)="newAvis.note = star"
+        [ngClass]="{
+          'text-yellow-400': star <= (hovered || newAvis.note),
+          'text-gray-300': star > (hovered || newAvis.note)
+        }"
+      ></i>
+    </div>
+
+    <!-- Comment Input -->
+    <textarea
+      [(ngModel)]="newAvis.commentaire"
+      class="w-full border p-2 rounded mb-4"
+      rows="3"
+      placeholder="Laissez un commentaire..."
+    ></textarea>
+
+    <!-- Submit Button -->
+    <button
+      (click)="submitAvis()"
+      class="bg-blue-500 text-white px-4 py-2 rounded-full hover:bg-blue-600"
+    >
+      Envoyer
+    </button>
+
+    <!-- Evaluation Summary -->
+    <div class="mt-6">
+      <p class="text-gray-600">
+        Note moyenne : <strong>{{ evaluation?.score || '0' }}/5</strong>
+      </p>
+      <p class="text-gray-500">
+        Basé sur {{ evaluation?.nombreVotes || 0 }} avis.
+      </p>
+    </div>
   </div>
-  <div *ngIf="errorMessage" class="bg-red-100 text-red-700 p-3 rounded mb-4">
-    {{ errorMessage }}
+
+  <!-- Bouton Voir tous les avis -->
+  <div class="text-center mt-6 mb-16" [@fadeAnimation]>
+    <button
+      (click)="goToTemoignages()"
+      class="inline-flex items-center bg-blue-500 text-white px-6 py-2 rounded-full hover:bg-blue-600 transition"
+      [@fadeAnimation]
+    >
+      Voir tous les avis
+      <i class="ri-arrow-right-line ml-2" [@fadeAnimation]></i>
+    </button>
   </div>
-
-  <!-- User Name Input -->
-  <input
-    [(ngModel)]="newAvis.utilisateur"
-    class="w-full border p-2 rounded mb-4"
-    placeholder="Votre nom (facultatif)"
-  />
-
-  <!-- Star Rating -->
-  <div class="flex mb-4 space-x-1">
-    <i
-      class="ri-star-fill text-2xl cursor-pointer"
-      *ngFor="let star of [1,2,3,4,5]"
-      (mouseenter)="hovered = star"
-      (mouseleave)="hovered = 0"
-      (click)="newAvis.note = star"
-      [ngClass]="{
-        'text-yellow-400': star <= (hovered || newAvis.note),
-        'text-gray-300': star > (hovered || newAvis.note)
-      }"
-    ></i>
-  </div>
-
-  <!-- Comment Input -->
-  <textarea
-    [(ngModel)]="newAvis.commentaire"
-    class="w-full border p-2 rounded mb-4"
-    rows="3"
-    placeholder="Laissez un commentaire..."
-  ></textarea>
-
-  <!-- Submit Button -->
-  <button
-    (click)="submitAvis()"
-    class="bg-blue-500 text-white px-4 py-2 rounded-full hover:bg-blue-600"
-  >
-    Envoyer
-  </button>
-
-  <!-- Evaluation Summary -->
-  <div class="mt-6">
-    <p class="text-gray-600">
-      Note moyenne : <strong>{{ evaluation?.score || '0' }}/5</strong>
-    </p>
-    <p class="text-gray-500">
-      Basé sur {{ evaluation?.nombreVotes || 0 }} avis.
-    </p>
-  </div>
-</div>
-
-
-<!-- Bouton Voir tous les avis -->
-<div class="text-center mt-6 mb-16" [@fadeAnimation]> 
-  <button [@fadeAnimation]
-    (click)="goToTemoignages()"
-    class="inline-flex items-center bg-blue-500 text-white px-6 py-2 rounded-full hover:bg-blue-600 transition  "  [@fadeAnimation]
-  >
-    Voir tous les avis
-    <i class="ri-arrow-right-line ml-2" [@fadeAnimation] ></i>
-  </button>
-</div>
+</section>
 
  
 

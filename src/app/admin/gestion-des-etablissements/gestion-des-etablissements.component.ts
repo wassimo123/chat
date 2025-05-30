@@ -436,6 +436,7 @@ isValidEmail(email: string): boolean {
       statut: "Actif",
       visibility: "public",
       showMap: false,
+      coordinates:"",
       telephone: "",
       email: "",
       siteWeb: "",

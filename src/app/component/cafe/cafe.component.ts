@@ -6,6 +6,9 @@ import { FooterComponent } from '../footer/footer.component';
 import { Router } from '@angular/router';
 import { EtablissementService } from '../../services/etablissement.service';
 import { Etablissement } from '../../models/etablissement.model';
+import { trigger, transition, style, animate } from '@angular/animations';
+import { ViewportScroller } from '@angular/common';
+
 
 interface FilterServices {
   Piscine: boolean;
@@ -36,7 +39,18 @@ interface CafeDisplay {
   standalone: true,
   imports: [CommonModule, FormsModule, NavbarComponent, FooterComponent],
   templateUrl: './cafe.component.html',
-  styleUrls: ['./cafe.component.css']
+  styleUrls: ['./cafe.component.css'],
+  animations: [
+    trigger('fadeAnimation', [
+      transition(':enter', [
+        style({ opacity: 0, transform: 'translateY(10px)' }),
+        animate('400ms ease-out', style({ opacity: 1, transform: 'translateY(0)' }))
+      ]),
+      transition(':leave', [
+        animate('200ms ease-in', style({ opacity: 0 }))
+      ])
+    ])
+  ]
 })
 export class CafeComponent implements OnInit {
   searchQuery: string = '';
@@ -60,9 +74,10 @@ export class CafeComponent implements OnInit {
   Cafe: CafeDisplay[] = [];
   filteredCafe: CafeDisplay[] = [];
 
-  constructor(private router: Router, private etablissementService: EtablissementService) {}
+  constructor(private router: Router, private etablissementService: EtablissementService, private viewportScroller: ViewportScroller) {}
 
   ngOnInit() {
+    this.viewportScroller.scrollToPosition([0, 0]);
     this.fetchCafe();
   }
 

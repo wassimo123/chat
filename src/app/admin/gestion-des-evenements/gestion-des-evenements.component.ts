@@ -148,9 +148,9 @@ export class GestionDesEvenementsComponent implements OnInit, AfterViewInit {
         this.updatePagination();
         this.updateCharts();
       },
-      error: (err: any) => {
-        this.showNotification('Erreur lors du chargement des événements: ' + err.message, 'error');
-      }
+      // error: (err: any) => {
+      //   this.showNotification('Erreur lors du chargement des événements: ' + err.message, 'error');
+      // }
     });
   }
 

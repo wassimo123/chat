@@ -6,7 +6,7 @@ import * as AOS from 'aos';
 import * as echarts from 'echarts';
 import { NavbarComponent } from '../component/navbar/navbar.component';
 import { FooterComponent } from '../component/footer/footer.component';
-
+import { ViewportScroller } from '@angular/common';
 
 @Component({
   selector: 'app-heritage-detail',
@@ -27,7 +27,8 @@ export class HeritageDetailComponent implements OnInit, AfterViewInit {
 
   constructor(
     private route: ActivatedRoute,
-    private heritageService: HeritageService
+    private heritageService: HeritageService,
+    private viewportScroller: ViewportScroller
   ) {}
 
   ngOnInit(): void {
@@ -49,6 +50,7 @@ export class HeritageDetailComponent implements OnInit, AfterViewInit {
   }
 
   ngAfterViewInit(): void {
+    this.viewportScroller.scrollToPosition([0, 0]);
     if (this.heritageItem) {
       const chartDom = document.getElementById('visitorChart');
       if (chartDom) {

@@ -36,7 +36,7 @@
 
           <a routerLink="/evenement" class="text-gray-700 hover:text-primary">Événements</a>
           <a routerLink="/promotion" class="text-gray-700 hover:text-primary">Promotions</a>
-          <a routerLink="/Experience" class="text-gray-700 hover:text-primary">Expérience</a>
+          <a routerLink="/culture" class="text-gray-700 hover:text-primary">Cultures</a>
         </div>
       </div>
 
@@ -44,11 +44,13 @@
       <div class="hidden md:flex items-center space-x-4">
         <div class="relative">
           <input
+            [(ngModel)]="searchQuery"
+            (keyup.enter)="performSearch()"
             type="text"
             placeholder="Rechercher..."
             class="h-10 pl-10 pr-4 py-2 border border-gray-300 rounded-full text-sm focus:outline-none focus:ring-2 focus:ring-primary"
           />
-          <i class="ri-search-line absolute left-3 top-2.5 text-gray-400"></i>
+          <i class="ri-search-line absolute left-3 top-2.5 text-gray-400 cursor-pointer" (click)="performSearch()"></i>
         </div>
         <button
           routerLink="/connexion"
@@ -126,11 +128,13 @@
         <div class="px-3 py-2">
           <div class="relative">
             <input
+              [(ngModel)]="searchQuery"
+              (keyup.enter)="performSearch()"
               type="text"
               placeholder="Rechercher..."
               class="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-full text-sm focus:outline-none focus:ring-2 focus:ring-primary"
             />
-            <i class="ri-search-line absolute left-3 top-2.5 text-gray-400"></i>
+            <i class="ri-search-line absolute left-3 top-2.5 text-gray-400 cursor-pointer" (click)="performSearch()"></i>
           </div>
         </div>
 

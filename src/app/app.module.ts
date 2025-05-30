@@ -41,6 +41,8 @@ import { HistoireComponent } from './histoire/histoire.component';
 import { HeritageDetailComponent } from './heritage-detail/heritage-detail.component';
 import { TemoignagesComponent } from './components/temoignages/temoignages.component';
 import { DecouvrirSfaxComponent } from './decouvrir-sfax/decouvrir-sfax.component';
+import { SearchComponent } from './search/search.component';
+import { CulturesTraditionnelsComponent } from './cultures-traditionnels/cultures-traditionnels.component';
 
 
 
@@ -69,8 +71,9 @@ import { DecouvrirSfaxComponent } from './decouvrir-sfax/decouvrir-sfax.componen
    PartenaireEtablissementsComponent,
   //  PartenaireEvenementsComponent,
   //  PartenairePromotionsComponent,
-   GestionDesPublicitesComponent
-  
+   GestionDesPublicitesComponent,
+
+
     
 
    
@@ -103,6 +106,8 @@ import { DecouvrirSfaxComponent } from './decouvrir-sfax/decouvrir-sfax.componen
     TemoignagesComponent,
     DecouvrirSfaxComponent,
     ReactiveFormsModule,
+    SearchComponent,
+    CulturesTraditionnelsComponent,
     
 ],
   providers: [],

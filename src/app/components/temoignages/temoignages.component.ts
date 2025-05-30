@@ -1,31 +1,12 @@
-import {
-  Component,
-  OnInit
-} from '@angular/core';
-import {
-  CommonModule
-} from '@angular/common';
-import {
-  FormsModule
-} from '@angular/forms';
-import {
-  EvaluationService
-} from '../../services/evaluation.service';
-import {
-  NavbarComponent
-} from 'src/app/component/navbar/navbar.component';
-import {
-  FooterComponent
-} from 'src/app/component/footer/footer.component';
-import {
-  Router
-} from '@angular/router';
-import {
-  trigger,
-  transition,
-  style,
-  animate
-} from '@angular/animations';
+import {Component, OnInit} from '@angular/core';
+import {CommonModule} from '@angular/common';
+import {FormsModule} from '@angular/forms';
+import {EvaluationService} from '../../services/evaluation.service';
+import {NavbarComponent} from 'src/app/component/navbar/navbar.component';
+import {FooterComponent} from 'src/app/component/footer/footer.component';
+import {Router} from '@angular/router';
+import {trigger,transition,style,animate} from '@angular/animations';
+import { ViewportScroller } from '@angular/common';
 
 @Component({
   selector: 'app-temoignages',
@@ -52,9 +33,10 @@ export class TemoignagesComponent implements OnInit {
   avisParPage: number = 9;
   selectedNoteFilter: string = 'all';
 
-  constructor(private evaluationService: EvaluationService, private router: Router) {}
+  constructor(private evaluationService: EvaluationService, private router: Router,private viewportScroller: ViewportScroller) {}
 
   ngOnInit(): void {
+    this.viewportScroller.scrollToPosition([0, 0]);
     this.evaluationService.getEvaluation().subscribe({
       next: (res) => {
         this.avisList = (res.avis || []).map((avis: any) => ({

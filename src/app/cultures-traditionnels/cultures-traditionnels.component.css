@@ -1,0 +1,379 @@
+/* ==========================================================================
+   Global Variables
+   ========================================================================== */
+   :root {
+    --primary: #D97706; /* Warm amber inspired by Tunisian culture */
+    --primary-dark: #B45309; /* Darker amber for hover states */
+    --secondary: #1E40AF; /* Mediterranean blue */
+    --background: #F9FAFB; /* Light gray background */
+    --text: #1F2937; /* Dark gray for text */
+    --text-light: #6B7280; /* Lighter gray for secondary text */
+    --white: #FFFFFF;
+    --shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+    --shadow-light: 0 4px 15px rgba(0, 0, 0, 0.1);
+    --transition: all 0.3s ease;
+    --border-radius: 1rem;
+    --border-radius-button: 9999px;
+    --font-heading: 'Playfair Display', serif;
+    --font-body: 'Roboto', sans-serif;
+  }
+  
+  /* ==========================================================================
+     Base Styles
+     ========================================================================== */
+  :host {
+    display: block;
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+  }
+  
+  body {
+    font-family: var(--font-body);
+    color: var(--text);
+    background-color: var(--background);
+    line-height: 1.6;
+    margin: 0;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+  
+  h1, h2, h3, h4 {
+    font-family: var(--font-heading);
+    color: var(--text);
+    margin-bottom: 1rem;
+  }
+  
+  p {
+    margin-bottom: 1rem;
+  }
+  
+  a {
+    text-decoration: none;
+    color: inherit;
+  }
+  
+  /* ==========================================================================
+     Typography
+     ========================================================================== */
+  h1 {
+    font-size: clamp(2.5rem, 5vw, 3.5rem);
+    font-weight: 700;
+  }
+  
+  h2 {
+    font-size: clamp(1.875rem, 4vw, 3rem);
+  }
+  
+  h3 {
+    font-size: clamp(1.25rem, 3vw, 1.5rem);
+  }
+  
+  h4 {
+    font-size: clamp(1rem, 2.5vw, 1.25rem);
+  }
+  
+  /* ==========================================================================
+     Layout
+     ========================================================================== */
+  .container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 1rem;
+  }
+  
+  section {
+    padding: 4rem 1rem;
+  }
+  
+  /* ==========================================================================
+     Hero Section
+     ========================================================================== */
+  .hero-section {
+    position: relative;
+    min-height: 80vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    background-size: cover;
+    background-position: center;
+  }
+  
+  .hero-section .overlay {
+    position: absolute;
+    inset: 0;
+    background-color: rgba(0, 0, 0, 0.5);
+  }
+  
+  .hero-section h1 {
+    color: var(--white);
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+  }
+  
+  .hero-section p {
+    color: var(--white);
+    font-size: clamp(1rem, 2vw, 1.25rem);
+    max-width: 800px;
+    margin: 0 auto;
+  }
+  
+  /* ==========================================================================
+     Card Component
+     ========================================================================== */
+  .card {
+    background: var(--white);
+    border-radius: var(--border-radius);
+    overflow: hidden;
+    transition: var(--transition);
+  }
+  
+  .card:hover {
+    transform: translateY(-10px);
+    box-shadow: var(--shadow);
+  }
+  
+  .card img {
+    width: 100%;
+    height: auto;
+    object-fit: cover;
+    transition: var(--transition);
+  }
+  
+  .card:hover img {
+    transform: scale(1.1);
+  }
+  
+  /* ==========================================================================
+     Patrimoine Culturel Section
+     ========================================================================== */
+  .patrimoine-card {
+    background: var(--white);
+    border-radius: var(--border-radius);
+    box-shadow: var(--shadow-light);
+    overflow: hidden;
+    transition: var(--transition);
+  }
+  
+  .patrimoine-card:hover {
+    transform: translateY(-5px);
+    box-shadow: var(--shadow);
+  }
+  
+  .patrimoine-card img {
+    width: 100%;
+    height: 250px;
+    object-fit: cover;
+  }
+  
+  /* Specific image sizes for Charmoula Houtmelah, Kosksi bel Hout, and Bezine bel Kleya */
+  .patrimoine-card img[alt="Charmoula houtmelah"],
+  .patrimoine-card img[alt="Kosksi bel hout"],
+  .patrimoine-card img[alt="Bezine bel kleya"] {
+    height: 300px;
+    object-fit: cover;
+  }
+  
+  .patrimoine-card h3 {
+    font-size: 1.25rem;
+    font-weight: 600;
+    margin-bottom: 1rem;
+  }
+  
+  .patrimoine-card p {
+    font-size: 0.95rem;
+    color: var(--text-light);
+    margin-bottom: 1.5rem;
+  }
+  
+  .patrimoine-card .btn-blue {
+    background-color: var(--secondary);
+    color: var(--white);
+    padding: 0.75rem 1.5rem;
+    border-radius: 0.75rem;
+    font-weight: 500;
+    transition: var(--transition);
+    display: inline-block;
+  }
+  
+  .patrimoine-card .btn-blue:hover {
+    background-color: #1a3a9f;
+  }
+  
+  /* ==========================================================================
+     Button Component
+     ========================================================================== */
+  .btn-primary {
+    background-color: var(--primary);
+    color: var(--white);
+    padding: 0.75rem 1.5rem;
+    border-radius: var(--border-radius-button);
+    font-weight: 500;
+    transition: var(--transition);
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+  
+  .btn-primary:hover {
+    background-color: var(--primary-dark);
+  }
+  
+  .btn-primary:focus {
+    outline: none;
+    box-shadow: 0 0 0 3px rgba(217, 119, 6, 0.3);
+  }
+  
+  .btn-secondary {
+    border: 2px solid var(--primary);
+    color: var(--primary);
+    padding: 0.75rem 1.5rem;
+    border-radius: var(--border-radius-button);
+    font-weight: 500;
+    transition: var(--transition);
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+  
+  .btn-secondary:hover {
+    background-color: var(--primary);
+    color: var(--white);
+  }
+  
+  .btn-secondary:focus {
+    outline: none;
+    box-shadow: 0 0 0 3px rgba(217, 119, 6, 0.3);
+  }
+  
+  /* ==========================================================================
+     Animations
+     ========================================================================== */
+  .fade-in {
+    opacity: 0;
+    transform: translateY(20px);
+    transition: opacity 0.6s ease-out, transform 0.6s ease-out;
+  }
+  
+  .fade-in.visible {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  
+  /* Optimize AOS animations for performance */
+  [data-aos] {
+    transition-property: opacity, transform;
+    will-change: opacity, transform;
+  }
+  
+  /* ==========================================================================
+     Gastronomie Section
+     ========================================================================== */
+  .gastronomie-img {
+    border-radius: var(--border-radius);
+    box-shadow: var(--shadow-light);
+    width: 100%;
+    height: auto;
+    object-fit: cover;
+  }
+  
+  /* ==========================================================================
+     Responsive Design
+     ========================================================================== */
+  @media (max-width: 1024px) {
+    section {
+      padding: 3rem 1rem;
+    }
+  
+    .container {
+      padding: 0 0.75rem;
+    }
+  }
+  
+  @media (max-width: 768px) {
+    .hero-section {
+      min-height: 70vh;
+    }
+  
+    .hero-section h1 {
+      font-size: 2.5rem;
+    }
+  
+    .hero-section p {
+      font-size: 1rem;
+    }
+  
+    h2 {
+      font-size: 1.875rem;
+    }
+  
+    .card, .patrimoine-card {
+      margin-bottom: 1.5rem;
+    }
+  
+    .btn-primary, .btn-secondary, .patrimoine-card .btn-blue {
+      padding: 0.5rem 1rem;
+      font-size: 0.875rem;
+    }
+  
+    .patrimoine-card img {
+      height: 200px;
+    }
+  
+    .patrimoine-card img[alt="Charmoula houtmelah"],
+    .patrimoine-card img[alt="Kosksi bel hout"],
+    .patrimoine-card img[alt="Bezine bel kleya"] {
+      height: 250px;
+    }
+  }
+  
+  @media (max-width: 640px) {
+    .hero-section {
+      min-height: 60vh;
+    }
+  
+    .hero-section h1 {
+      font-size: 2rem;
+    }
+  
+    section {
+      padding: 2rem 1rem;
+    }
+  
+    .container {
+      padding: 0 0.5rem;
+    }
+  
+    .patrimoine-card img {
+      height: 180px;
+    }
+  
+    .patrimoine-card img[alt="Charmoula houtmelah"],
+    .patrimoine-card img[alt="Kosksi bel hout"],
+    .patrimoine-card img[alt="Bezine bel kleya"] {
+      height: 220px;
+    }
+  }
+  
+  @media (max-width: 480px) {
+    h1 {
+      font-size: 1.75rem;
+    }
+  
+    h2 {
+      font-size: 1.5rem;
+    }
+  
+    .patrimoine-card img {
+      height: 150px;
+    }
+  
+    .patrimoine-card img[alt="Charmoula houtmelah"],
+    .patrimoine-card img[alt="Kosksi bel hout"],
+    .patrimoine-card img[alt="Bezine bel kleya"] {
+      height: 180px;
+    }
+  }
+
+
+ 

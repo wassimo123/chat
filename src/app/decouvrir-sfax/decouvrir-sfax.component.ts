@@ -6,7 +6,7 @@ import { NavbarComponent } from '../component/navbar/navbar.component';
 import { FooterComponent } from '../component/footer/footer.component';
 import * as AOS from 'aos'; // Import AOS
 import { trigger, transition, style, animate } from '@angular/animations';
-
+import { ViewportScroller } from '@angular/common';
 
 @Component({
   selector: 'app-decouvrir-sfax',
@@ -35,11 +35,12 @@ export class DecouvrirSfaxComponent implements OnInit {
   modalTitle = '';
   currentIndex = 0;
 
-  constructor(private sanitizer: DomSanitizer) {
+  constructor(private sanitizer: DomSanitizer,private viewportScroller: ViewportScroller) {
     this.videoUrl = this.sanitizer.bypassSecurityTrustResourceUrl('https://www.youtube.com/embed/ny9TYVKsI2g');
   }
 
   ngOnInit(): void {
+    this.viewportScroller.scrollToPosition([0, 0]);
     AOS.init({
       duration: 800,
       easing: 'ease-in-out',

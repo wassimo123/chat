@@ -6,7 +6,7 @@ import { FooterComponent } from '../footer/footer.component';
 import { EvaluationService } from '../../services/evaluation.service';
 import { Router } from '@angular/router';
 import { trigger,transition,style, animate} from '@angular/animations';
-
+import { ViewportScroller } from '@angular/common';
 
 @Component({
   selector: 'app-home',
@@ -33,14 +33,18 @@ export class HomeComponent {
   images: string[] = [
     'assets/images/ville1.jpg',
     'assets/images/ville2.jpg',
-    'assets/images/ville3.jpg',
+    'assets/images/sf1.webp',
+    'assets/images/qq.jpg',
     'assets/images/ville4.jpg',
+    
    
   ];
   
   currentIndex: number = 0;
   
   ngOnInit() {
+    
+    this.viewportScroller.scrollToPosition([0, 0]);
     setInterval(() => {
       this.currentIndex = (this.currentIndex + 1) % this.images.length;
     }, 4000); // toutes les 10 secondes par exemple
@@ -71,7 +75,7 @@ export class HomeComponent {
     commentaire: ''
   };
 
-  constructor(private evaluationService: EvaluationService,private router: Router) {
+  constructor(private evaluationService: EvaluationService,private router: Router,private viewportScroller: ViewportScroller) {
     this.fetchEvaluation(); // Charger les avis au démarrage
   }
 

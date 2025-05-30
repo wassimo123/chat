@@ -8,6 +8,8 @@ import { Evenement } from '../../models/evenement.model';
 import { forkJoin, Observable } from 'rxjs';
 import { HttpClient } from '@angular/common/http';
 import { trigger, transition, style, animate } from '@angular/animations';
+import { ViewportScroller } from '@angular/common';
+
 
 interface FilterOption {
   name: string;
@@ -86,10 +88,12 @@ export class EventComponent implements OnInit {
 
   constructor(
     private evenementService: EvenementService,
-    private http: HttpClient
+    private http: HttpClient,
+    private viewportScroller: ViewportScroller
   ) {}
 
   ngOnInit() {
+    this.viewportScroller.scrollToPosition([0, 0]);
     this.loadEvents();
   }
 

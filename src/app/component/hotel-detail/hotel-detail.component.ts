@@ -7,12 +7,26 @@ import { FooterComponent } from '../footer/footer.component';
 import { EtablissementService } from '../../services/etablissement.service';
 import * as L from 'leaflet';
 import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
+import { trigger, transition, style, animate } from '@angular/animations';
+import { ViewportScroller } from '@angular/common';
+
 @Component({
   selector: 'app-hotel-detail',
   standalone: true,
   imports: [CommonModule, FormsModule, RouterLink, NavbarComponent, FooterComponent],
   templateUrl: './hotel-detail.component.html',
-  styleUrls: ['./hotel-detail.component.css']
+  styleUrls: ['./hotel-detail.component.css'],
+    animations: [
+    trigger('fadeAnimation', [
+      transition(':enter', [
+        style({ opacity: 0, transform: 'translateY(10px)' }),
+        animate('400ms ease-out', style({ opacity: 1, transform: 'translateY(0)' }))
+      ]),
+      transition(':leave', [
+        animate('200ms ease-in', style({ opacity: 0 }))
+      ])
+    ])
+  ]
 })
 export class HotelDetailComponent implements OnInit {
   hotel: any = null;
@@ -23,20 +37,25 @@ export class HotelDetailComponent implements OnInit {
   numberOfPeople: string = '1';
   map: any;
   currentPhotoIndex: number = 0;
+ 
+
 
   constructor(
     private route: ActivatedRoute,
     private etablissementService: EtablissementService,
-    private sanitizer: DomSanitizer
+    private sanitizer: DomSanitizer,
+    private viewportScroller: ViewportScroller
   ) {}
 
   ngOnInit() {
+    this.viewportScroller.scrollToPosition([0, 0]);
     this.route.paramMap.subscribe(params => {
       const id = params.get('id');
       if (id) {
         this.etablissementService.getEtablissementById(id).subscribe({
           next: (hotel) => {
             this.hotel = hotel;
+            console.log("hotel: ",this.hotel.coordinates);
           },
           
           error: (err) => {
@@ -85,17 +104,55 @@ export class HotelDetailComponent implements OnInit {
       });
   }
 
+  jours: string[] = ['lundi', 'mardi', 'mercredi', 'jeudi', 'vendredi', 'samedi', 'dimanche'];
+
+
+  getNavRoute(): string {
+    switch(this.hotel.type) { 
+      case 'Restaurant': { 
+         return 'restaurants';
+      } 
+      case 'Café': { 
+        return 'cafes';
+
+     }   
+      case 'Hôtel': { 
+        return 'hotels';
+
+   } 
+      default: { 
+         return 'hotels';
+      } 
+   } 
+   
+  }
   getGoogleMapsUrl(address: string): string {
     return `https://maps.google.com/?q=${encodeURIComponent(address)}`;
   }
-
+  getLongitude():number {
+    return this.hotel.coordinates[1];
+  }
+  getLatitude():number {
+    return this.hotel.coordinates[0];
+  }
+  getMapUrl(): SafeResourceUrl {
+    const lat = this.getLatitude();
+    const lng = this.getLongitude();  
+    const unsafeUrl = `https://maps.google.com/maps?q=${lat},${lng}&z=18&t=k&output=embed`;
+    return this.sanitizer.bypassSecurityTrustResourceUrl(unsafeUrl);
+  }
   goToWebsite(url: string): void {
     if (url) {
       window.open(url, '_blank');
     }
   }
-  getSafeMapUrl(fullAddress: string): SafeResourceUrl {
+  /*getSafeMapUrl(fullAddress: string): SafeResourceUrl {
     const url = `https://www.google.com/maps/embed/v1/place?key=AIzaSyBaacRlPP7Nv7b3F46CpTYeIHIN9HUFXKk&q=${encodeURIComponent(fullAddress)}&maptype=satellite`;
+    return this.sanitizer.bypassSecurityTrustResourceUrl(url);
+  }*/
+  getSafeMapUrl(): SafeResourceUrl {
+    const coords = '34.80808227434395,10.7159930444201';
+    const url = `https://www.google.com/maps/embed/v1/view?key=AIzaSyBaacRlPP7Nv7b3F46CpTYeIHIN9HUFXKk&center=${coords}&zoom=18`;
     return this.sanitizer.bypassSecurityTrustResourceUrl(url);
   }
   openInGoogleMaps(address: string) {
@@ -126,7 +183,29 @@ export class HotelDetailComponent implements OnInit {
       this.currentPhotoIndex = (this.currentPhotoIndex - 1 + this.hotel.photos.length) % this.hotel.photos.length;
     }
   }
+  selectedPhotoIndex: number | null = null;
 
+  openPhotoModal(index: number): void {
+    this.selectedPhotoIndex = index;
+  }
+  
+  closePhotoModal(): void {
+    this.selectedPhotoIndex = null;
+  }
+  
+  showNextPhotoModal(): void {
+    if (this.selectedPhotoIndex !== null && this.hotel.photos.length > 0) {
+      this.selectedPhotoIndex = (this.selectedPhotoIndex + 1) % this.hotel.photos.length;
+    }
+  }
+  
+  showPreviousPhotoModal(): void {
+    if (this.selectedPhotoIndex !== null && this.hotel.photos.length > 0) {
+      this.selectedPhotoIndex =
+        (this.selectedPhotoIndex - 1 + this.hotel.photos.length) % this.hotel.photos.length;
+    }
+  }
+  
   
 }
 

@@ -35,6 +35,7 @@ export interface ReseauxSociaux {
     pays?: string;
     showMap: boolean;
     telephone: string;
+    coordinates:string;
     email: string;
     siteWeb: string;
     reseauxSociaux: ReseauxSociaux;

@@ -28,10 +28,10 @@ export interface Publicite {
   partenaireId: string;
   nom: string;
   adresse: string;
-  type: string; // E.g. "Restaurant", "Hôtel", "Café"
-  pack: string; // E.g. "Standard", "Premium", etc.
-  statut: string; // E.g. "En attente", "Validée", "Refusée"
-  visibility: string; // E.g. "public", "private"
+  type: string; 
+  pack: string; 
+  statut: string; 
+  visibility: string; 
   informations: {
     description: string;
     services: string[];
@@ -59,11 +59,13 @@ export interface Publicite {
     telephone: string;
     email: string;
     siteWeb: string;
+    showMap:boolean;
     description: string;
     services: string[];
     horaires: Horaires;
     photos: string[];
     reseauxSociaux: SocialMedia;
+    coordinates:string;
   };
   utilisateurId: string; // Added the utilisateurId property here
   createdAt: string;
@@ -275,13 +277,44 @@ export class GestionDesPublicitesComponent implements OnInit {
       });
     }
   }
+  jours: string[] = ['lundi', 'mardi', 'mercredi', 'jeudi', 'vendredi', 'samedi', 'dimanche'];
+
+
+servicesList(){
+  return this.selectedPublicite?.etablissement.services;
+}
   
+hasAnyReseauxSociaux(): boolean {
+  if (!this.selectedPublicite?.etablissement?.reseauxSociaux) return false;
+  
+  const { facebook, instagram, twitter, linkedin } = this.selectedPublicite.etablissement.reseauxSociaux;
+  return !!(facebook || instagram || twitter || linkedin);
+}
+hasPhotos(): boolean {
+  return !!(
+    this.selectedPublicite &&
+    this.selectedPublicite.etablissement &&
+    Array.isArray(this.selectedPublicite.etablissement.photos) &&
+    this.selectedPublicite.etablissement.photos.length > 0
+  );
+}
+
+getPhotoUrl(photoPath: string): string {
+  // S'il contient déjà "http", on le renvoie tel quel
+  if (photoPath.startsWith('http')) return photoPath;
+
+  // Sinon, on le complète
+  return `http://localhost:5000/${photoPath}`;
+}
+
+
 // In the component where you handle the fetching of publicite
 consulterPublicite(id: number): void {
   const found = this.publicites.find(pub => pub._id === id);
   if (found) {
     this.selectedPublicite = found; // Assign found publicite
     console.log('Selected publicite etablissement ID:', this.selectedPublicite.etablissement._id);
+    console.log('selectedPublicite',this.selectedPublicite);
     // Check if the selected publicite has an etablissementId, then fetch the establishment details
     if (this.selectedPublicite && this.selectedPublicite.etablissement._id) {
       this.etablissementService.getEtablissementByvaliderId(this.selectedPublicite.etablissement._id).subscribe({
@@ -312,18 +345,20 @@ consulterPublicite(id: number): void {
   }
 }
 
+getHorairesForDay(day: string): { open: string; close: string; closed: boolean } | null {
+  const horaires = this.selectedPublicite?.etablissement?.horaires; // ✅ correction ici
 
-  getHorairesForDay(day: string): { open: string; close: string; closed: boolean } | null {
-    if (this.selectedPublicite && this.selectedPublicite.informations.horaires) {
-      const horaires = this.selectedPublicite.informations.horaires;
-      // Check if the day is a valid schedule entry (exclude is24_7 and specialHours)
-      if (day in horaires && day !== 'is24_7' && day !== 'specialHours') {
-        const schedule = horaires[day as keyof typeof horaires];
-        if (schedule && typeof schedule === 'object' && 'open' in schedule && 'close' in schedule && 'closed' in schedule) {
-          return schedule as { open: string; close: string; closed: boolean };
-        }
-      }
-    }
+  if (!horaires || ['is24_7', 'specialHours'].includes(day)) {
     return null;
   }
+
+  const schedule = horaires[day as keyof Horaires];
+  if (schedule && typeof schedule === 'object') {
+    return schedule;
+  }
+
+  return null;
+}
+
+
 }

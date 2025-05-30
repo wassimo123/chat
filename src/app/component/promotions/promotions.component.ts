@@ -5,6 +5,8 @@ import { NavbarComponent } from '../navbar/navbar.component';
 import { FooterComponent } from '../footer/footer.component';
 import { PromotionService, Etablissement } from '../../services/promotion.service';
 import { Router } from '@angular/router';
+import { ViewportScroller } from '@angular/common';
+import { trigger, transition, style, animate } from '@angular/animations';
 
 interface FilterOption {
   name: string;
@@ -59,9 +61,20 @@ interface ExtendedPromotion extends Promotion {
   imports: [CommonModule, FormsModule, NavbarComponent, FooterComponent],
   templateUrl: './promotions.component.html',
   styleUrls: ['./promotions.component.css'],
+  animations: [
+    trigger('fadeAnimation', [
+      transition(':enter', [
+        style({ opacity: 0, transform: 'translateY(10px)' }),
+        animate('400ms ease-out', style({ opacity: 1, transform: 'translateY(0)' }))
+      ]),
+      transition(':leave', [
+        animate('200ms ease-in', style({ opacity: 0 }))
+      ])
+    ])
+  ]
 })
 export class PromotionsComponent implements OnInit {
-  constructor(private router: Router, private promotionService: PromotionService) {}
+  constructor(private router: Router, private promotionService: PromotionService,private viewportScroller: ViewportScroller) {}
 
   promotions: ExtendedPromotion[] = [];
   filteredPromotions: ExtendedPromotion[] = [];
@@ -102,6 +115,7 @@ export class PromotionsComponent implements OnInit {
   expiringSoon: boolean = false;
 
   ngOnInit() {
+    this.viewportScroller.scrollToPosition([0, 0]);
     this.loadPromotions();
   }
 

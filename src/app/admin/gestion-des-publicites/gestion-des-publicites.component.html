@@ -37,10 +37,16 @@
       </a>
     </nav>
   </aside>
-
+  <ng-template #authTemplate>
+    <div class="flex h-screen items-center justify-center bg-gray-50">
+      <div class="text-center">
+        <p class="text-lg font-semibold text-gray-700">Redirection en cours...</p>
+      </div>
+    </div>
+  </ng-template>
   <!-- Contenu principal -->
   <div class="flex-1 flex flex-col">
-    <div *ngIf="isAuthenticated; else notAuthenticated">
+    <div *ngIf="isAuthenticated; else authTemplate">
       <!-- Header -->
       <header class="bg-white shadow-sm h-20">
         <div class="h-full px-6 flex items-center justify-between">
@@ -89,10 +95,11 @@
             <div *ngFor="let publicite of publicites" class="bg-blue-50 rounded-lg p-4 shadow-sm flex justify-between items-center">
               <div>
                 <h2 class="text-lg font-semibold text-gray-800">{{ publicite.nom }}</h2>
-                <p class="text-sm text-gray-600">Type d'établissement: {{ publicite.type }}</p>
+                <p class="text-sm text-gray-600">Type d'établissement: {{ publicite.etablissement.type }}</p>
                 <p class="text-sm text-gray-600">Pack: {{ publicite.pack }}</p>
                 <p class="text-sm text-gray-600">Statut: {{ publicite.statut }}</p>
-                <p class="text-sm text-gray-600">Date et heure: {{ currentDateTime | date:'dd/MM/yyyy HH:mm' }}</p>
+                <p class="text-sm text-gray-600">Date et heure: {{ publicite.createdAt| date:'dd/MM/yyyy HH:mm' }}</p>
+              
               </div>
               <div class="flex space-x-2">
                 <button class="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded-button transition-colors" (click)="validerPublicite(publicite._id)">Valider</button>
@@ -104,129 +111,182 @@
         </div>
       </main>
 
-      <!-- Modal de détails de la publicité -->
-      <div *ngIf="showDetailsModal && selectedPublicite" class="fixed inset-0 z-50 bg-black bg-opacity-50 flex items-center justify-center">
-        <div class="bg-white rounded-lg shadow-lg max-w-4xl w-full p-6 relative overflow-y-auto max-h-[90vh]">
-          <button class="absolute top-2 right-2 text-gray-500 hover:text-red-500" (click)="showDetailsModal = false">
-            <i class="ri-close-line text-2xl"></i>
-          </button>
+    <!-- Modal de détails de la publicité -->
+<div *ngIf="showDetailsModal && selectedPublicite" class="fixed inset-0 z-50 bg-black bg-opacity-60 flex items-center justify-center p-4 transition-all duration-300">
+  <div class="bg-white rounded-2xl shadow-2xl max-w-5xl w-full p-8 relative overflow-y-auto max-h-[90vh] transform transition-all duration-300 scale-100 hover:scale-[1.01]">
+    
+    <!-- Close Button -->
+    <button class="absolute top-4 right-4 text-gray-500 hover:text-red-600 transition" (click)="showDetailsModal = false">
+      <i class="ri-close-line text-3xl"></i>
+    </button>
 
-          <h2 class="text-xl font-semibold mb-4">Détails de la publicité</h2>
+    <!-- Header -->
+    <div class="flex items-center space-x-4 border-b border-gray-200 pb-4 mb-6">
+      <div class="w-16 h-16 rounded-full bg-blue-100 flex items-center justify-center">
+        <i class="ri-store-line text-3xl text-blue-600"></i>
+      </div>
+      <div>
+        <h2 class="text-2xl font-bold text-gray-800">{{ selectedPublicite.etablissement.nom }}</h2>
+        <p class="text-sm text-gray-500">Type d’établissement : {{ selectedPublicite.etablissement.type }}</p>
+      </div>
+    </div>
 
-          <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            <!-- Publicité details -->
-            <p><strong>Nom :</strong> {{ selectedPublicite.nom }}</p>
-            <p><strong>Adresse :</strong> {{ selectedPublicite.adresse }}</p>
-            <p><strong>Type d'établissement :</strong> {{ selectedPublicite.type }}</p>
-            <p><strong>Pack :</strong> {{ selectedPublicite.pack }}</p>
-            <p><strong>Statut :</strong> {{ selectedPublicite.statut }}</p>
-            <p><strong>Visibilité :</strong> {{ selectedPublicite.visibility }}</p>
-          
-            <!-- Etablissement details (from selectedPublicite.etablissement) -->
-            <p><strong>Nom de l'établissement :</strong> {{ selectedPublicite.etablissement.nom }}</p>
-            <p><strong>Adresse de l'établissement :</strong> {{ selectedPublicite.etablissement.adresse }}</p>
-            <p><strong>Type d'établissement :</strong> {{ selectedPublicite.etablissement.type }}</p>
-            <p><strong>Statut de l'établissement :</strong> {{ selectedPublicite.etablissement.statut }}</p>
-            <p><strong>Ville de l'établissement :</strong> {{ selectedPublicite.etablissement.ville }}</p>
-            <p><strong>Pays de l'établissement :</strong> {{ selectedPublicite.etablissement.pays }}</p>
-            <p><strong>Code postal de l'établissement :</strong> {{ selectedPublicite.etablissement.codePostal }}</p>
-            <p><strong>Téléphone de l'établissement :</strong> {{ selectedPublicite.etablissement.telephone }}</p>
-            <p><strong>Email de l'établissement :</strong> {{ selectedPublicite.etablissement.email }}</p>
-            <p><strong>Site web de l'établissement :</strong> 
-              <a *ngIf="selectedPublicite.etablissement.siteWeb" [href]="selectedPublicite.etablissement.siteWeb" target="_blank" class="text-blue-500 underline">
-                {{ selectedPublicite.etablissement.siteWeb }}
-              </a>
-            </p>
-          
-            <!-- Additional details from publicite -->
-            <p><strong>Ville :</strong> {{ selectedPublicite.informations.ville }}</p>
-            <p><strong>Pays :</strong> {{ selectedPublicite.informations.pays }}</p>
-            <p><strong>Code postal :</strong> {{ selectedPublicite.informations.codePostal }}</p>
-            <p><strong>Téléphone :</strong> {{ selectedPublicite.informations.telephone }}</p>
-            <p><strong>Email :</strong> {{ selectedPublicite.informations.email }}</p>
-            <p><strong>Site web :</strong> 
-              <a *ngIf="selectedPublicite.informations.siteWeb" [href]="selectedPublicite.informations.siteWeb" target="_blank" class="text-blue-500 underline">
-                {{ selectedPublicite.informations.siteWeb }}
-              </a>
-            </p>
-          
-            <p><strong>Date et heure :</strong> {{ currentDateTime | date:'dd/MM/yyyy HH:mm' }}</p>
-          </div>
-          
-
-          <div class="mt-4">
-            <p><strong>Description :</strong></p>
-            <p class="text-sm text-gray-700">{{ selectedPublicite.informations.description }}</p>
-          </div>
-
-          <div *ngIf="selectedPublicite.informations.services?.length" class="mt-4">
-            <p><strong>Services :</strong></p>
-            <ul class="list-disc list-inside text-sm text-gray-700">
-              <li *ngFor="let service of selectedPublicite.informations.services">{{ service }}</li>
-            </ul>
-          </div>
-
-          <div *ngIf="selectedPublicite.informations.socialMedia" class="mt-4">
-            <p><strong>Réseaux sociaux :</strong></p>
-            <ul class="text-sm text-gray-700">
-              <li *ngIf="selectedPublicite.informations.socialMedia.facebook">
-                <a [href]="selectedPublicite.informations.socialMedia.facebook" target="_blank" class="underline text-blue-600">
-                  Facebook
-                </a>
-              </li>
-              <li *ngIf="selectedPublicite.informations.socialMedia.instagram">
-                <a [href]="selectedPublicite.informations.socialMedia.instagram" target="_blank" class="underline text-pink-500">
-                  Instagram
-                </a>
-              </li>
-              <li *ngIf="selectedPublicite.informations.socialMedia.twitter">
-                <a [href]="selectedPublicite.informations.socialMedia.twitter" target="_blank" class="underline text-blue-400">
-                  Twitter
-                </a>
-              </li>
-              <li *ngIf="selectedPublicite.informations.socialMedia.linkedin">
-                <a [href]="selectedPublicite.informations.socialMedia.linkedin" target="_blank" class="underline text-blue-700">
-                  LinkedIn
-                </a>
-              </li>
-            </ul>
-          </div>
-
-          <div *ngIf="selectedPublicite.informations.horaires" class="mt-4">
-            <p><strong>Horaires :</strong></p>
-            <div class="grid grid-cols-2 sm:grid-cols-3 gap-2 text-sm text-gray-700 mt-2">
-              <ng-container *ngFor="let day of ['lundi', 'mardi', 'mercredi', 'jeudi', 'vendredi', 'samedi', 'dimanche']">
-                <div *ngIf="getHorairesForDay(day)">
-                  <strong>{{ day | titlecase }}:</strong>
-                  <span *ngIf="!getHorairesForDay(day)!.closed">
-                    {{ getHorairesForDay(day)!.open }} - {{ getHorairesForDay(day)!.close }}
-                  </span>
-                  <span *ngIf="getHorairesForDay(day)!.closed">
-                    Fermé
-                  </span>
-                </div>
-              </ng-container>
-            </div>
-            <p class="mt-2" *ngIf="selectedPublicite.informations.horaires.specialHours">
-              <strong>Horaires spéciaux :</strong> {{ selectedPublicite.informations.horaires.specialHours }}
-            </p>
-            <p *ngIf="selectedPublicite.informations.horaires.is24_7" class="mt-2 text-green-600 font-medium">
-              Ouvert 24h/24 et 7j/7
-            </p>
-          </div>
-
-          <div *ngIf="selectedPublicite.informations.photos?.length" class="mt-4">
-            <p><strong>Photos :</strong></p>
-            <div class="flex flex-wrap gap-2 mt-2">
-              <img *ngFor="let photo of selectedPublicite.informations.photos" 
-                   [src]="'/uploads/' + photo" 
-                   alt="photo" 
-                   class="w-32 h-32 object-cover rounded border">
-            </div>
-          </div>
+    <!-- Section : Informations Générales -->
+    <div class="mb-8">
+      <h3 class="text-lg font-semibold text-gray-700 mb-4">Informations Générales</h3>
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 text-gray-600">
+        <div class="bg-gray-50 p-4 rounded-lg shadow-sm">
+          <p class="text-sm"><strong>Statut :</strong>
+            <span class="inline-block ml-2 px-3 py-1 rounded-full text-xs font-medium"
+              [ngClass]="{
+                'bg-green-100 text-green-800': selectedPublicite.etablissement.statut === 'Actif',
+                'bg-yellow-100 text-yellow-800': selectedPublicite.etablissement.statut === 'En attente',
+                'bg-red-100 text-red-800': selectedPublicite.etablissement.statut === 'Inactif'
+              }">
+              {{ selectedPublicite.etablissement.statut }}
+            </span>
+          </p>
+        </div>
+        <div class="bg-gray-50 p-4 rounded-lg shadow-sm">
+          <p class="text-sm"><strong>Visibilité :</strong> {{ selectedPublicite.etablissement.visibility }}</p>
+        </div>
+        <div class="bg-gray-50 p-4 rounded-lg shadow-sm">
+          <p class="text-sm"><strong>Date de création :</strong> {{ selectedPublicite.createdAt | date:'dd/MM/yyyy HH:mm' }}</p>
+        </div>
+        <div class="bg-gray-50 p-4 rounded-lg shadow-sm">
+          <p class="text-sm"><strong>Site web :</strong>
+            <a [href]="selectedPublicite.etablissement.siteWeb" target="_blank" class="text-blue-600 underline hover:text-blue-800">
+              {{ selectedPublicite.etablissement.siteWeb }}
+            </a>
+          </p>
         </div>
       </div>
     </div>
+
+    <!-- Section : Localisation -->
+    <div class="mb-8">
+      <h3 class="text-lg font-semibold text-gray-700 mb-4">Localisation</h3>
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 text-gray-600">
+        <div class="bg-gray-50 p-4 rounded-lg shadow-sm">
+          <p class="text-sm"><strong>Adresse complète :</strong> {{ selectedPublicite.etablissement.adresse }}</p>
+        </div>
+        <div class="bg-gray-50 p-4 rounded-lg shadow-sm">
+          <p class="text-sm"><strong>Coordonnées Map :</strong> {{ selectedPublicite.etablissement.coordinates }}</p>
+        </div>
+        <div class="bg-gray-50 p-4 rounded-lg shadow-sm">
+          <p class="text-sm"><strong>Code postal :</strong> {{ selectedPublicite.etablissement.codePostal }}</p>
+        </div>
+        <div class="bg-gray-50 p-4 rounded-lg shadow-sm">
+          <p class="text-sm"><strong>Ville :</strong> {{ selectedPublicite.etablissement.ville }}</p>
+        </div>
+        <div class="bg-gray-50 p-4 rounded-lg shadow-sm">
+          <p class="text-sm"><strong>Pays :</strong> {{ selectedPublicite.etablissement.pays }}</p>
+        </div>
+        <div class="bg-gray-50 p-4 rounded-lg shadow-sm">
+          <p class="text-sm"><strong>Afficher sur la carte :</strong> {{ selectedPublicite.etablissement.showMap ? 'Oui' : 'Non' }}</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Section : Coordonnées -->
+    <div class="mb-8">
+      <h3 class="text-lg font-semibold text-gray-700 mb-4">Coordonnées</h3>
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 text-gray-600">
+        <div class="bg-gray-50 p-4 rounded-lg shadow-sm">
+          <p class="text-sm"><strong>Téléphone :</strong> {{ selectedPublicite.etablissement.telephone }}</p>
+        </div>
+        <div class="bg-gray-50 p-4 rounded-lg shadow-sm">
+          <p class="text-sm"><strong>Email :</strong> {{ selectedPublicite.etablissement.email }}</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Section : Description et Services -->
+    <div class="mb-8">
+      <h3 class="text-lg font-semibold text-gray-700 mb-4">Description et Services</h3>
+      <div class="bg-gray-50 p-4 rounded-lg shadow-sm text-sm text-gray-700">
+        <p><strong>Description :</strong> {{ selectedPublicite.etablissement.description }}</p>
+      </div>
+      <div *ngIf="selectedPublicite.etablissement.services?.length" class="bg-gray-50 p-4 mt-4 rounded-lg shadow-sm">
+        <p class="text-sm font-semibold text-gray-700 mb-2">Services proposés :</p>
+        <ul class="grid grid-cols-1 sm:grid-cols-2 gap-2 text-sm text-gray-600">
+          <li *ngFor="let service of selectedPublicite.etablissement.services" class="flex items-center">
+            <i class="ri-check-line text-green-500 mr-2"></i> {{ service }}
+          </li>
+        </ul>
+      </div>
+    </div>
+
+    <!-- Section : Horaires -->
+    <div *ngIf="selectedPublicite.etablissement.horaires" class="mb-8">
+      <h3 class="text-lg font-semibold text-gray-700 mb-4">Horaires d'ouverture</h3>
+      <div class="bg-gray-50 p-4 rounded-lg shadow-sm text-sm text-gray-600">
+        <p class="mb-2"><strong>Ouvert 24h/24, 7j/7 :</strong> {{ selectedPublicite.etablissement.horaires.is24_7 ? 'Oui' : 'Non' }}</p>
+        <div *ngIf="!selectedPublicite.etablissement.horaires.is24_7" class="grid grid-cols-1 sm:grid-cols-3 gap-2">
+          <ng-container *ngFor="let day of jours">
+            <div *ngIf="getHorairesForDay(day)">
+              <strong>{{ day | titlecase }} :</strong>
+              <span *ngIf="!getHorairesForDay(day)?.closed">{{ getHorairesForDay(day)?.open }} - {{ getHorairesForDay(day)?.close }}</span>
+              <span *ngIf="getHorairesForDay(day)?.closed" class="text-red-500">Fermé</span>
+            </div>
+          </ng-container>
+        </div>
+        <p *ngIf="selectedPublicite.etablissement.horaires.specialHours" class="mt-2">
+          <strong>Horaires spéciaux :</strong> {{ selectedPublicite.etablissement.horaires.specialHours }}
+        </p>
+      </div>
+    </div>
+
+    <!-- Section : Réseaux sociaux -->
+    <div *ngIf="hasAnyReseauxSociaux()" class="mb-8">
+      <h3 class="text-lg font-semibold text-gray-700 mb-4">Réseaux Sociaux</h3>
+      <div class="bg-gray-50 p-4 rounded-lg shadow-sm">
+        <ul class="space-y-2 text-sm">
+          <li *ngIf="selectedPublicite.etablissement.reseauxSociaux.facebook">
+            <a [href]="selectedPublicite.etablissement.reseauxSociaux.facebook" target="_blank" class="flex items-center text-blue-600 hover:underline">
+              <i class="ri-facebook-fill mr-2"></i> Facebook
+            </a>
+          </li>
+          <li *ngIf="selectedPublicite.etablissement.reseauxSociaux.instagram">
+            <a [href]="selectedPublicite.etablissement.reseauxSociaux.instagram" target="_blank" class="flex items-center text-pink-500 hover:underline">
+              <i class="ri-instagram-line mr-2"></i> Instagram
+            </a>
+          </li>
+          <li *ngIf="selectedPublicite.etablissement.reseauxSociaux.twitter">
+            <a [href]="selectedPublicite.etablissement.reseauxSociaux.twitter" target="_blank" class="flex items-center text-sky-500 hover:underline">
+              <i class="ri-twitter-fill mr-2"></i> Twitter
+            </a>
+          </li>
+          <li *ngIf="selectedPublicite.etablissement.reseauxSociaux.linkedin">
+            <a [href]="selectedPublicite.etablissement.reseauxSociaux.linkedin" target="_blank" class="flex items-center text-blue-800 hover:underline">
+              <i class="ri-linkedin-fill mr-2"></i> LinkedIn
+            </a>
+          </li>
+        </ul>
+      </div>
+    </div>
+
+    <!-- Section : Photos -->
+    <div *ngIf="hasPhotos()" class="mb-8">
+      <h3 class="text-lg font-semibold text-gray-700 mb-4">Photos</h3>
+      <div class="grid grid-cols-2 sm:grid-cols-3 gap-4">
+        <div *ngFor="let photo of selectedPublicite.etablissement.photos" class="relative">
+          <img [src]="getPhotoUrl(photo)" class="w-full h-40 object-cover rounded-lg border shadow hover:scale-105 transition" alt="Photo établissement" />
+        </div>
+      </div>
+    </div>
+
+    <!-- Footer -->
+    <div class="border-t pt-4 mt-6 flex justify-end">
+      <button type="button" class="px-4 py-2 text-sm border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50" (click)="showDetailsModal = false">
+        Fermer
+      </button>
+    </div>
+
+  </div>
+</div>
+
+      
 
     <!-- Si l'utilisateur n'est pas authentifié -->
     <ng-template #notAuthenticated>

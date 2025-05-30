@@ -12,9 +12,42 @@
   body {
   font-family: 'Inter', 'Segoe UI', 'Roboto', sans-serif;
   font-size: 16px;
+  overflow-x: hidden;
+  width: 100%;
 }
 
-  
+html {
+  scroll-behavior: auto; /* ou remove si smooth gêne */
+}
+
+
+@layer utilities {
+  .animate-bounce-arrow1 {
+    animation: bounceArrow 2s infinite;
+    animation-delay: 0s;
+  }
+
+  .animate-bounce-arrow2 {
+    animation: bounceArrow 2s infinite;
+    animation-delay: 0.2s;
+  }
+
+  .animate-bounce-arrow3 {
+    animation: bounceArrow 2s infinite;
+    animation-delay: 0.4s;
+  }
+
+  @keyframes bounceArrow {
+    0%, 100% {
+      transform: translateY(0) rotate(45deg);
+    }
+    50% {
+      transform: translateY(10px) rotate(45deg);
+    }
+  }
+}
+
+
   
   .modal {
     display: none;

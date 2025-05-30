@@ -16,6 +16,7 @@ interface EtablissementRaw {
   ville?: string;
   pays?: string;
   showMap: boolean;
+  coordinates:string;
   telephone: string;
   email: string;
   siteWeb: string;
@@ -130,13 +131,14 @@ export class EtablissementService {
     formData.append('visibility', etablissement.visibility || 'public');
     formData.append('codePostal', etablissement.codePostal || '');
     formData.append('ville', etablissement.ville || '');
+    formData.append('coordinates',etablissement.coordinates);
     formData.append('pays', etablissement.pays || '');
     formData.append('showMap', (etablissement.showMap ?? true).toString());
     formData.append('telephone', etablissement.telephone);
     formData.append('email', etablissement.email);
     formData.append('siteWeb', etablissement.siteWeb);
-    formData.append('description', etablissement.description);
-  
+    formData.append('description', etablissement.description || '');
+  ///wassim
     // Add services (array)
     if (etablissement.services?.length) {
       etablissement.services.forEach(service => {
@@ -215,6 +217,7 @@ export class EtablissementService {
     formData.append('codePostal', etablissement.codePostal || '');
     formData.append('ville', etablissement.ville || '');
     formData.append('pays', etablissement.pays || '');
+    formData.append('coordinates', etablissement.coordinates);
     formData.append('showMap', (etablissement.showMap ?? true).toString());
     formData.append('telephone', etablissement.telephone);
     formData.append('email', etablissement.email);

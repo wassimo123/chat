@@ -34,8 +34,8 @@ import { HistoireComponent } from './histoire/histoire.component';
 import { HeritageDetailComponent } from './heritage-detail/heritage-detail.component';
 import { TemoignagesComponent } from './components/temoignages/temoignages.component';
 import { DecouvrirSfaxComponent } from './decouvrir-sfax/decouvrir-sfax.component';
-
-
+import { SearchComponent } from './search/search.component';
+import { CulturesTraditionnelsComponent } from './cultures-traditionnels/cultures-traditionnels.component';
 
 
 const routes: Routes = [
@@ -56,8 +56,8 @@ const routes: Routes = [
   { path: 'heritage/:id', component: HeritageDetailComponent },
   { path: 'temoignages', component: TemoignagesComponent }, 
   { path: 'decouvrire', component: DecouvrirSfaxComponent },
-
-
+  { path: 'search', component: SearchComponent },
+  { path: 'culture', component: CulturesTraditionnelsComponent },
   
   { path: 'navbar', component: NavbarComponent },
   { path: 'footer', component: FooterComponent },

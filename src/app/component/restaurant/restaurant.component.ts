@@ -6,13 +6,25 @@ import { FooterComponent } from '../footer/footer.component';
 import { Router } from '@angular/router';
 import { EtablissementService } from '../../services/etablissement.service';
 import { Etablissement } from '../../models/etablissement.model';
+import { trigger, transition, style, animate } from '@angular/animations';
+import { ViewportScroller } from '@angular/common';
 
 interface FilterServices {
-  Piscine: boolean;
-  Spa: boolean;
-  Restaurant: boolean;
-  Wifi: boolean;
+  wifi: boolean;
+  emporter: boolean;
+  piscine: boolean;
+  parking: boolean;
+  reservation: boolean;
+  petitDejeuner: boolean;
+  terrasse: boolean;
+  accessibilite: boolean;
+  paiementCarte: boolean;
+  livraison: boolean;
+  climatisation: boolean;
+  serviceChambre: boolean;
 }
+
+
 
 interface RestaurantDisplay {
   id: string;
@@ -35,19 +47,39 @@ interface RestaurantDisplay {
   standalone: true,
   imports: [CommonModule, FormsModule, NavbarComponent, FooterComponent],
   templateUrl: './restaurant.component.html',
-  styleUrls: ['./restaurant.component.css']
+  styleUrls: ['./restaurant.component.css'],
+  animations: [
+    trigger('fadeAnimation', [
+      transition(':enter', [
+        style({ opacity: 0, transform: 'translateY(10px)' }),
+        animate('400ms ease-out', style({ opacity: 1, transform: 'translateY(0)' }))
+      ]),
+      transition(':leave', [
+        animate('200ms ease-in', style({ opacity: 0 }))
+      ])
+    ])
+  ]
 })
 export class RestaurantComponent implements OnInit {
   searchQuery: string = '';
   filterPriceMin: number | null = null;
   filterPriceMax: number | null = null;
   filterStars: { [key: number]: boolean } = { 3: false, 4: false, 5: false };
-  filterServices: FilterServices = {
-    Piscine: false,
-    Spa: false,
-    Restaurant: false,
-    Wifi: false
+  filterServices = {
+    wifi: false,
+    emporter: false,
+    piscine: false,
+    parking: false,
+    reservation: false,
+    petitDejeuner: false,
+    terrasse: false,
+    accessibilite: false,
+    paiementCarte: false,
+    livraison: false,
+    climatisation: false,
+    serviceChambre: false,
   };
+  
   showFilters: boolean = false;
   sortOption: string = 'default';
   isLoading: boolean = false;
@@ -60,9 +92,10 @@ export class RestaurantComponent implements OnInit {
   filteredRestaurant: RestaurantDisplay[] = [];
 restaurant: any;
 
-  constructor(private router: Router, private etablissementService: EtablissementService) {}
+  constructor(private router: Router, private etablissementService: EtablissementService,private viewportScroller: ViewportScroller) {}
 
   ngOnInit() {
+    this.viewportScroller.scrollToPosition([0, 0]);
     this.fetchRestaurant();
   }
 
@@ -115,37 +148,73 @@ restaurant: any;
   normalizeService(service: string): string {
     switch (service.toLowerCase()) {
       case 'wifi gratuit':
-        return 'Wifi';
+        return 'wifi';
       case 'piscine':
-        return 'Piscine';
+        return 'piscine';
       case 'spa':
-        return 'Spa';
+        return 'spa';
       case 'restaurant':
-        return 'Restaurant';
+        return 'restaurant';
+      case 'à emporter':
+        return 'emporter';
+      case 'réservation':
+        return 'reservation';
+      case 'petit-déjeuner inclus':
+        return 'petitDejeuner';
+      case 'terrasse':
+        return 'terrasse';
+      case 'accessibilité pmr':
+        return 'accessibilite';
+      case 'paiement par carte':
+        return 'paiementCarte';
+      case 'livraison':
+        return 'livraison';
+      case 'climatisation':
+        return 'climatisation';
+      case 'service de chambre':
+        return 'serviceChambre';
       default:
-        return service;
+        return service.toLowerCase(); // fallback
     }
   }
+  
 
   filterRestaurant() {
     let filtered = this.Restaurant.filter((item: RestaurantDisplay) => {
-      const matchesSearch = item.nom.toLowerCase().includes(this.searchQuery.toLowerCase()) ||
-                           item.description.toLowerCase().includes(this.searchQuery.toLowerCase());
-      const matchesPrice = (!this.filterPriceMin || item.price >= (this.filterPriceMin ?? 0)) &&
-                           (!this.filterPriceMax || item.price <= (this.filterPriceMax ?? Infinity));
+      // Recherche par nom ou description
+      const matchesSearch =
+        item.nom.toLowerCase().includes(this.searchQuery.toLowerCase()) ||
+        item.description.toLowerCase().includes(this.searchQuery.toLowerCase());
+  
+      // Filtrage par prix
+      const matchesPrice =
+        (!this.filterPriceMin || item.price >= this.filterPriceMin) &&
+        (!this.filterPriceMax || item.price <= this.filterPriceMax);
+  
+      // Filtrage par étoiles
       const selectedStars = Object.keys(this.filterStars)
         .filter(star => this.filterStars[parseInt(star)])
         .map(star => parseInt(star));
-      const matchesStars = selectedStars.length === 0 || selectedStars.some(star => Math.floor(item.rating) === star);
+      const matchesStars =
+        selectedStars.length === 0 || selectedStars.some(star => Math.floor(item.rating) === star);
+  
+      // Filtrage par services
       const selectedServices = Object.keys(this.filterServices)
         .filter(service => this.filterServices[service as keyof FilterServices]);
-      const matchesServices = selectedServices.length === 0 || selectedServices.every(service => item.services.includes(service));
-
+  
+      const matchesServices =
+        selectedServices.length === 0 ||
+        selectedServices.every(service =>
+          item.services.map(s => s.toLowerCase()).includes(service.toLowerCase())
+        );
+  
+      // Retour du résultat global
       return matchesSearch && matchesPrice && matchesStars && matchesServices;
     });
-
+  
     this.filteredRestaurant = filtered.slice(0, this.currentItems);
   }
+  
 
   onSortChange(event: Event) {
     const target = event.target as HTMLSelectElement;

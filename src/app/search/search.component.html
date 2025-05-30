@@ -1,0 +1,132 @@
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+  <!-- Search Bar -->
+  <div class="mb-8 flex flex-col sm:flex-row items-center justify-between gap-4">
+    <div class="relative w-full sm:w-1/2">
+      <input
+        [(ngModel)]="query"
+        (ngModelChange)="onSearchChange($event)"
+        (blur)="showSuggestions = false"
+        type="text"
+        placeholder="Rechercher..."
+        class="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-full text-sm focus:outline-none focus:ring-2 focus:ring-primary"
+        aria-label="Rechercher des promotions, établissements ou événements"
+        autocomplete="off"
+      />
+      <i class="ri-search-line absolute left-3 top-3 text-gray-400"></i>
+      <!-- Suggestions Dropdown -->
+      <div *ngIf="showSuggestions" class="absolute z-10 w-full bg-white border border-gray-300 rounded-md mt-1 shadow-lg max-h-60 overflow-y-auto">
+        <div
+          *ngFor="let suggestion of suggestions"
+          (mousedown)="selectSuggestion(suggestion)"
+          class="px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 cursor-pointer"
+        >
+          {{ suggestion }}
+        </div>
+      </div>
+    </div>
+    <div class="flex items-center gap-3">
+      <!-- Filter Dropdown -->
+      <div class="relative">
+        <select
+          [(ngModel)]="filterType"
+          (change)="setFilter($event)"
+          class="h-10 pl-3 pr-8 border border-gray-300 rounded-full text-sm focus:outline-none focus:ring-2 focus:ring-primary appearance-none"
+          aria-label="Filtrer par type"
+        >
+          <option value="all">Tous</option>
+          <option value="promotion">Promotions</option>
+          <option value="établissement">Établissements</option>
+          <option value="événement">Événements</option>
+        </select>
+        <i class="ri-filter-3-line absolute right-3 top-3 text-gray-400"></i>
+      </div>
+      <!-- Sort Dropdown -->
+      <div class="relative">
+        <select
+          [(ngModel)]="sortOption"
+          (change)="setSort($event)"
+          class="h-10 pl-3 pr-8 border border-gray-300 rounded-full text-sm focus:outline-none focus:ring-2 focus:ring-primary appearance-none"
+          aria-label="Trier les résultats"
+        >
+          <option value="relevance">Pertinence</option>
+          <option value="newest">Plus récent</option>
+          <option value="oldest">Plus ancien</option>
+        </select>
+        <i class="ri-sort-desc absolute right-3 top-3 text-gray-400"></i>
+      </div>
+    </div>
+  </div>
+
+  <!-- Results Header -->
+  <div class="mb-6">
+    <h2 class="text-2xl font-bold text-gray-800">
+      Résultats pour "{{ query }}" ({{ totalResults }} trouvé{{ totalResults !== 1 ? 's' : ''}})
+    </h2>
+  </div>
+
+  <!-- Loading -->
+  <div *ngIf="isLoading" class="text-center">
+    <span class="animate-spin inline-block h-8 w-8 border-4 border-primary border-t-transparent rounded-full"></span>
+    <p class="mt-2 text-gray-600">Chargement...</p>
+  </div>
+
+  <!-- Error Message -->
+  <div *ngIf="errorMessage && !isLoading" class="bg-red-100 text-red-700 p-4 rounded mb-6">
+    {{ errorMessage }}
+  </div>
+
+  <!-- No Results -->
+  <div *ngIf="!isLoading && results.length === 0 && !errorMessage" class="text-center text-gray-600">
+    Aucun résultat trouvé pour "{{ query }}".
+  </div>
+
+  <!-- Results -->
+  <div *ngIf="results.length > 0" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+    <div *ngFor="let result of results" class="bg-white rounded-lg shadow-md p-4 hover:shadow-lg transition-shadow duration-300">
+      <div class="flex items-start gap-3">
+        <!-- Image -->
+        <img
+          [src]="result.image"
+          alt="{{ result.title }}"
+          class="w-16 h-16 object-cover rounded-md"
+          onerror="this.src='assets/images/2.png'"
+        />
+        <div class="flex-1">
+          <h3 class="text-lg font-semibold text-gray-800 mb-1">{{ result.title }}</h3>
+          <p class="text-sm text-gray-600 mb-2 line-clamp-2">{{ result.description }}</p>
+          <p class="text-xs text-gray-500 mb-2">Type: {{ result.type }}</p>
+          <a
+            [routerLink]="result.link"
+            class="text-primary text-sm font-medium hover:underline"
+            [attr.aria-label]="'Voir plus sur ' + result.title"
+          >
+            Voir plus
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Pagination -->
+  <div *ngIf="results.length > 0" class="mt-8 flex justify-center items-center gap-3">
+    <button
+      (click)="changePage(currentPage - 1)"
+      [disabled]="currentPage === 1"
+      class="h-10 w-10 flex items-center justify-center border border-gray-300 rounded-full text-gray-600 hover:bg-gray-100 disabled:opacity-50"
+      aria-label="Page précédente"
+    >
+      <i class="ri-arrow-left-s-line text-xl"></i>
+    </button>
+    <span class="text-gray-600">
+      Page {{ currentPage }} sur {{ totalPages }}
+    </span>
+    <button
+      (click)="changePage(currentPage + 1)"
+      [disabled]="currentPage === totalPages"
+      class="h-10 w-10 flex items-center justify-center border border-gray-300 rounded-full text-gray-600 hover:bg-gray-100 disabled:opacity-50"
+      aria-label="Page suivante"
+    >
+      <i class="ri-arrow-right-s-line text-xl"></i>
+    </button>
+  </div>
+</div>

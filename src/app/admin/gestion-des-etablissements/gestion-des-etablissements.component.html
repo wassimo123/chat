@@ -488,9 +488,13 @@
           <div class="bg-white rounded-lg shadow-sm p-6 mb-6">
             <h2 class="text-lg font-medium text-gray-900 mb-4">Localisation</h2>
             <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <div class="md:col-span-2">
+              <div>
                 <label for="adresse" class="block text-sm font-medium text-gray-700 mb-1">Adresse complète <span class="text-red-500">*</span></label>
                 <input id="adresse" type="text" [(ngModel)]="currentEtablissement.adresse" name="adresse" class="mt-1 block w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-primary" placeholder="Numéro et nom de rue" required>
+              </div>
+              <div>
+                <label for="coordones" class="block text-sm font-medium text-gray-700 mb-1">Coordonées Map <span class="text-red-500">*</span></label>
+                <input id="coordones" type="text" [(ngModel)]="currentEtablissement.coordinates" name="coordonnes" class="mt-1 block w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-primary" placeholder="Coordonnées" required>
               </div>
               <div>
                 <label for="codePostal" class="block text-sm font-medium text-gray-700 mb-1">Code postal</label>
@@ -786,6 +790,9 @@
                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 text-gray-600">
                   <div class="bg-gray-50 p-4 rounded-lg shadow-sm hover:shadow-md transition-shadow duration-200">
                     <p class="text-sm"><strong>Adresse complète :</strong> {{ currentEtablissement.adresse }}</p>
+                  </div>
+                  <div class="bg-gray-50 p-4 rounded-lg shadow-sm hover:shadow-md transition-shadow duration-200">
+                    <p class="text-sm"><strong>Coordonnées Map :</strong> {{ currentEtablissement.coordinates }}</p>
                   </div>
                   <div class="bg-gray-50 p-4 rounded-lg shadow-sm hover:shadow-md transition-shadow duration-200">
                     <p class="text-sm"><strong>Code postal :</strong> {{ currentEtablissement.codePostal || '-' }}</p>

@@ -6,7 +6,7 @@ import { FooterComponent } from '../component/footer/footer.component';
 import { NavbarComponent } from '../component/navbar/navbar.component';
 import * as AOS from 'aos';
 import { trigger, transition, style, animate } from '@angular/animations';
-
+import { ViewportScroller } from '@angular/common';
 @Component({
   selector: 'app-histoire',
   standalone: true,
@@ -26,9 +26,10 @@ import { trigger, transition, style, animate } from '@angular/animations';
   ]
 })
 export class HistoireComponent implements OnInit {
-  constructor(private router: Router) {}
+  constructor(private router: Router,private viewportScroller: ViewportScroller) {}
 
   ngOnInit(): void {
+    this.viewportScroller.scrollToPosition([0, 0]);
     AOS.init({
       duration: 1000,
       easing: 'ease-in-out',
