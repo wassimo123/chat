@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit,HostListener, ElementRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { NavbarComponent } from '../navbar/navbar.component';
@@ -74,7 +74,7 @@ interface ExtendedPromotion extends Promotion {
   ]
 })
 export class PromotionsComponent implements OnInit {
-  constructor(private router: Router, private promotionService: PromotionService,private viewportScroller: ViewportScroller) {}
+  constructor(private router: Router, private promotionService: PromotionService,private viewportScroller: ViewportScroller , private eRef: ElementRef) {}
 
   promotions: ExtendedPromotion[] = [];
   filteredPromotions: ExtendedPromotion[] = [];
@@ -117,6 +117,27 @@ export class PromotionsComponent implements OnInit {
   ngOnInit() {
     this.viewportScroller.scrollToPosition([0, 0]);
     this.loadPromotions();
+  }
+
+  @HostListener('document:click', ['$event'])
+  onDocumentClick(event: MouseEvent) {
+    const targetElement = event.target as HTMLElement;
+
+    // Vérifie si le clic est à l'extérieur de la modale de détails
+    if (this.showPromotionDetailModal && this.selectedPromotion) {
+      const modalDetail = document.querySelector('.promotion-detail-modal');
+      if (modalDetail && !modalDetail.contains(targetElement) && !targetElement.closest('.info-button')) {
+        this.closeModal();
+      }
+    }
+
+    // Vérifie si le clic est à l'extérieur de la modale de notification
+    if (this.showNotifyModal && this.selectedPromotion) {
+      const modalNotify = document.querySelector('.notify-modal');
+      if (modalNotify && !modalNotify.contains(targetElement) && !targetElement.closest('.notify-icon')) {
+        this.closeModal();
+      }
+    }
   }
 
   loadPromotions(): void {

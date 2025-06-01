@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit,ElementRef, HostListener } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { NavbarComponent } from '../navbar/navbar.component';
@@ -89,7 +89,8 @@ export class EventComponent implements OnInit {
   constructor(
     private evenementService: EvenementService,
     private http: HttpClient,
-    private viewportScroller: ViewportScroller
+    private viewportScroller: ViewportScroller,
+    private elRef: ElementRef
   ) {}
 
   ngOnInit() {
@@ -97,6 +98,14 @@ export class EventComponent implements OnInit {
     this.loadEvents();
   }
 
+  onClickOutside(event: MouseEvent) {
+    const modalContent = this.elRef.nativeElement.querySelector('.modal-content');
+    const isInsideModal = modalContent && modalContent.contains(event.target as Node);
+  
+    if (!isInsideModal && (this.showReserveModal || this.showNotifyModal)) {
+      this.closeModal();
+    }
+  }
   loadEvents(): void {
     this.evenementService.getEvenements().subscribe({
       next: (events: Evenement[]) => {

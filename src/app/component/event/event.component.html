@@ -250,11 +250,15 @@
     </div>
 
     <!-- Modal for Event Details -->
-    <div
-      *ngIf="showReserveModal"
-      class="fixed inset-0 bg-gray-900 bg-opacity-50 flex items-center justify-center z-50 overflow-y-auto"
-    >
-      <div class="bg-white rounded-lg shadow-xl w-full max-w-lg m-4">
+            <div
+          *ngIf="showReserveModal"
+          class="fixed inset-0 bg-gray-900 bg-opacity-50 flex items-center justify-center z-50 overflow-y-auto"
+          (click)="closeModal()"
+        >
+          <div
+            class="bg-white rounded-lg shadow-xl w-full max-w-lg m-4"
+            (click)="$event.stopPropagation()"
+          >
         <div class="p-6 modal-content overflow-y-auto max-h-[90vh]">
           <div class="flex justify-between items-start mb-6">
             <h3 class="text-xl font-semibold text-gray-900">
@@ -326,11 +330,15 @@
     </div>
 
     <!-- Modal for Notification -->
-    <div
-      *ngIf="showNotifyModal"
-      class="fixed inset-0 bg-gray-900 bg-opacity-50 flex items-center justify-center z-50"
-    >
-      <div class="bg-white rounded-lg shadow-xl max-w-md w-full p-6">
+            <div
+            *ngIf="showNotifyModal"
+            class="fixed inset-0 bg-gray-900 bg-opacity-50 flex items-center justify-center z-50"
+            (click)="closeModal()"
+          >
+            <div
+              class="bg-white rounded-lg shadow-xl max-w-md w-full p-6"
+              (click)="$event.stopPropagation()"
+            >
         <div class="flex justify-between items-start mb-4">
           <h3 class="text-xl font-semibold text-gray-900">
             Notification - {{ selectedEvent?.nom }}
