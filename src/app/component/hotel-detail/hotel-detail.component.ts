@@ -81,51 +81,68 @@ export class HotelDetailComponent implements OnInit {
     if (this.map) {
       this.map.remove();
     }
-
-    const fullAddress = '${this.hotel.adresse}, ${this.hotel.ville}, ${this.hotel.pays}';
-
-    fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(fullAddress)}`)
-      .then(res => res.json())
-      .then(data => {
-        if (data && data.length > 0) {
-          const lat = parseFloat(data[0].lat);
-          const lon = parseFloat(data[0].lon);
-
-          this.map = L.map('map').setView([lat, lon], 15);
-
-          L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-            attribution: '© OpenStreetMap contributors'
-          }).addTo(this.map);
-
-          L.marker([lat, lon]).addTo(this.map)
-            .bindPopup(this.hotel.nom)
-            .openPopup();
-        }
-      });
+  
+    if (this.hotel && this.hotel.coordinates && this.hotel.nom && this.hotel.adresse) {
+      const lat = this.hotel.coordinates[0]; // Latitude
+      const lng = this.hotel.coordinates[1]; // Longitude
+  
+      this.map = L.map('map').setView([lat, lng], 16);
+  
+      L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        attribution: '© OpenStreetMap contributors'
+      }).addTo(this.map);
+  
+      const popupContent = `<b>${this.hotel.nom}</b><br>${this.hotel.adresse} , ${this.hotel.ville}, ${this.hotel.pays}`;
+      L.marker([lat, lng])
+        .addTo(this.map)
+        .bindPopup(popupContent)
+        .openPopup();
+    } else {
+      console.error('Données manquantes (nom, adresse ou coordonnées)');
+    }
   }
+  
 
   jours: string[] = ['lundi', 'mardi', 'mercredi', 'jeudi', 'vendredi', 'samedi', 'dimanche'];
 
 
-  getNavRoute(): string {
-    switch(this.hotel.type) { 
-      case 'Restaurant': { 
-         return 'restaurants';
-      } 
-      case 'Café': { 
-        return 'cafes';
+  // getNavRoute(): string {
+  //   switch(this.hotel.type) { 
+  //     case 'Restaurant': { 
+  //        return 'restaurants';
+  //     } 
+  //     case 'Café': { 
+  //       return 'cafes';
 
-     }   
-      case 'Hôtel': { 
-        return 'hotels';
+  //    }   
+  //     case 'Hôtel': { 
+  //       return 'hotels';
 
-   } 
-      default: { 
-         return 'hotels';
-      } 
-   } 
+  //  } 
+  //     default: { 
+  //        return 'hotels';
+  //     } 
+  //  } 
    
+  // }
+  getNavRoute(): string {
+    if (!this.hotel || !this.hotel.type) {
+      return 'hotels'; // valeur par défaut
+    }
+  
+    switch (this.hotel.type) {
+      case 'Restaurant':
+        return 'restaurants';
+      case 'Café':
+        return 'cafes';
+      case 'Hôtel':
+        return 'hotels';
+      default:
+        return 'hotels';
+    }
   }
+  
+  
   getGoogleMapsUrl(address: string): string {
     return `https://maps.google.com/?q=${encodeURIComponent(address)}`;
   }
@@ -135,12 +152,58 @@ export class HotelDetailComponent implements OnInit {
   getLatitude():number {
     return this.hotel.coordinates[0];
   }
-  getMapUrl(): SafeResourceUrl {
-    const lat = this.getLatitude();
-    const lng = this.getLongitude();  
-    const unsafeUrl = `https://maps.google.com/maps?q=${lat},${lng}&z=18&t=k&output=embed`;
-    return this.sanitizer.bypassSecurityTrustResourceUrl(unsafeUrl);
+
+
+  // getMapUrl(): SafeResourceUrl {
+  //   const lat = this.getLatitude();
+  //   const lng = this.getLongitude();  
+  //   const unsafeUrl = `https://maps.google.com/maps?q=${lat},${lng}&z=18&t=k&output=embed`;
+  //   return this.sanitizer.bypassSecurityTrustResourceUrl(unsafeUrl);
+  // }
+
+// getMapUrl(): SafeResourceUrl {
+//   if (!this.hotel || !this.hotel.coordinates) {
+//     return this.sanitizer.bypassSecurityTrustResourceUrl('');
+//   }
+
+//   const lat = this.hotel.coordinates[0]; // Latitude
+//   const lng = this.hotel.coordinates[1]; // Longitude
+//   const label = encodeURIComponent(this.hotel.nom); // Nom de l'établissement
+
+//   const mapUrl = `https://maps.google.com/maps?q=${lat},${lng} (${label})&z=18&output=embed`;
+
+//   return this.sanitizer.bypassSecurityTrustResourceUrl(mapUrl);
+// }
+getMapUrl(): SafeResourceUrl {
+  if (!this.hotel || !this.hotel.coordinates || !this.hotel.nom || !this.hotel.adresse) {
+    return this.sanitizer.bypassSecurityTrustResourceUrl('');
   }
+
+  const lat = this.hotel.coordinates[0];
+  const lng = this.hotel.coordinates[1];
+  const fullName = encodeURIComponent(`${this.hotel.nom}, ${this.hotel.adresse}, ${this.hotel.ville}, ${this.hotel.pays}`);
+
+  const apiKey = 'AIzaSyBaacRlPP7Nv7b3F46CpTYeIHIN9HUFXKk';
+
+  const mapUrl = `https://www.google.com/maps/embed/v1/place?key=${apiKey}&q=${fullName}&center=${lat},${lng}&zoom=18`;
+
+  return this.sanitizer.bypassSecurityTrustResourceUrl(mapUrl);
+}
+
+
+
+extractDomain(url: string): string {
+  try {
+    const domain = new URL(url).hostname.replace('www.', '');
+    return domain;
+  } catch {
+    return url;
+  }
+}
+
+
+
+
   goToWebsite(url: string): void {
     if (url) {
       window.open(url, '_blank');

@@ -1,4 +1,10 @@
 <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+  <div class="mb-6">
+    <a routerLink="/home" class="inline-flex items-center gap-2 text-sm text-primary hover:underline">
+      <i class="ri-arrow-left-line"></i> Retour à l'accueil
+    </a>
+  </div>
+  
   <!-- Search Bar -->
   <div class="mb-8 flex flex-col sm:flex-row items-center justify-between gap-4">
     <div class="relative w-full sm:w-1/2">
@@ -95,13 +101,16 @@
           <h3 class="text-lg font-semibold text-gray-800 mb-1">{{ result.title }}</h3>
           <p class="text-sm text-gray-600 mb-2 line-clamp-2">{{ result.description }}</p>
           <p class="text-xs text-gray-500 mb-2">Type: {{ result.type }}</p>
-          <a
-            [routerLink]="result.link"
-            class="text-primary text-sm font-medium hover:underline"
-            [attr.aria-label]="'Voir plus sur ' + result.title"
-          >
-            Voir plus
-          </a>
+                <a
+        [routerLink]="result.link"
+        class="text-primary text-sm font-medium hover:underline"
+        [attr.aria-label]="'Voir plus sur ' + result.title"
+      >
+        Voir plus
+      </a>
+
+        
+        
         </div>
       </div>
     </div>

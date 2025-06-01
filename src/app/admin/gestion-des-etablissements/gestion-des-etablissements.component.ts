@@ -76,6 +76,7 @@ export class GestionDesEtablissementsComponent implements OnInit, AfterViewInit 
       this.sortDirection = "desc";}
 
   ngOnInit(): void {
+    document.addEventListener('click', this.handleClickOutsideFilters.bind(this), true);
      // Vérification de l'authentification
      const token = localStorage.getItem('token');
      const userData = localStorage.getItem('user');
@@ -140,6 +141,29 @@ export class GestionDesEtablissementsComponent implements OnInit, AfterViewInit 
       });
     });
   }
+
+  handleClickOutsideFilters(event: MouseEvent): void {
+    const target = event.target as HTMLElement;
+    if (!target.closest('.relative')) {
+      this.showTypeFilter = false;
+      this.showStatusFilter = false;
+      this.showLocationFilter = false;
+    }
+  }
+  
+
+  closeModalOnBackdrop(event: MouseEvent): void {
+    const target = event.target as HTMLElement;
+    if (target.classList.contains('bg-black') || target.classList.contains('bg-gray-900')) {
+      this.closeModal();
+      this.closeArchiveModal();
+      this.showTypeFilter = false;
+      this.showStatusFilter = false;
+      this.showLocationFilter = false;
+    }
+  }
+  
+  
 //ghnjk
   ngAfterViewInit(): void {
     if (this.isAuthenticated) {
@@ -502,6 +526,68 @@ isValidEmail(email: string): boolean {
   }
 
 // Remplacer la méthode saveEtablissement
+// saveEtablissement(): void {
+ 
+//   if (
+//     !this.currentEtablissement.nom ||
+//     !this.currentEtablissement.type ||
+//     !this.currentEtablissement.statut ||
+//     !this.currentEtablissement.adresse ||
+//     !this.currentEtablissement.email
+//   ) {
+//     this.showNotification(
+//       "Veuillez remplir tous les champs obligatoires : Nom, Type, Statut, Adresse, Email.",
+//       "error"
+//     );
+//     return;
+//   }
+
+ 
+//   if (!this.isValidEmail(this.currentEtablissement.email)) {
+//     this.showNotification("Veuillez entrer une adresse email valide.", "error");
+//     return;
+//   }
+
+//   if (this.modalTitle === "Ajouter un établissement") {
+//     this.etablissementService.addEtablissement(this.currentEtablissement).subscribe({
+//       next: (response: Etablissement) => {
+//         const newEtablissement: Etablissement = {
+//           ...response,
+//           selected: false,
+//           updatedAt: response.updatedAt || new Date().toISOString(), 
+//         };
+//         console.log("newEtablissement:", newEtablissement);
+//         this.etablissements.unshift(newEtablissement); 
+//         this.closeModal();
+//         this.updateStats();
+//         this.filterEtablissements();
+//         this.showNotification("Établissement ajouté avec succès !", "success");
+//       },
+//       error: (err: any) => {
+//         this.showNotification("Erreur lors de l’ajout: " + err.message, "error");
+//       },
+//     });
+//   } else if (this.currentEtablissement.id) {
+//     this.etablissementService.updateEtablissement(this.currentEtablissement.id, this.currentEtablissement).subscribe({
+//       next: (response: Etablissement) => {
+//         const updatedEtablissement: Etablissement = {
+//           ...response,
+//           selected: false,
+//           updatedAt: response.updatedAt || new Date().toISOString(), 
+//         };
+//         const index = this.etablissements.findIndex((e) => e.id === updatedEtablissement.id);
+//         if (index !== -1) this.etablissements[index] = updatedEtablissement;
+//         this.closeModal();
+//         this.updateStats();
+//         this.filterEtablissements();
+//         this.showNotification("Établissement modifié avec succès !", "success");
+//       },
+//       error: (err: any) => {
+//         this.showNotification("Erreur lors de la mise à jour: " + err.message, "error");
+//       },
+//     });
+//   }
+// }
 saveEtablissement(): void {
   // Vérifier les champs obligatoires
   if (
@@ -524,6 +610,25 @@ saveEtablissement(): void {
     return;
   }
 
+  // Conversion des coordonnées si elles sont saisies
+  if (this.currentEtablissement.coordinates) {
+    const parts = this.currentEtablissement.coordinates
+      .toString()
+      .split(",")
+      .map((val) => parseFloat(val.trim()));
+
+    if (parts.length === 2 && !isNaN(parts[0]) && !isNaN(parts[1])) {
+      this.currentEtablissement.coordinates = parts; // Remplace le texte par [lat, lng]
+    } else {
+      this.showNotification(
+        "Les coordonnées doivent être au format 'latitude, longitude'.",
+        "error"
+      );
+      return;
+    }
+  }
+
+  // Ajouter ou mettre à jour l'établissement
   if (this.modalTitle === "Ajouter un établissement") {
     this.etablissementService.addEtablissement(this.currentEtablissement).subscribe({
       next: (response: Etablissement) => {
@@ -544,26 +649,31 @@ saveEtablissement(): void {
       },
     });
   } else if (this.currentEtablissement.id) {
-    this.etablissementService.updateEtablissement(this.currentEtablissement.id, this.currentEtablissement).subscribe({
-      next: (response: Etablissement) => {
-        const updatedEtablissement: Etablissement = {
-          ...response,
-          selected: false,
-          updatedAt: response.updatedAt || new Date().toISOString(), // Mettre à jour avec la date actuelle si absent
-        };
-        const index = this.etablissements.findIndex((e) => e.id === updatedEtablissement.id);
-        if (index !== -1) this.etablissements[index] = updatedEtablissement;
-        this.closeModal();
-        this.updateStats();
-        this.filterEtablissements();
-        this.showNotification("Établissement modifié avec succès !", "success");
-      },
-      error: (err: any) => {
-        this.showNotification("Erreur lors de la mise à jour: " + err.message, "error");
-      },
-    });
+    this.etablissementService
+      .updateEtablissement(this.currentEtablissement.id, this.currentEtablissement)
+      .subscribe({
+        next: (response: Etablissement) => {
+          const updatedEtablissement: Etablissement = {
+            ...response,
+            selected: false,
+            updatedAt: response.updatedAt || new Date().toISOString(), // Mettre à jour avec la date actuelle si absent
+          };
+          const index = this.etablissements.findIndex(
+            (e) => e.id === updatedEtablissement.id
+          );
+          if (index !== -1) this.etablissements[index] = updatedEtablissement;
+          this.closeModal();
+          this.updateStats();
+          this.filterEtablissements();
+          this.showNotification("Établissement modifié avec succès !", "success");
+        },
+        error: (err: any) => {
+          this.showNotification("Erreur lors de la mise à jour: " + err.message, "error");
+        },
+      });
   }
 }
+
 
   closeModal(): void {
     this.isModalOpen = false;
@@ -648,12 +758,25 @@ saveEtablissement(): void {
   }
 
   
+  // viewEtablissement(etablissement: Etablissement): void {
+  //   // Nettoyer l'adresse en supprimant les codes comme QPBF+GCQ
+  //   let cleanedAddress = etablissement.adresse.replace(/^[A-Z0-9+]+,\s*/, ''); // Supprime le code Plus Code au début
+  //   this.selectedAddressForMap = `${cleanedAddress}, ${etablissement.ville ?? ''}, ${etablissement.codePostal ?? ''}, ${etablissement.pays ?? ''}`;
+  //   this.showMapPopup = true;
+  // }
   viewEtablissement(etablissement: Etablissement): void {
-    // Nettoyer l'adresse en supprimant les codes comme QPBF+GCQ
-    let cleanedAddress = etablissement.adresse.replace(/^[A-Z0-9+]+,\s*/, ''); // Supprime le code Plus Code au début
-    this.selectedAddressForMap = `${cleanedAddress}, ${etablissement.ville ?? ''}, ${etablissement.codePostal ?? ''}, ${etablissement.pays ?? ''}`;
-    this.showMapPopup = true;
+    // Extrait les coordonnées (assure-toi qu'elles sont bien [lat, lng])
+    let coords = Array.isArray(etablissement.coordinates) ? etablissement.coordinates : [0, 0];
+    let lat = coords[0];
+    let lng = coords[1];
+  
+    // Générer un lien Google Maps avec le nom de l'établissement
+    const query = encodeURIComponent(`${etablissement.nom}, ${etablissement.adresse}`);
+    const googleMapsUrl = `https://www.google.com/maps/search/?api=1&query=${query}&query_place_id=${lat},${lng}`;
+  
+    window.open(googleMapsUrl, '_blank');
   }
+  
 
   toggleProfile(): void {
     this.isProfileMenuOpen = !this.isProfileMenuOpen;
@@ -848,6 +971,7 @@ onPhotoSelected(event: Event): void {
 ngOnDestroy(): void {
   this.photoBlobUrls.forEach(url => URL.revokeObjectURL(url));
   this.photoBlobUrls.clear();
+  document.removeEventListener('click', this.handleClickOutsideFilters.bind(this), true);
 }
   
   

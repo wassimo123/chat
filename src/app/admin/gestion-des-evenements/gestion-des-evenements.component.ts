@@ -1,4 +1,4 @@
-import { Component, OnInit, AfterViewInit, ElementRef, ViewChild } from '@angular/core';
+import { Component, OnInit, AfterViewInit, ElementRef, ViewChild, HostListener } from '@angular/core';
 import { Chart } from 'chart.js';
 import { registerables } from 'chart.js';
 import { EvenementService } from '../../services/evenement.service';
@@ -121,6 +121,52 @@ export class GestionDesEvenementsComponent implements OnInit, AfterViewInit {
         this.notifications = validNotifications;
       });
     });
+  }
+  @HostListener('document:click', ['$event'])
+  onDocumentClick(event: Event) {
+    const target = event.target as HTMLElement;
+
+    // Gestion du menu profil
+    if (!target.closest('#profileButton') && !target.closest('#profileMenu')) {
+      this.isProfileMenuOpen = false;
+    }
+
+    // Fermeture du modal d'ajout/modification/visualisation si clic en dehors
+    if (
+      this.isModalOpen &&
+      !target.closest('.max-w-lg') && // Conteneur du modal (ajout/modif)
+      !target.closest('.max-w-5xl') && // Conteneur du modal (visualisation)
+      !target.closest('.bg-primary') && // Bouton "Ajouter un événement"
+      !target.closest('.ri-pencil-line') && // Bouton "Modifier"
+      !target.closest('.ri-eye-line') && // Bouton "Visualiser"
+      !target.closest('.ri-archive-line') // Bouton "Archiver" (par sécurité)
+    ) {
+      this.closeModal();
+    }
+
+    // Fermeture du modal d'archivage si clic en dehors
+    if (
+      this.isArchiveModalOpen &&
+      !target.closest('.max-w-md') && // Conteneur du modal d'archivage
+      !target.closest('.ri-archive-line') // Bouton "Archiver"
+    ) {
+      this.closeArchiveModal();
+    }
+
+    // Fermeture des filtres si clic en dehors
+    if (
+      this.showStatusFilter &&
+      !target.closest('.relative') // Conteneur du filtre de statut
+    ) {
+      this.showStatusFilter = false;
+    }
+
+    if (
+      this.showTypeEtablissementFilter &&
+      !target.closest('.relative') // Conteneur du filtre de type d'établissement
+    ) {
+      this.showTypeEtablissementFilter = false;
+    }
   }
 
   ngAfterViewInit(): void {
@@ -510,23 +556,23 @@ export class GestionDesEvenementsComponent implements OnInit, AfterViewInit {
     const errors: string[] = [];
 
     // Validate each required field
-    if (!this.currentEvent.nom) errors.push("Le nom de l'événement est requis.");
-    if (!this.currentEvent.dateDebut) errors.push("La date de début est requise.");
-    if (!this.currentEvent.dateFin) errors.push("La date de fin est requise.");
-    if (!this.currentEvent.heureDebut) errors.push("L'heure de début est requise.");
-    if (!this.currentEvent.lieu) errors.push("Le lieu est requis.");
-    if (!this.currentEvent.ville) errors.push("La ville est requise.");
-    if (!this.currentEvent.capacite || this.currentEvent.capacite <= 0) errors.push("La capacité doit être un nombre positif.");
-    if (!this.currentEvent.categorie) errors.push("La catégorie est requise.");
-    if (!this.currentEvent.etablissementId.type) errors.push("Le type d'établissement est requis.");
-    if (!this.currentEvent.etablissementId) errors.push("Un établissement valide est requis.");
-    if (!this.currentEvent.statut) errors.push("Le statut est requis.");
+    if (!this.currentEvent.nom) errors.push(" nom ");
+    if (!this.currentEvent.dateDebut) errors.push("date de début ");
+    if (!this.currentEvent.dateFin) errors.push(" date de fin ");
+    if (!this.currentEvent.heureDebut) errors.push("L'heure de début ");
+    if (!this.currentEvent.lieu) errors.push(" lieu ");
+    if (!this.currentEvent.ville) errors.push("ville");
+    if (!this.currentEvent.capacite || this.currentEvent.capacite <= 0) errors.push("capacité ");
+    if (!this.currentEvent.categorie) errors.push("catégorie ");
+    if (!this.currentEvent.etablissementId.type) errors.push(" type d'établissement");
+    if (!this.currentEvent.etablissementId) errors.push("établissement ");
+    if (!this.currentEvent.statut) errors.push(" statut");
     if (this.currentEvent.estPublic === undefined || this.currentEvent.estPublic === null) {
-      errors.push("La visibilité (public/privé) doit être définie.");
+      errors.push(" visibilité ");
     }
     if (this.currentEvent.prix.estGratuit === false) {
       if (!this.currentEvent.prix.montant || this.currentEvent.prix.montant <= 0) {
-        errors.push("Un prix valide (supérieur à 0) est requis si l'événement n'est pas gratuit.");
+        errors.push(" prix ");
       }
     }
 
@@ -539,7 +585,7 @@ export class GestionDesEvenementsComponent implements OnInit, AfterViewInit {
 
     // If there are validation errors, display them
     if (errors.length > 0) {
-      this.showNotification(errors.join(' '), 'error');
+      this.showNotification('Veuillez remplir tous les champs obligatoires.', 'error');
       return;
     }
 

@@ -108,7 +108,7 @@
           </div>
           <h1 class="text-2xl font-semibold text-gray-900">Gestion des Promotions</h1>
         </div>
-        <button class="mt-4 md:mt-0 px-4 py-2 bg-primary text-white rounded-button flex items-center whitespace-nowrap" (click)="openAddPromotionModal()">
+        <button class="mt-4 md:mt-0 px-4 py-2 bg-primary text-white rounded-button flex items-center whitespace-nowrap add-promotion-btn" (click)="openAddPromotionModal()">
           <div class="w-4 h-4 flex items-center justify-center mr-2">
             <i class="ri-add-line"></i>
           </div>
@@ -171,13 +171,13 @@
     </div>
     <div class="flex flex-col md:flex-row md:items-center space-y-4 md:space-y-0 md:space-x-4">
       <div class="relative">
-        <button class="flex items-center justify-between w-full md:w-32 px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-200 rounded-lg hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-primary whitespace-nowrap" (click)="toggleStatusFilter()">
+        <button class="status-filter-btn flex items-center justify-between w-full md:w-32 px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-200 rounded-lg hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-primary whitespace-nowrap" (click)="toggleStatusFilter()">
           <span>{{ selectedStatus ? getStatusLabel(selectedStatus) : 'Statut' }}</span>
           <div class="w-4 h-4 flex items-center justify-center ml-2">
             <i class="ri-arrow-down-s-line"></i>
           </div>
         </button>
-        <div class="absolute mt-1 right-0 md:right-auto bg-white rounded-lg shadow-lg z-10" [class.hidden]="!showStatusFilter">
+        <div class="status-filter-menu absolute mt-1 right-0 md:right-auto bg-white rounded-lg shadow-lg z-10" [class.hidden]="!showStatusFilter">
           <div class="py-1">
             <a class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 cursor-pointer" (click)="selectStatus('')">Tous</a>
             <a class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 cursor-pointer" (click)="selectStatus('active')">Actif</a>
@@ -186,23 +186,24 @@
           </div>
         </div>
       </div>
-      <div class="relative">
-        <button class="flex items-center justify-between w-full md:w-50 px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-200 rounded-lg hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-primary whitespace-nowrap" (click)="toggleEstablishmentFilter()">
-          <span>{{ selectedEstablishmentType || 'Type d\'établissement' }}</span>
-          <div class="w-4 h-4 flex items-center justify-center ml-2">
-            <i class="ri-arrow-down-s-line"></i>
-          </div>
-        </button>
-        <div class="absolute mt-1 right-0 md:right-auto bg-white rounded-lg shadow-lg z-10" [class.hidden]="!showEstablishmentFilter">
-          <div class="py-1">
-            <a class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 cursor-pointer" (click)="selectEstablishmentType('')">Tous</a>
-            <a class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 cursor-pointer" (click)="selectEstablishmentType('Hôtel')">Hôtel</a>
-            <a class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 cursor-pointer" (click)="selectEstablishmentType('Restaurant')">Restaurant</a>
-            <a class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 cursor-pointer" (click)="selectEstablishmentType('Café')">Café</a>
-            <a class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 cursor-pointer" (click)="selectEstablishmentType('Sfax')">Sfax</a>
-          </div>
-        </div>
-      </div>
+
+     <div class="relative">
+  <button class="establishment-filter-btn flex items-center justify-between w-full md:w-50 px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-200 rounded-lg hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-primary whitespace-nowrap" (click)="toggleEstablishmentFilter()">
+    <span>{{ selectedEstablishmentType || 'Type d\'établissement' }}</span>
+    <div class="w-4 h-4 flex items-center justify-center ml-2">
+      <i class="ri-arrow-down-s-line"></i>
+    </div>
+  </button>
+  <div class="establishment-filter-menu absolute mt-1 right-0 md:right-auto bg-white rounded-lg shadow-lg z-10" [class.hidden]="!showEstablishmentFilter">
+    <div class="py-1">
+      <a class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 cursor-pointer" (click)="selectEstablishmentType('')">Tous</a>
+      <a class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 cursor-pointer" (click)="selectEstablishmentType('Hôtel')">Hôtel</a>
+      <a class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 cursor-pointer" (click)="selectEstablishmentType('Restaurant')">Restaurant</a>
+      <a class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 cursor-pointer" (click)="selectEstablishmentType('Café')">Café</a>
+      <a class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 cursor-pointer" (click)="selectEstablishmentType('Sfax')">Sfax</a>
+    </div>
+  </div>
+</div>
       <!-- Optional: Add Establishment Dropdown if Needed -->
       <!-- <div class="relative">
         <button class="flex items-center justify-between w-full md:w-40 px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-200 rounded-lg hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-primary whitespace-nowrap" (click)="toggleEstablishmentListFilter()">

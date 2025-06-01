@@ -67,6 +67,8 @@ export class GestionDesUtilisateursComponent implements OnInit {
   totalItems: number = 0;
   totalPages: number = 1;
 
+
+  
   showArchiveConfirmation = false;
   userToArchive: string | null = null;
   isAuthenticated: boolean = false; // Ajout de la propriété isAuthenticated
@@ -394,10 +396,50 @@ export class GestionDesUtilisateursComponent implements OnInit {
   @HostListener('document:click', ['$event'])
   onDocumentClick(event: Event) {
     const target = event.target as HTMLElement;
+  
+    // Gestion du menu profil
     if (!target.closest('#profileButton') && !target.closest('#profileMenu')) {
       this.isProfileMenuOpen = false;
     }
+  
+    // Vérifie si on clique à l'extérieur des modals **mais pas sur les boutons d'action**
+    if (
+      this.isModalOpen &&
+      !target.closest('.max-w-2xl') &&
+      !target.closest('#addUserBtn') &&
+      !target.closest('.ri-edit-line') &&
+      !target.closest('.px-4') // Exclut les boutons OK/Enregistrer/Annuler dans le modal
+    ) {
+      this.closeModal();
+    }
+  
+    if (
+      this.isPasswordModalOpen &&
+      !target.closest('.max-w-md') &&
+      !target.closest('#profileMenu') &&
+      !target.closest('.px-4') // Exclut les boutons OK/Enregistrer/Annuler dans le modal
+    ) {
+      this.closePasswordModal();
+    }
+  
+    if (
+      this.showMessageModal &&
+      !target.closest('.max-w-sm') &&
+      !target.closest('.px-4') // Exclut le bouton OK du modal de message
+    ) {
+      this.closeMessageModal();
+    }
+  
+    if (
+      this.showArchiveConfirmation &&
+      !target.closest('.max-w-md') &&
+      !target.closest('.ri-archive-line') &&
+      !target.closest('.px-4') // Exclut les boutons du modal Archive
+    ) {
+      this.cancelArchive();
+    }
   }
+  
 
   showPasswordModal() {
     this.isPasswordModalOpen = true;

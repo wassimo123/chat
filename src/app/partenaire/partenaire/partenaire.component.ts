@@ -34,16 +34,35 @@ export class PartenaireComponent implements OnInit {
   toggleProfile() {
     this.isProfileMenuOpen = !this.isProfileMenuOpen;
   }
-
+  clickInsideModal = false;
   @HostListener('document:click', ['$event'])
   onDocumentClick(event: MouseEvent) {
     const target = event.target as HTMLElement;
+  
+    // Clic dans le profil
     if (!target.closest('#profileButton') && !target.closest('#profileMenu')) {
       this.isProfileMenuOpen = false;
     }
+  
+    // Clic dans le modal OU sur le bouton qui ouvre le modal
+    const clickedInModal = target.closest('.max-w-lg') || 
+                           target.closest('button[aria-label="Fermer la boîte de dialogue"]') ||
+                           target.closest('button.bg-indigo-600') ||
+                           target.closest('button[openDialog]'); // Bouton "Commencer"
+  
+    if (this.showDialog && !clickedInModal) {
+      this.closeDialog();
+    }
   }
+  
+  
+
+
   openDialog(): void {
-    this.showDialog = true; // Show the dialog
+    this.showDialog = true; 
+      setTimeout(() => {
+    this.clickInsideModal = true;
+  }, 0);
   }
 
   closeDialog(): void {

@@ -137,10 +137,33 @@ export class PartenaireEtablissementsComponent implements OnInit {
   @HostListener('document:click', ['$event'])
   onDocumentClick(event: MouseEvent) {
     const target = event.target as HTMLElement;
+  
+    // Fermer le menu profil si clic en dehors
     if (!target.closest('#profileButton') && !target.closest('#profileMenu')) {
       this.isProfileMenuOpen = false;
     }
+  
+    // Fermer le modal de pricing si clic en dehors
+    if (this.showPricingModal && 
+        !target.closest('.max-w-4xl') &&
+        !target.closest('button[aria-label="Fermer la modal"]') &&
+        !target.closest('button.bg-red-500') &&
+        !target.closest('button.bg-primary')) {
+      this.showPricingModal = false;
+      this.cdr.detectChanges();
+    }
+  
+    // Fermer le modal de validation si clic en dehors
+    if (this.showValidationDialog &&
+        !target.closest('.max-w-sm') &&
+        !target.closest('button.bg-primary')) {
+      this.showValidationDialog = false;
+      this.cdr.detectChanges();
+    }
+  
+    // Fermer la modale d'archivage ou autre si besoin (ajoute tes autres modales ici si nécessaire)
   }
+  
   
   logout() {
     localStorage.removeItem('token');
@@ -301,34 +324,39 @@ export class PartenaireEtablissementsComponent implements OnInit {
 
   confirmSelection(): void {
     if (!this.selectedPlan) {
-      if (!this.pricingPlans || this.pricingPlans.length === 0) {
-        Swal.fire({
-          icon: 'error',
-          title: 'Erreur',
-          text: 'Aucun pack disponible. Veuillez contacter le support.',
-          confirmButtonText: 'OK',
-          confirmButtonColor: '#3085d6'
-        });
-        return;
-      }
-      this.selectedPlan = this.pricingPlans[0];
+      Swal.fire({
+        icon: 'error',
+        title: 'Erreur',
+        text: 'Veuillez sélectionner un pack avant de continuer.',
+        confirmButtonText: 'OK',
+        confirmButtonColor: '#3085d6'
+      });
+      return;
     }
   
+    // SweetAlert2 avec gestion du clic dehors
     Swal.fire({
       title: 'Confirmer la sélection',
       text: `Vous avez sélectionné le pack ${this.selectedPlan.name} pour ${this.selectedPlan.price} TND. Voulez-vous confirmer ?`,
       icon: 'question',
       showCancelButton: true,
+      allowOutsideClick: true, // Permet de fermer SweetAlert en cliquant dehors
       confirmButtonText: 'Oui, confirmer',
       cancelButtonText: 'Non, annuler',
       confirmButtonColor: '#3085d6',
-      cancelButtonColor: '#d33'
+      cancelButtonColor: '#d33',
+      didClose: () => {
+        // Si l'utilisateur ferme SweetAlert en cliquant dehors, on NE ferme PAS la modale du pack
+        if (this.showPricingModal === false) {
+          this.showPricingModal = true; // Rassure qu'elle reste ouverte
+          this.cdr.detectChanges();
+        }
+      }
     }).then((result) => {
       if (result.isConfirmed) {
         this.closePricingModal();
         this.submitFinal().then(() => {
           this.selectedPlan = null;
-          // Delay resetForm to ensure the view is stable
           setTimeout(() => {
             this.resetForm();
           }, 0);
@@ -345,6 +373,7 @@ export class PartenaireEtablissementsComponent implements OnInit {
       }
     });
   }
+  
  
   submitFinal(): Promise<void> {
     return new Promise((resolve, reject) => {

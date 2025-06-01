@@ -159,13 +159,30 @@ export class GestionDesPublicitesComponent implements OnInit {
     this.router.navigate(['/connexion']);
   }
 
+  // @HostListener('document:click', ['$event'])
+  // onDocumentClick(event: Event): void {
+  //   const target = event.target as HTMLElement;
+  //   if (!target.closest('#profileButton') && !target.closest('#profileMenu')) {
+  //     this.isProfileMenuOpen = false;
+  //   }
+  // }
   @HostListener('document:click', ['$event'])
-  onDocumentClick(event: Event): void {
-    const target = event.target as HTMLElement;
-    if (!target.closest('#profileButton') && !target.closest('#profileMenu')) {
-      this.isProfileMenuOpen = false;
+onDocumentClick(event: MouseEvent): void {
+  const target = event.target as HTMLElement;
+  // Vérifiez si le modal est ouvert
+  if (this.showDetailsModal) {
+    // Vérifiez si le clic est en dehors du contenu du modal
+    if (!target.closest('.max-w-5xl') && !target.closest('.bg-blue-500')) {
+      this.showDetailsModal = false; // Ferme le modal
     }
   }
+  // Gestion du menu profil
+  if (!target.closest('#profileButton') && !target.closest('#profileMenu')) {
+    this.isProfileMenuOpen = false;
+  }
+}
+
+
   validerPublicite(id: number): void {
     // Find the publicite by ID
     const found = this.publicites.find(pub => pub._id === id);

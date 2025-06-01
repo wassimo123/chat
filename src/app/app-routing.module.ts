@@ -44,6 +44,9 @@ const routes: Routes = [
   { path: 'cafes', component: CafeComponent },
   { path: 'restaurants', component: RestaurantComponent },
   { path: 'etablissements/:id', component: HotelDetailComponent },
+  { path: 'evenements/:id', component: EventComponent },  // Correction ici
+  { path: 'promotion/:id', component: PromotionsComponent },
+  
   { path: 'evenement', component: EventComponent },
   { path: 'promotion', component: PromotionsComponent },
   { path: 'users', component: GestionDesUtilisateursComponent, canActivate: [AuthGuard] }, 

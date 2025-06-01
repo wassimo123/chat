@@ -1,9 +1,9 @@
 <app-navbar></app-navbar>
 
-<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8" [@fadeAnimation]>
+<div *ngIf="hotel" class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8" [@fadeAnimation]>
   <!-- Back Arrow and Breadcrumb -->
   <div class="mt-20 mb-8 flex items-center">
-    <a routerLink="/{{getNavRoute()}}" class="mr-4 text-gray-700 hover:text-primary">
+    <a [routerLink]="['/', getNavRoute()]" class="mr-4 text-gray-700 hover:text-primary">
       <i class="ri-arrow-left-line text-2xl"></i>
     </a>
     <nav class="flex" aria-label="Breadcrumb">
@@ -14,13 +14,13 @@
         <li>
           <div class="flex items-center">
             <i class="ri-arrow-right-s-line text-gray-400"></i>
-            <a routerLink="/{{getNavRoute()}}" class="ml-1 text-gray-700 hover:text-primary md:ml-2">{{hotel.type}}s</a>
+            <a [routerLink]="['/', getNavRoute()]" class="ml-1 text-gray-700 hover:text-primary md:ml-2">{{ hotel?.type }}s</a>
           </div>
         </li>
         <li aria-current="page">
           <div class="flex items-center">
             <i class="ri-arrow-right-s-line text-gray-400"></i>
-            <span class="ml-1 text-gray-500 md:ml-2">{{ hotel.nom }}</span>
+            <span class="ml-1 text-gray-500 md:ml-2">{{ hotel?.nom }}</span>
           </div>
         </li>
       </ol>
@@ -38,7 +38,7 @@
   />
 </div>
 
-<!-- Modale de visualisation -->
+
 <!-- Modale de visualisation -->
 <div *ngIf="selectedPhotoIndex !== null" class="fixed inset-0 bg-black bg-opacity-90 flex items-center justify-center z-50">
   <!-- Flèche gauche en dehors de l’image -->
@@ -154,9 +154,11 @@
           </div>
           <div *ngIf="hotel.siteWeb">
             <a [href]="hotel.siteWeb" target="_blank" class="flex items-center text-indigo-600 hover:underline">
-              <i class="ri-global-line mr-2"></i> {{ hotel.siteWeb }}
+              <i class="ri-global-line mr-2"></i>
+              Visiter le site web ({{ extractDomain(hotel.siteWeb) }})
             </a>
           </div>
+          
         </div>
       </div>
 
@@ -170,12 +172,14 @@
     </div>
 
     <!-- Google Map -->
-    <div class="mt-12">
-      <h3 class="text-lg font-semibold text-gray-900 mb-3">Localisation</h3>
-      <div class="rounded-xl shadow overflow-hidden h-[400px] border">
-        <iframe [src]="getMapUrl()" width="100%" height="100%" class="border-none"></iframe>
-      </div>
-    </div>
+    <!-- Google Map -->
+<div class="mt-12">
+  <h3 class="text-lg font-semibold text-gray-900 mb-3">Localisation</h3>
+  <div class="rounded-xl shadow overflow-hidden h-[400px] border">
+    <iframe [src]="getMapUrl()" width="100%" height="100%" class="border-none"></iframe>
+  </div>
+</div>
+
   </div>
 </div>
 

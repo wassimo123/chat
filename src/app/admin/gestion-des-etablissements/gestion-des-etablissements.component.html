@@ -439,7 +439,8 @@
   </ng-template>
 
   <!-- Modal for adding/editing/viewing -->
-  <div class="fixed inset-0 bg-gray-900 bg-opacity-50 flex items-center justify-center z-50 overflow-y-auto" [class.hidden]="!isModalOpen">
+  <div class="fixed inset-0 bg-gray-900 bg-opacity-50 flex items-center justify-center z-50 overflow-y-auto" [class.hidden]="!isModalOpen" (click)="closeModalOnBackdrop($event)">
+
     <div class="bg-white rounded-lg shadow-xl w-full max-w-4xl m-4">
       <div class="p-6 modal-content overflow-y-auto max-h-[90vh]">
         <h2 class="text-xl font-semibold text-gray-900 mb-6">{{ modalTitle }}</h2>
@@ -740,8 +741,11 @@
         <!-- Mode Affichage des détails -->
         <div *ngIf="modalTitle === 'Détails de l\'établissement'" class="space-y-6">
           <!-- Informations de base -->
-          <div class="fixed inset-0 z-50 bg-black bg-opacity-60 flex items-center justify-center p-4 transition-all duration-300">
-            <div class="bg-white rounded-2xl shadow-2xl max-w-5xl w-full p-8 relative overflow-y-auto max-h-[90vh] transform transition-all duration-300 scale-100 hover:scale-[1.01]">
+          <div class="fixed inset-0 z-50 bg-black bg-opacity-60 flex items-center justify-center p-4"
+          *ngIf="isModalOpen && modalTitle === 'Détails de l\'établissement'"
+          (click)="closeModalOnBackdrop($event)">
+       <div class="bg-white rounded-2xl shadow-2xl max-w-5xl w-full p-8 relative overflow-y-auto max-h-[90vh]"
+            (click)="$event.stopPropagation()">
               <!-- Close Button -->
               <button class="absolute top-4 right-4 text-gray-500 hover:text-red-600 transition-colors duration-200" (click)="closeModal()">
                 <i class="ri-close-line text-3xl"></i>
@@ -925,7 +929,8 @@
     <app-map-modal *ngIf="showMapPopup" [fullAddress]="selectedAddressForMap || ''" (click)="showMapPopup = false"></app-map-modal>
   </div>
       <!-- Archive modal -->
-      <div class="fixed inset-0 bg-gray-900 bg-opacity-50 flex items-center justify-center z-50" [class.hidden]="!isArchiveModalOpen">
+      <div class="fixed inset-0 bg-gray-900 bg-opacity-50 flex items-center justify-center z-50" [class.hidden]="!isArchiveModalOpen" (click)="closeModalOnBackdrop($event)">
+
         <div class="bg-white rounded-lg shadow-lg max-w-md w-full p-6">
           <div class="text-center mb-6">
             <div class="w-16 h-16 rounded-full bg-red-100 flex items-center justify-center mx-auto mb-4">

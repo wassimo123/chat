@@ -1,4 +1,4 @@
-import { Component, OnInit, AfterViewInit, ElementRef, ViewChild } from '@angular/core';
+import { Component, OnInit, AfterViewInit, ElementRef, ViewChild, HostListener } from '@angular/core';
 import { Chart } from 'chart.js';
 import { registerables } from 'chart.js';
 import { PromotionService, Etablissement } from '../../services/promotion.service';
@@ -219,6 +219,70 @@ export class GestionDesPromotionsComponent implements OnInit, AfterViewInit {
       },
     });
   }
+
+  @HostListener('document:click', ['$event'])
+  onDocumentClick(event: Event) {
+    const target = event.target as HTMLElement;
+  
+    // Gestion du menu profil
+    if (!target.closest('#profileButton') && !target.closest('#profileMenu')) {
+      this.isProfileMenuOpen = false;
+    }
+  
+    // Fermeture du modal d'ajout/modification si clic en dehors
+    if (
+      this.isModalOpen &&
+      !target.closest('.max-w-4xl') && // Conteneur du modal principal
+      !target.closest('.ri-pencil-line') && // Bouton Modifier
+      !target.closest('.add-promotion-btn') && // Bouton Ajouter une promotion
+      !target.closest('.max-w-sm') // ✅ Empêcher la fermeture si on clique sur la modale d'erreur (bouton OK)
+    ) {
+      this.closeModal();
+    }
+  
+    // Fermeture du modal d'archivage si clic en dehors
+    if (
+      this.isArchiveModalOpen &&
+      !target.closest('.max-w-md') &&
+      !target.closest('.ri-archive-line')
+    ) {
+      this.closeArchiveModal();
+    }
+  
+    // Fermeture du modal message uniquement si clic en dehors de sa propre boîte
+    if (
+      this.showMessageModal &&
+      !target.closest('.max-w-sm')
+    ) {
+      this.closeMessageModal();
+    }
+  
+    // Fermeture du modal de détails si clic en dehors
+    if (
+      this.isDetailModalOpen &&
+      !target.closest('.max-w-4xl')
+    ) {
+      this.closeDetailModal();
+    }
+  
+    // Gestion des filtres déroulants
+    if (
+      this.showStatusFilter &&
+      !target.closest('.status-filter-btn') &&
+      !target.closest('.status-filter-menu')
+    ) {
+      this.showStatusFilter = false;
+    }
+  
+    if (
+      this.showEstablishmentFilter &&
+      !target.closest('.establishment-filter-btn') &&
+      !target.closest('.establishment-filter-menu')
+    ) {
+      this.showEstablishmentFilter = false;
+    }
+  }
+  
 
   // Select a type and filter establishments
 selectEstablishmentType(type: string): void {
@@ -607,7 +671,7 @@ getPhotoUrl(photo: string | string[] | null | undefined): string {
       !this.currentPromotion.endDate ||
       !this.currentPromotion.status
     ) {
-      this.showNotification('Veuillez remplir tous les champs obligatoires, y compris le type et le statut.', 'error');
+      this.showNotification('Veuillez remplir tous les champs obligatoires.', 'error');
       return;
     }
 

@@ -81,6 +81,19 @@ export class SearchComponent implements OnInit {
     });
   }
 
+  getDetailsLink(result: any): string {
+    if (result.type === 'Promotion') {
+      return `/promotion/${result.id}`;
+    } else if (result.type === 'Événement') {
+      return `/evenement/${result.id}`;
+    } else if (['Hôtel', 'Café', 'Restaurant'].includes(result.type)) {
+      return `/etablissements/${result.type.toLowerCase()}/${result.id}`;
+    } else {
+      return '/'; // Fallback si le type n'est pas reconnu
+    }
+  }
+  
+
   selectSuggestion(suggestion: string): void {
     this.query = suggestion;
     this.showSuggestions = false;

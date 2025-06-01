@@ -450,260 +450,258 @@
   </ng-template>
 
   <!-- Add/Edit/View Event Modal -->
-  <div class="fixed inset-0 bg-gray-900 bg-opacity-50 flex items-center justify-center z-50 overflow-y-auto" [class.hidden]="!isModalOpen">
-    <div class="bg-white rounded-lg shadow-xl w-full max-w-lg m-4">
-      <div class="p-6 modal-content overflow-y-auto max-h-[90vh]">
-        <h2 class="text-xl font-semibold text-gray-900 mb-6">{{ modalTitle }}</h2>
-        <div *ngIf="isViewMode; else editForm">
-          <!-- Mode Visualisation -->
-          <div class="fixed inset-0 z-50 bg-black bg-opacity-60 flex items-center justify-center p-4 transition-all duration-300">
-            <div class="bg-white rounded-2xl shadow-2xl max-w-5xl w-full p-8 relative overflow-y-auto max-h-[90vh] transform transition-all duration-300 scale-100 hover:scale-[1.01]">
-              <!-- Close Button -->
-              <button class="absolute top-4 right-4 text-gray-500 hover:text-red-600 transition-colors duration-200" (click)="closeModal()">
-                <i class="ri-close-line text-3xl"></i>
-              </button>
-
-              <!-- Modal Header -->
-              <div class="flex items-center space-x-4 border-b border-gray-200 pb-4 mb-6">
-                <div class="w-16 h-16 rounded-full bg-indigo-100 flex items-center justify-center">
-                  <i class="ri-calendar-event-line text-3xl text-indigo-600"></i>
-                </div>
-                <div>
-                  <h2 class="text-2xl font-bold text-gray-800">{{ currentEvent.nom }}</h2>
-                  <p class="text-sm text-gray-500">Catégorie : {{ currentEvent.categorie }}</p>
-                </div>
-              </div>
-
-              <!-- Event Details Sections -->
-              <div class="mb-8">
-                <h3 class="text-lg font-semibold text-gray-700 mb-4">Informations Générales</h3>
-                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 text-gray-600">
-                  <div class="bg-gray-50 p-4 rounded-lg shadow-sm hover:shadow-md transition-shadow duration-200">
-                    <p class="text-sm"><strong>Nom :</strong> {{ currentEvent.nom }}</p>
-                  </div>
-                  <div class="bg-gray-50 p-4 rounded-lg shadow-sm hover:shadow-md transition-shadow duration-200">
-                    <p class="text-sm"><strong>Catégorie :</strong> {{ currentEvent.categorie }}</p>
-                  </div>
-                  <div class="bg-gray-50 p-4 rounded-lg shadow-sm hover:shadow-md transition-shadow duration-200">
-                    <p class="text-sm"><strong>Type d’établissement :</strong> {{ currentEvent.etablissementId.type }}</p>
-                  </div>
-                  <div class="bg-gray-50 p-4 rounded-lg shadow-sm hover:shadow-md transition-shadow duration-200">
-                    <p class="text-sm"><strong>Nom Établissement :</strong> {{ getEstablishmentName() }}</p>
-                  </div>
-                  <div class="bg-gray-50 p-4 rounded-lg shadow-sm hover:shadow-md transition-shadow duration-200">
-                    <p class="text-sm"><strong>Statut :</strong> 
-                      <span class="inline-block px-3 py-1 rounded-full text-xs font-medium" 
-                            [ngClass]="{'bg-green-100 text-green-800': currentEvent.statut === 'À venir', 
-                                        'bg-indigo-100 text-indigo-800': currentEvent.statut === 'En cours',
-                                        'bg-red-100 text-red-800': currentEvent.statut === 'Terminé'}">
-                        {{ currentEvent.statut }}
-                      </span>
-                    </p>
-                  </div>
-                  <div class="bg-gray-50 p-4 rounded-lg shadow-sm hover:shadow-md transition-shadow duration-200">
-                    <p class="text-sm"><strong>Visibilité :</strong> {{ currentEvent.estPublic ? 'Public' : 'Privé' }}</p>
-                  </div>
-                </div>
-              </div>
-
-              <!-- Dates and Times Section -->
-              <div class="mb-8">
-                <h3 class="text-lg font-semibold text-gray-700 mb-4">Dates et Heures</h3>
-                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 text-gray-600">
-                  <div class="bg-gray-50 p-4 rounded-lg shadow-sm hover:shadow-md transition-shadow duration-200">
-                    <p class="text-sm"><strong>Date de début :</strong> {{ currentEvent.dateDebut | date:'mediumDate' }}</p>
-                  </div>
-                  <div class="bg-gray-50 p-4 rounded-lg shadow-sm hover:shadow-md transition-shadow duration-200">
-                    <p class="text-sm"><strong>Date de fin :</strong> {{ currentEvent.dateFin | date:'mediumDate' }}</p>
-                  </div>
-                  <div class="bg-gray-50 p-4 rounded-lg shadow-sm hover:shadow-md transition-shadow duration-200">
-                    <p class="text-sm"><strong>Heure de début :</strong> {{ currentEvent.heureDebut }}</p>
-                  </div>
-                  <div class="bg-gray-50 p-4 rounded-lg shadow-sm hover:shadow-md transition-shadow duration-200">
-                    <p class="text-sm"><strong>Heure de fin :</strong> {{ currentEvent.heureFin || 'Non spécifiée' }}</p>
-                  </div>
-                </div>
-              </div>
-
-              <!-- Location Section -->
-              <div class="mb-8">
-                <h3 class="text-lg font-semibold text-gray-700 mb-4">Localisation</h3>
-                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 text-gray-600">
-                  <div class="bg-gray-50 p-4 rounded-lg shadow-sm hover:shadow-md transition-shadow duration-200">
-                    <p class="text-sm"><strong>Lieu :</strong> {{ currentEvent.lieu }}</p>
-                  </div>
-                  <div class="bg-gray-50 p-4 rounded-lg shadow-sm hover:shadow-md transition-shadow duration-200">
-                    <p class="text-sm"><strong>Ville :</strong> {{ currentEvent.ville }}</p>
-                  </div>
-                </div>
-              </div>
-
-              <!-- Capacity and Pricing Section -->
-              <div class="mb-8">
-                <h3 class="text-lg font-semibold text-gray-700 mb-4">Capacité et Prix</h3>
-                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 text-gray-600">
-                  <div class="bg-gray-50 p-4 rounded-lg shadow-sm hover:shadow-md transition-shadow duration-200">
-                    <p class="text-sm"><strong>Capacité maximale :</strong> {{ currentEvent.capacite }}</p>
-                  </div>
-                  <div class="bg-gray-50 p-4 rounded-lg shadow-sm hover:shadow-md transition-shadow duration-200">
-                    <p class="text-sm"><strong>Prix :</strong> {{ currentEvent.prix.estGratuit ? 'Gratuit' : (currentEvent.prix.montant + ' TND') }}</p>
-                  </div>
-                </div>
-              </div>
-
-              <!-- Organizer and Description Section -->
-              <div class="mb-8">
-                <h3 class="text-lg font-semibold text-gray-700 mb-4">Détails Additionnels</h3>
-                <div class="bg-gray-50 p-4 rounded-lg shadow-sm hover:shadow-md transition-shadow duration-200">
-                  <p class="text-sm text-gray-600"><strong>Organisateur :</strong> {{ currentEvent.organisateur || 'Non spécifié' }}</p>
-                </div>
-                <div class="bg-gray-50 p-4 rounded-lg shadow-sm hover:shadow-md transition-shadow duration-200 mt-4">
-                  <p class="text-sm text-gray-600"><strong>Description :</strong> {{ currentEvent.description || 'Aucune description disponible.' }}</p>
-                </div>
-              </div>
-
-              <!-- Photo Section -->
-              <div *ngIf="photoPreview" class="mb-8">
-                <h3 class="text-lg font-semibold text-gray-700 mb-4">Photo de l'événement</h3>
-                <div class="bg-gray-50 p-4 rounded-lg shadow-sm hover:shadow-md transition-shadow duration-200">
-                  <img [src]="photoPreview" alt="Photo de l'événement" class="w-full h-40 object-cover rounded-lg" (error)="handleImageError()">
-                </div>
+ <!-- Add/Edit Event Modal -->
+<div class="fixed inset-0 bg-gray-900 bg-opacity-50 flex items-center justify-center z-50 overflow-y-auto" [class.hidden]="!isModalOpen || isViewMode">
+  <div class="bg-white rounded-lg shadow-xl w-full max-w-lg m-4">
+    <div class="p-6 modal-content overflow-y-auto max-h-[90vh]">
+      <h2 class="text-xl font-semibold text-gray-900 mb-6">{{ modalTitle }}</h2>
+      <form (ngSubmit)="saveEvent()">
+        <div class="space-y-4">
+          <div>
+            <label for="event-name" class="block text-sm font-medium text-gray-700">Nom de l'événement <span class="text-red-500">*</span></label>
+            <input id="event-name" type="text" [(ngModel)]="currentEvent.nom" name="nom" class="mt-1 block w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-primary" required>
+          </div>
+          <div class="grid grid-cols-2 gap-4">
+            <div>
+              <label for="event-date-debut" class="block text-sm font-medium text-gray-700">Date de début <span class="text-red-500">*</span></label>
+              <input id="event-date-debut" type="date" [(ngModel)]="currentEvent.dateDebut" name="dateDebut" class="mt-1 block w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-primary" required>
+            </div>
+            <div>
+              <label for="event-date-fin" class="block text-sm font-medium text-gray-700">Date de fin <span class="text-red-500">*</span></label>
+              <input id="event-date-fin" type="date" [(ngModel)]="currentEvent.dateFin" name="dateFin" class="mt-1 block w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-primary" required>
+            </div>
+          </div>
+          <div class="grid grid-cols-2 gap-4">
+            <div>
+              <label for="event-time" class="block text-sm font-medium text-gray-700">Heure de début <span class="text-red-500">*</span></label>
+              <input id="event-time" type="time" [(ngModel)]="currentEvent.heureDebut" name="heureDebut" class="mt-1 block w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-primary" required>
+            </div>
+            <div>
+              <label for="event-end-time" class="block text-sm font-medium text-gray-700">Heure de fin</label>
+              <input id="event-end-time" type="time" [(ngModel)]="currentEvent.heureFin" name="heureFin" class="mt-1 block w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-primary">
+            </div>
+          </div>
+          <div>
+            <label for="event-location" class="block text-sm font-medium text-gray-700">Lieu <span class="text-red-500">*</span></label>
+            <input id="event-location" type="text" [(ngModel)]="currentEvent.lieu" name="lieu" class="mt-1 block w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-primary" required>
+          </div>
+          <div>
+            <label for="event-city" class="block text-sm font-medium text-gray-700">Ville <span class="text-red-500">*</span></label>
+            <input id="event-city" type="text" [(ngModel)]="currentEvent.ville" name="ville" class="mt-1 block w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-primary" required>
+          </div>
+          <div>
+            <label for="event-capacity" class="block text-sm font-medium text-gray-700">Capacité maximale <span class="text-red-500">*</span></label>
+            <input id="event-capacity" type="number" [(ngModel)]="currentEvent.capacite" name="capacite" class="mt-1 block w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-primary" required>
+          </div>
+          <div>
+            <label for="event-category" class="block text-sm font-medium text-gray-700">Catégorie <span class="text-red-500">*</span></label>
+            <select id="event-category" [(ngModel)]="currentEvent.categorie" name="categorie" class="mt-1 block w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-primary" required>
+              <option value="" disabled>Sélectionnez une catégorie</option>
+              <option>Gastronomie</option>
+              <option>Musique</option>
+              <option>Littérature</option>
+              <option>Cinéma</option>
+              <option>Art</option>
+              <option>Sport</option>
+              <option>Conférences</option>
+              <option>Festivals</option>
+              <option>Autre</option>
+            </select>
+          </div>
+          <div>
+            <label for="event-typeEtablissement" class="block text-sm font-medium text-gray-700">Type d'établissement <span class="text-red-500">*</span></label>
+            <select id="event-typeEtablissement" [(ngModel)]="currentEvent.etablissementId.type" name="typeEtablissement" (change)="onTypeChange()" class="mt-1 block w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-primary" required>
+              <option value="" disabled>Sélectionnez un type</option>
+              <option value="Restaurant">Restaurant</option>
+              <option value="Hôtel">Hôtel</option>
+              <option value="Café">Café</option>
+              <option value="Sfax">Sfax</option>
+            </select>
+          </div>
+          <div>
+            <label for="event-establishment" class="block text-sm font-medium text-gray-700">Nom Établissement <span class="text-red-500">*</span></label>
+            <select id="event-establishment" [(ngModel)]="currentEvent.etablissementId._id" name="establishmentId" class="mt-1 block w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-primary" required>
+              <option value="" disabled>Sélectionnez un établissement</option>
+              <option *ngFor="let etab of etablissementsType" [value]="etab._id">{{ etab.nom }}</option>
+            </select>
+          </div>
+          <div>
+            <label for="event-status" class="block text-sm font-medium text-gray-700">Statut <span class="text-red-500">*</span></label>
+            <select id="event-status" [(ngModel)]="currentEvent.statut" name="statut" class="mt-1 block w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-primary" required>
+              <option value="" disabled>Sélectionnez un statut</option>
+              <option>À venir</option>
+              <option>En cours</option>
+              <option>Terminé</option>
+            </select>
+          </div>
+          <div>
+            <label for="event-is-public" class="block text-sm font-medium text-gray-700">Visibilité <span class="text-red-500">*</span></label>
+            <div class="mt-1 flex items-center">
+              <input id="event-is-public" type="checkbox" [(ngModel)]="currentEvent.estPublic" name="estPublic" class="mr-2">
+              <label for="event-is-public" class="text-sm text-gray-700">Événement public</label>
+            </div>
+          </div>
+          <div>
+            <label for="event-is-free" class="block text-sm font-medium text-gray-700">Prix <span class="text-red-500">*</span></label>
+            <div class="mt-1 flex items-center">
+              <input id="event-is-free" type="checkbox" [(ngModel)]="currentEvent.prix.estGratuit" name="estGratuit" class="mr-2">
+              <label for="event-is-free" class="text-sm text-gray-700">Événement gratuit</label>
+            </div>
+            <div *ngIf="!currentEvent.prix.estGratuit" class="mt-2">
+              <label for="event-price" class="block text-sm font-medium text-gray-700">Montant (TND) <span class="text-red-500">*</span></label>
+              <input id="event-price" type="number" [(ngModel)]="currentEvent.prix.montant" name="montant" min="0" class="mt-1 block w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-primary" required>
+            </div>
+          </div>
+          <div>
+            <label for="event-photo" class="block text-sm font-medium text-gray-700">Photo de l'événement</label>
+            <input id="event-photo" type="file" accept="image/*" (change)="onPhotoChange($event)" class="mt-1 block w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-primary">
+            <div class="mt-2" *ngIf="photoPreview">
+              <div class="relative">
+                <img [src]="photoPreview" alt="Aperçu de la photo" class="w-full h-24 object-cover rounded-lg" (error)="handleImageError()">
+                <button type="button" class="absolute top-1 right-1 bg-red-500 text-white rounded-full w-6 h-6 flex items-center justify-center" (click)="removePhoto()">
+                  <i class="ri-close-line"></i>
+                </button>
               </div>
             </div>
           </div>
-          <div class="mt-6 flex justify-end">
-            <button type="button" class="px-4 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50" (click)="closeModal()">Fermer</button>
+          <div>
+            <label for="event-organizer" class="block text-sm font-medium text-gray-700">Organisateur</label>
+            <input id="event-organizer" type="text" [(ngModel)]="currentEvent.organisateur" name="organisateur" class="mt-1 block w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-primary">
+          </div>
+          <div>
+            <label for="event-description" class="block text-sm font-medium text-gray-700">Description</label>
+            <textarea id="event-description" [(ngModel)]="currentEvent.description" name="description" rows="3" class="mt-1 block w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-primary"></textarea>
           </div>
         </div>
-        <ng-template #editForm>
-          <!-- Mode Édition/Ajout -->
-          <form (ngSubmit)="saveEvent()">
-            <div class="space-y-4">
-              <div>
-                <label for="event-name" class="block text-sm font-medium text-gray-700">Nom de l'événement <span class="text-red-500">*</span></label>
-                <input id="event-name" type="text" [(ngModel)]="currentEvent.nom" name="nom" class="mt-1 block w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-primary" required>
-              </div>
-              <div class="grid grid-cols-2 gap-4">
-                <div>
-                  <label for="event-date-debut" class="block text-sm font-medium text-gray-700">Date de début <span class="text-red-500">*</span></label>
-                  <input id="event-date-debut" type="date" [(ngModel)]="currentEvent.dateDebut" name="dateDebut" class="mt-1 block w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-primary" required>
-                </div>
-                <div>
-                  <label for="event-date-fin" class="block text-sm font-medium text-gray-700">Date de fin <span class="text-red-500">*</span></label>
-                  <input id="event-date-fin" type="date" [(ngModel)]="currentEvent.dateFin" name="dateFin" class="mt-1 block w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-primary" required>
-                </div>
-              </div>
-              <div class="grid grid-cols-2 gap-4">
-                <div>
-                  <label for="event-time" class="block text-sm font-medium text-gray-700">Heure de début <span class="text-red-500">*</span></label>
-                  <input id="event-time" type="time" [(ngModel)]="currentEvent.heureDebut" name="heureDebut" class="mt-1 block w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-primary" required>
-                </div>
-                <div>
-                  <label for="event-end-time" class="block text-sm font-medium text-gray-700">Heure de fin</label>
-                  <input id="event-end-time" type="time" [(ngModel)]="currentEvent.heureFin" name="heureFin" class="mt-1 block w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-primary">
-                </div>
-              </div>
-              <div>
-                <label for="event-location" class="block text-sm font-medium text-gray-700">Lieu <span class="text-red-500">*</span></label>
-                <input id="event-location" type="text" [(ngModel)]="currentEvent.lieu" name="lieu" class="mt-1 block w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-primary" required>
-              </div>
-              <div>
-                <label for="event-city" class="block text-sm font-medium text-gray-700">Ville <span class="text-red-500">*</span></label>
-                <input id="event-city" type="text" [(ngModel)]="currentEvent.ville" name="ville" class="mt-1 block w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-primary" required>
-              </div>
-              <div>
-                <label for="event-capacity" class="block text-sm font-medium text-gray-700">Capacité maximale <span class="text-red-500">*</span></label>
-                <input id="event-capacity" type="number" [(ngModel)]="currentEvent.capacite" name="capacite" class="mt-1 block w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-primary" required>
-              </div>
-              <div>
-                <label for="event-category" class="block text-sm font-medium text-gray-700">Catégorie <span class="text-red-500">*</span></label>
-                <select id="event-category" [(ngModel)]="currentEvent.categorie" name="categorie" class="mt-1 block w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-primary" required>
-                  <option value="" disabled>Sélectionnez une catégorie</option>
-                  <option>Gastronomie</option>
-                  <option>Musique</option>
-                  <option>Littérature</option>
-                  <option>Cinéma</option>
-                  <option>Art</option>
-                  <option>Sport</option>
-                  <option>Conférences</option>
-                  <option>Festivals</option>
-                  <option>Autre</option>
-                </select>
-              </div>
-              <div>
-                <label  for="event-typeEtablissement" class="block text-sm font-medium text-gray-700">Type d'établissement <span class="text-red-500">*</span></label>
-                <select id="event-typeEtablissement" [(ngModel)]="currentEvent.etablissementId.type" name="typeEtablissement" (change)="onTypeChange()" class="mt-1 block w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-primary" required>
-                  <option value="" disabled>Sélectionnez un type</option>
-                  <option value="Restaurant">Restaurant</option>
-                  <option value="Hôtel">Hôtel</option>
-                  <option value="Café">Café</option>
-                  <option value="Sfax">Sfax</option>
-                </select>
-              </div>
-              <div>
-                <label for="event-establishment" class="block text-sm font-medium text-gray-700">Nom Établissement <span class="text-red-500">*</span></label>
-                <select id="event-establishment" [(ngModel)]="currentEvent.etablissementId._id" name="establishmentId"  class="mt-1 block w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-primary" required>
-                  <option value="" disabled>Sélectionnez un établissement</option>
-                  <option *ngFor="let etab of etablissementsType" [value]="etab._id">{{ etab.nom }}</option>
-                </select>
-              </div>
-              <div>
-                <label for="event-status" class="block text-sm font-medium text-gray-700">Statut <span class="text-red-500">*</span></label>
-                <select id="event-status" [(ngModel)]="currentEvent.statut" name="statut" class="mt-1 block w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-primary" required>
-                  <option value="" disabled>Sélectionnez un statut</option>
-                  <option>À venir</option>
-                  <option>En cours</option>
-                  <option>Terminé</option>
-                </select>
-              </div>
-              <div>
-                <label for="event-is-public" class="block text-sm font-medium text-gray-700">Visibilité <span class="text-red-500">*</span></label>
-                <div class="mt-1 flex items-center">
-                  <input id="event-is-public" type="checkbox" [(ngModel)]="currentEvent.estPublic" name="estPublic" class="mr-2">
-                  <label for="event-is-public" class="text-sm text-gray-700">Événement public</label>
-                </div>
-              </div>
-              <div>
-                <label for="event-is-free" class="block text-sm font-medium text-gray-700">Prix <span class="text-red-500">*</span></label>
-                <div class="mt-1 flex items-center">
-                  <input id="event-is-free" type="checkbox" [(ngModel)]="currentEvent.prix.estGratuit" name="estGratuit" class="mr-2">
-                  <label for="event-is-free" class="text-sm text-gray-700">Événement gratuit</label>
-                </div>
-                <div *ngIf="!currentEvent.prix.estGratuit" class="mt-2">
-                  <label for="event-price" class="block text-sm font-medium text-gray-700">Montant (TND) <span class="text-red-500">*</span></label>
-                  <input id="event-price" type="number" [(ngModel)]="currentEvent.prix.montant" name="montant" min="0" class="mt-1 block w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-primary" required>
-                </div>
-              </div>
-              <div>
-                <label for="event-photo" class="block text-sm font-medium text-gray-700">Photo de l'événement</label>
-                <input id="event-photo" type="file" accept="image/*" (change)="onPhotoChange($event)" class="mt-1 block w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-primary">
-                <div class="mt-2" *ngIf="photoPreview">
-                  <div class="relative">
-                    <img [src]="photoPreview" alt="Aperçu de la photo" class="w-full h-24 object-cover rounded-lg" (error)="handleImageError()">
-                    <button type="button" class="absolute top-1 right-1 bg-red-500 text-white rounded-full w-6 h-6 flex items-center justify-center" (click)="removePhoto()">
-                      <i class="ri-close-line"></i>
-                    </button>
-                  </div>
-                </div>
-              </div>
-              <div>
-                <label for="event-organizer" class="block text-sm font-medium text-gray-700">Organisateur</label>
-                <input id="event-organizer" type="text" [(ngModel)]="currentEvent.organisateur" name="organisateur" class="mt-1 block w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-primary">
-              </div>
-              <div>
-                <label for="event-description" class="block text-sm font-medium text-gray-700">Description</label>
-                <textarea id="event-description" [(ngModel)]="currentEvent.description" name="description" rows="3" class="mt-1 block w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-primary"></textarea>
-              </div>
-            </div>
-            <div class="mt-6 flex justify-end space-x-3">
-              <button type="button" class="px-4 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50" (click)="closeModal()">Annuler</button>
-              <button type="submit" class="px-4 py-2 bg-primary text-white rounded-lg hover:bg-primary-dark">Enregistrer</button>
-            </div>
-          </form>
-        </ng-template>
-      </div>
+        <div class="mt-6 flex justify-end space-x-3">
+          <button type="button" class="px-4 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50" (click)="closeModal()">Annuler</button>
+          <button type="submit" class="px-4 py-2 bg-primary text-white rounded-lg hover:bg-primary-dark">Enregistrer</button>
+        </div>
+      </form>
     </div>
   </div>
+</div>
+
+<!-- View Event Modal -->
+<div class="fixed inset-0 bg-black bg-opacity-60 flex items-center justify-center z-50 overflow-y-auto" [class.hidden]="!isModalOpen || !isViewMode">
+  <div class="bg-white rounded-2xl shadow-2xl w-full max-w-5xl p-8 m-4 relative overflow-y-auto max-h-[90vh]">
+    <!-- Close Button -->
+    <button class="absolute top-4 right-4 text-gray-500 hover:text-red-600 transition-colors duration-200" (click)="closeModal()">
+      <i class="ri-close-line text-3xl"></i>
+    </button>
+
+    <!-- Modal Header -->
+    <div class="flex items-center space-x-4 border-b border-gray-200 pb-4 mb-6">
+      <div class="w-16 h-16 rounded-full bg-indigo-100 flex items-center justify-center">
+        <i class="ri-calendar-event-line text-3xl text-indigo-600"></i>
+      </div>
+      <div>
+        <h2 class="text-2xl font-bold text-gray-800">{{ currentEvent.nom }}</h2>
+        <p class="text-sm text-gray-500">Catégorie : {{ currentEvent.categorie }}</p>
+      </div>
+    </div>
+
+    <!-- Event Details Sections -->
+    <div class="mb-8">
+      <h3 class="text-lg font-semibold text-gray-700 mb-4">Informations Générales</h3>
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 text-gray-600">
+        <div class="bg-gray-50 p-4 rounded-lg shadow-sm hover:shadow-md transition-shadow duration-200">
+          <p class="text-sm"><strong>Nom :</strong> {{ currentEvent.nom }}</p>
+        </div>
+        <div class="bg-gray-50 p-4 rounded-lg shadow-sm hover:shadow-md transition-shadow duration-200">
+          <p class="text-sm"><strong>Catégorie :</strong> {{ currentEvent.categorie }}</p>
+        </div>
+        <div class="bg-gray-50 p-4 rounded-lg shadow-sm hover:shadow-md transition-shadow duration-200">
+          <p class="text-sm"><strong>Type d’établissement :</strong> {{ currentEvent.etablissementId.type }}</p>
+        </div>
+        <div class="bg-gray-50 p-4 rounded-lg shadow-sm hover:shadow-md transition-shadow duration-200">
+          <p class="text-sm"><strong>Nom Établissement :</strong> {{ getEstablishmentName() }}</p>
+        </div>
+        <div class="bg-gray-50 p-4 rounded-lg shadow-sm hover:shadow-md transition-shadow duration-200">
+          <p class="text-sm"><strong>Statut :</strong> 
+            <span class="inline-block px-3 py-1 rounded-full text-xs font-medium" 
+                  [ngClass]="{'bg-green-100 text-green-800': currentEvent.statut === 'À venir', 
+                              'bg-indigo-100 text-indigo-800': currentEvent.statut === 'En cours',
+                              'bg-red-100 text-red-800': currentEvent.statut === 'Terminé'}">
+              {{ currentEvent.statut }}
+            </span>
+          </p>
+        </div>
+        <div class="bg-gray-50 p-4 rounded-lg shadow-sm hover:shadow-md transition-shadow duration-200">
+          <p class="text-sm"><strong>Visibilité :</strong> {{ currentEvent.estPublic ? 'Public' : 'Privé' }}</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Dates and Times Section -->
+    <div class="mb-8">
+      <h3 class="text-lg font-semibold text-gray-700 mb-4">Dates et Heures</h3>
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 text-gray-600">
+        <div class="bg-gray-50 p-4 rounded-lg shadow-sm hover:shadow-md transition-shadow duration-200">
+          <p class="text-sm"><strong>Date de début :</strong> {{ currentEvent.dateDebut | date:'mediumDate' }}</p>
+        </div>
+        <div class="bg-gray-50 p-4 rounded-lg shadow-sm hover:shadow-md transition-shadow duration-200">
+          <p class="text-sm"><strong>Date de fin :</strong> {{ currentEvent.dateFin | date:'mediumDate' }}</p>
+        </div>
+        <div class="bg-gray-50 p-4 rounded-lg shadow-sm hover:shadow-md transition-shadow duration-200">
+          <p class="text-sm"><strong>Heure de début :</strong> {{ currentEvent.heureDebut }}</p>
+        </div>
+        <div class="bg-gray-50 p-4 rounded-lg shadow-sm hover:shadow-md transition-shadow duration-200">
+          <p class="text-sm"><strong>Heure de fin :</strong> {{ currentEvent.heureFin || 'Non spécifiée' }}</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Location Section -->
+    <div class="mb-8">
+      <h3 class="text-lg font-semibold text-gray-700 mb-4">Localisation</h3>
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 text-gray-600">
+        <div class="bg-gray-50 p-4 rounded-lg shadow-sm hover:shadow-md transition-shadow duration-200">
+          <p class="text-sm"><strong>Lieu :</strong> {{ currentEvent.lieu }}</p>
+        </div>
+        <div class="bg-gray-50 p-4 rounded-lg shadow-sm hover:shadow-md transition-shadow duration-200">
+          <p class="text-sm"><strong>Ville :</strong> {{ currentEvent.ville }}</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Capacity and Pricing Section -->
+    <div class="mb-8">
+      <h3 class="text-lg font-semibold text-gray-700 mb-4">Capacité et Prix</h3>
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 text-gray-600">
+        <div class="bg-gray-50 p-4 rounded-lg shadow-sm hover:shadow-md transition-shadow duration-200">
+          <p class="text-sm"><strong>Capacité maximale :</strong> {{ currentEvent.capacite }}</p>
+        </div>
+        <div class="bg-gray-50 p-4 rounded-lg shadow-sm hover:shadow-md transition-shadow duration-200">
+          <p class="text-sm"><strong>Prix :</strong> {{ currentEvent.prix.estGratuit ? 'Gratuit' : (currentEvent.prix.montant + ' TND') }}</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Organizer and Description Section -->
+    <div class="mb-8">
+      <h3 class="text-lg font-semibold text-gray-700 mb-4">Détails Additionnels</h3>
+      <div class="bg-gray-50 p-4 rounded-lg shadow-sm hover:shadow-md transition-shadow duration-200">
+        <p class="text-sm text-gray-600"><strong>Organisateur :</strong> {{ currentEvent.organisateur || 'Non spécifié' }}</p>
+      </div>
+      <div class="bg-gray-50 p-4 rounded-lg shadow-sm hover:shadow-md transition-shadow duration-200 mt-4">
+        <p class="text-sm text-gray-600"><strong>Description :</strong> {{ currentEvent.description || 'Aucune description disponible.' }}</p>
+      </div>
+    </div>
+
+    <!-- Photo Section -->
+    <div *ngIf="photoPreview" class="mb-8">
+      <h3 class="text-lg font-semibold text-gray-700 mb-4">Photo de l'événement</h3>
+      <div class="bg-gray-50 p-4 rounded-lg shadow-sm hover:shadow-md transition-shadow duration-200">
+        <img [src]="photoPreview" alt="Photo de l'événement" class="w-full h-40 object-cover rounded-lg" (error)="handleImageError()">
+      </div>
+    </div>
+
+    <div class="mt-6 flex justify-end">
+      <button type="button" class="px-4 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50" (click)="closeModal()">Fermer</button>
+    </div>
+  </div>
+</div>
 
   <!-- Archive Confirmation Modal -->
   <div class="fixed inset-0 bg-gray-900 bg-opacity-50 flex items-center justify-center z-50" [class.hidden]="!isArchiveModalOpen">
@@ -723,4 +721,5 @@
       </div>
     </div>
   </div>
+  
 </div>

@@ -35,7 +35,8 @@ export interface ReseauxSociaux {
     pays?: string;
     showMap: boolean;
     telephone: string;
-    coordinates:string;
+    // coordinates:string;
+    coordinates: number[] | string;
     email: string;
     siteWeb: string;
     reseauxSociaux: ReseauxSociaux;
@@ -43,6 +44,7 @@ export interface ReseauxSociaux {
     services: string[];
     horaires: Horaires;
     photos: (string | File)[];
+    googleMapsUrl?: string;
     selected?: boolean;
     createdAt?: string | Date; // Ajouté pour refléter les données MongoDB
   updatedAt?: string | Date; // Champ principal pour le tri

@@ -131,7 +131,9 @@ export class EtablissementService {
     formData.append('visibility', etablissement.visibility || 'public');
     formData.append('codePostal', etablissement.codePostal || '');
     formData.append('ville', etablissement.ville || '');
-    formData.append('coordinates',etablissement.coordinates);
+    // formData.append('coordinates',etablissement.coordinates);
+    formData.append('coordinates', Array.isArray(etablissement.coordinates) ? etablissement.coordinates.join(',') : etablissement.coordinates);
+
     formData.append('pays', etablissement.pays || '');
     formData.append('showMap', (etablissement.showMap ?? true).toString());
     formData.append('telephone', etablissement.telephone);
@@ -217,7 +219,9 @@ export class EtablissementService {
     formData.append('codePostal', etablissement.codePostal || '');
     formData.append('ville', etablissement.ville || '');
     formData.append('pays', etablissement.pays || '');
-    formData.append('coordinates', etablissement.coordinates);
+    // formData.append('coordinates', etablissement.coordinates);
+    formData.append('coordinates', Array.isArray(etablissement.coordinates) ? etablissement.coordinates.join(',') : etablissement.coordinates);
+
     formData.append('showMap', (etablissement.showMap ?? true).toString());
     formData.append('telephone', etablissement.telephone);
     formData.append('email', etablissement.email);
