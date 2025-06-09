@@ -226,7 +226,7 @@ export class TableauDeBordComponent implements OnInit, AfterViewInit {
   }
 
   initCharts() {
-    // 🎯 Pour le graphique d'activité
+    //  Pour le graphique d'activité
     const chartDomActivity = this.userActivityChartElement.nativeElement;
     const existingActivityChart = echarts.getInstanceByDom(chartDomActivity);
     if (existingActivityChart) {
@@ -282,7 +282,7 @@ export class TableauDeBordComponent implements OnInit, AfterViewInit {
     };
     userActivityChart.setOption(userActivityOption);
   
-    // 🎯 Pour le graphique des rôles
+    // Pour le graphique des rôles
     const chartDomRoles = this.userRolesChartElement.nativeElement;
     const existingRolesChart = echarts.getInstanceByDom(chartDomRoles);
     if (existingRolesChart) {

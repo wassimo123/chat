@@ -508,7 +508,7 @@
                     <span class="ml-2 text-sm text-gray-700">Montant minimum d'achat requis</span>
                   </label>
                   <div class="ml-7 mt-1" *ngIf="currentPromotion.conditions.minPurchase">
-                    <input type="number" id="min-purchase-amount" name="min-purchase-amount" [(ngModel)]="currentPromotion.conditions.minPurchaseAmount" class="mt-1 block w-48 border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-primary" placeholder="Montant en €" min="0" step="0.01">
+                    <input type="number" id="min-purchase-amount" name="min-purchase-amount" [(ngModel)]="currentPromotion.conditions.minPurchaseAmount" class="mt-1 block w-48 border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-primary" placeholder="Montant en DT" min="0" step="0.01">
                   </div>
                   <label class="flex items-center">
                     <input type="checkbox" class="form-checkbox" name="new_customers" [(ngModel)]="currentPromotion.conditions.newCustomers">

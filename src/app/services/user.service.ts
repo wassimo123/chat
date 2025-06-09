@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { HttpClient, HttpHeaders, HttpErrorResponse } from '@angular/common/http';
 import { Observable, throwError } from 'rxjs';
 import { catchError, map, tap } from 'rxjs/operators';
-import { NotificationService } from './notification.service'; // ✅ Correct
+import { NotificationService } from './notification.service'; //  
 
 @Injectable({
   providedIn: 'root',
@@ -18,6 +18,7 @@ export class UserService {
     console.log('Token envoyé dans la requête :', token);
     return new HttpHeaders({
       Authorization: `Bearer ${token}`,
+      'Content-Type': 'application/json'
     });
   }
 
@@ -37,9 +38,42 @@ export class UserService {
     return this.http.get<any[]>(`${this.apiUrl}/users`);
   }
 
-  createUsers(body: any): Observable<any> {
-    return this.http.post<any>(`${this.apiUrl}/users`, body);
+  // createUsers(body: any): Observable<any> {
+  //   return this.http.post<any>(`${this.apiUrl}/users`, body);
+  // }
+//   createUsers(body: any): Observable<any> {
+//   const headers = this.getHeaders();
+//   console.log('Payload envoyé (FULL PAYLOAD):', JSON.stringify(body, null, 2));
+//   return this.http.post<any>(`${this.apiUrl}/users`, body, { headers }).pipe(
+//     catchError((error: HttpErrorResponse) => {
+//       console.error('Erreur HTTP:', JSON.stringify(error, null, 2));
+//       let errorMessage = error.error?.message || 'Erreur lors de la création de l\'utilisateur.';
+//       return throwError(() => new Error(errorMessage));
+//     })
+//   );
+// }
+createUsers(body: any): Observable<any> {
+    const headers = this.getHeaders();
+    console.log('Payload envoyé (FULL PAYLOAD):', JSON.stringify(body, null, 2));
+    return this.http.post<any>(`${this.apiUrl}/users`, body, { headers }).pipe(
+      catchError((error: HttpErrorResponse) => {
+        console.error('Erreur HTTP:', JSON.stringify(error, null, 2));
+        return throwError(() => error); // Rethrow the original HttpErrorResponse
+      })
+    );
   }
+  checkMatriculeExists(matricule: string): Observable<{ exists: boolean; status?: string } | null> {
+  const headers = this.getHeaders();
+  return this.http.get<{ exists: boolean; status?: string } | null>(
+    `${this.apiUrl}/check-matricule?matricule=${encodeURIComponent(matricule.trim())}`,
+    { headers }
+  ).pipe(
+    catchError((error: HttpErrorResponse) => {
+      console.error('Erreur lors de la vérification du matricule:', JSON.stringify(error, null, 2));
+      return throwError(() => error);
+    })
+  );
+}
 
   updateUser(matricule: string, body: any): Observable<any> {
     const { confirmPassword, ...userData } = body;
@@ -82,6 +116,7 @@ export class UserService {
         })
       );
   }
+  
   updateUserStatus(email: string, status: string): Observable<any> {
     return this.http.patch(`${this.apiUrl}/users/status/${email}`, { status }, { headers: this.getHeaders() });
   }
